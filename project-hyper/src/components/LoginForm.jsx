@@ -29,7 +29,6 @@ const LoginForm = ({ onLoginSuccess }) => {
         throw error;
       }
       onLoginSuccess(data);
-      console.log(data, error);
     } catch (error) {
       console.log("Error logging in:", error.message);
     }
