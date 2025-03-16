@@ -15,9 +15,9 @@ const LoginForm = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // TODO: remove console.log statements
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Clicked login");
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({

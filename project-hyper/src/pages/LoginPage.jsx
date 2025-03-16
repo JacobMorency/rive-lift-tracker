@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const handleSuccessfulLogin = (userData) => {
-    console.log("User logged in", userData);
+  const handleSuccessfulLogin = () => {
     navigate("/dashboard"); //TODO: Redirect to dashboard eventually
   };
 
