@@ -5,20 +5,20 @@ const BottomNav = () => {
   return (
     <div className="bg-black flex justify-around items-center py-2 fixed bottom-0 right-0 left-0">
       <div className="">
-        <Link to="/" className="text-white flex flex-col items-center">
-          <House color="white" size={32} />
+        <Link to="/dashboard" className="text-white flex flex-col items-center">
+          <House color="white" size={24} />
           <p>Home</p>
         </Link>
       </div>
       <div className="">
-        <Link to="/" className="text-white flex flex-col items-center">
-          <Dumbbell color="white" size={32} />
+        <Link to="/dashboard" className="text-white flex flex-col items-center">
+          <Dumbbell color="white" size={24} />
           <p>Workouts</p>
         </Link>
       </div>
       <div className="">
         <Link to="/profile" className="text-white flex flex-col items-center">
-          <User color="white" size={32} />
+          <User color="white" size={24} />
           <p>Profile</p>
         </Link>
       </div>

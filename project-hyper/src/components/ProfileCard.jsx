@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const ProfileCard = () => {
-  const { user } = useAuth();
+  const { user, userData } = useAuth();
   const navigate = useNavigate();
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -25,8 +25,10 @@ const ProfileCard = () => {
     <div className="p-4">
       <Card>
         <CardHeader>
-          <CardTitle>{user.first}</CardTitle>
-          <CardDescription>{user.email}</CardDescription>
+          <CardTitle>
+            {userData.first_name} {userData.last_name}
+          </CardTitle>
+          <CardDescription>{userData.email}</CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={handleLogout} className="bg-red-500">

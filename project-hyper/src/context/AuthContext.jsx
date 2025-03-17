@@ -5,35 +5,61 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [userData, setUserData] = useState(null);
 
-  // Fetches the user from the auth state
+  // Fetches the user from Supabase auth state
   const fetchUser = async () => {
     const {
       data: { user },
     } = await supabase.auth.getUser();
     setUser(user);
+
+    // Fetch user data only if user exists
+    if (user) {
+      fetchUserData(user.id);
+    }
   };
 
-  // Checks if the user is logged into the session
-  const checkUserLoggedIn = async () => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user || null);
-      }
-    );
+  // Fetches the user data from the "users" table
+  const fetchUserData = async (userId) => {
+    const { data, error } = await supabase
+      .from("users")
+      .select("first_name, last_name, email")
+      .eq("id", userId)
+      .single();
 
-    return () => {
-      authListener?.subscription?.unsubscribe();
-    };
+    if (error) {
+      console.error("Error fetching user data:", error.message);
+    } else {
+      setUserData(data);
+    }
   };
 
   useEffect(() => {
-    fetchUser();
-    checkUserLoggedIn();
+    fetchUser(); // Fetch user on initial mount
+
+    // Listen for auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user || null);
+        if (session?.user) {
+          fetchUserData(session.user.id);
+        } else {
+          setUserData(null); // Clear user data on logout
+        }
+      }
+    );
+
+    // Cleanup listener on unmount
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, userData }}>
+      {children}
+    </AuthContext.Provider>
   );
 };
 
