@@ -11,7 +11,6 @@ const Layout = ({ children }) => {
       data: { user },
     } = await supabase.auth.getUser();
     setUser(user);
-    console.log("user", user);
   };
 
   // Checks if the user is logged into the session
@@ -19,7 +18,6 @@ const Layout = ({ children }) => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setUser(session?.user || null);
-        console.log("Auth state changed:", session);
       }
     );
 
