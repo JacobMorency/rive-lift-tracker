@@ -17,7 +17,7 @@ const BottomNav = () => {
         </Link>
       </div>
       <div className="">
-        <Link to="/" className="text-white flex flex-col items-center">
+        <Link to="/profile" className="text-white flex flex-col items-center">
           <User color="white" size={32} />
           <p>Profile</p>
         </Link>
