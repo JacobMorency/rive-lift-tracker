@@ -8,8 +8,10 @@ import {
 } from "@/components/ui/card";
 import { supabase } from "../supabaseClient";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const ProfileCard = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -23,8 +25,8 @@ const ProfileCard = () => {
     <div className="p-4">
       <Card>
         <CardHeader>
-          <CardTitle>John Doe</CardTitle>
-          <CardDescription>johndoe@email.com</CardDescription>
+          <CardTitle>{user.first}</CardTitle>
+          <CardDescription>{user.email}</CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={handleLogout} className="bg-red-500">
