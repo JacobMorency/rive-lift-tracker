@@ -20,6 +20,10 @@ const ProfileCard = () => {
       return;
     }
     navigate("/");
+
+    if (!userData) {
+      return <p>Loading...</p>; // TODO: Add loading spinner or skeleton
+    }
   };
   return (
     <div className="p-4">
