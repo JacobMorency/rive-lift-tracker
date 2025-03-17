@@ -4,6 +4,7 @@ import Layout from "./components/Layout";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import { AuthenticatedOnlyRoute } from "./components/AuthenticatedOnlyRoute";
 
 function App() {
   return (
@@ -11,8 +12,22 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<LoginPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/dashboard"
+            element={
+              <AuthenticatedOnlyRoute>
+                <Dashboard />
+              </AuthenticatedOnlyRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <AuthenticatedOnlyRoute>
+                <Profile />
+              </AuthenticatedOnlyRoute>
+            }
+          />
         </Routes>
       </Layout>
     </Router>
