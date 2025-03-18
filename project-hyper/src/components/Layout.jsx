@@ -5,8 +5,8 @@ const Layout = ({ children }) => {
   const { user } = useAuth();
 
   return (
-    <div className="h-screen flex items-center justify-center">
-      <div className="w-full max-w-md">{children}</div>
+    <div className="h-screen flex flex-col">
+      <div className="w-full max-w-md mx-auto">{children}</div>
       {user && <BottomNav />}
     </div>
   );
