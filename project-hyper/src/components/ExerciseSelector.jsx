@@ -12,6 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Input } from "@/components/ui/input";
 import { ChevronsUpDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
@@ -31,12 +32,16 @@ const ExerciseSelector = ({
       console.error("Error fetching exercises:", error.message);
       return;
     }
-    setExerciseOptions(data);
+    setExerciseOptionsState(data);
   };
 
   // TODO: Implement search functionality
 
   // TODO: Handle the select
+  const handleSelect = (exercise) => {
+    setExerciseName(exercise.name);
+    setOpenDropdown(false);
+  };
 
   useEffect(() => {
     fetchExercises();
@@ -46,7 +51,11 @@ const ExerciseSelector = ({
     <div className="my-3">
       <Popover open={openDropdown} onOpenChange={setOpenDropdown}>
         <PopoverTrigger asChild>
-          <Button role="combobox" className="w-full relative">
+          <Button
+            role="combobox"
+            className="w-full relative"
+            onClick={fetchExercises}
+          >
             {exerciseName || "Select an Exercise"}
             <ChevronsUpDown size={16} className="absolute right-3" />
           </Button>
@@ -55,21 +64,17 @@ const ExerciseSelector = ({
           <Command>
             <CommandInput placeholder="Search for an exercise" />
             <CommandList>
+              <CommandEmpty>No exercise found.</CommandEmpty>
               <CommandGroup>
                 {exerciseOptions.map((exercise) => (
                   <CommandItem
                     key={exercise.id}
-                    onClick={() => {
-                      setExerciseName(exercise.name);
-                      setOpenDropdown(false);
-                    }}
+                    value={exercise.name}
+                    onSelect={() => handleSelect(exercise)}
                   >
                     {exercise.name}
                   </CommandItem>
                 ))}
-                {exerciseOptions.length === 0 && (
-                  <CommandEmpty>No exercises found</CommandEmpty>
-                )}
               </CommandGroup>
             </CommandList>
           </Command>
