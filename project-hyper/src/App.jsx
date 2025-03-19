@@ -5,6 +5,7 @@ import PageHeader from "./components/PageHeader";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
+import AddWorkoutPage from "./pages/AddWorkoutPage";
 import { AuthenticatedOnlyRoute } from "./components/AuthenticatedOnlyRoute";
 
 function App() {
@@ -18,6 +19,16 @@ function App() {
             <AuthenticatedOnlyRoute>
               <Layout header={<PageHeader heading="Dashboard" />}>
                 <Dashboard />
+              </Layout>
+            </AuthenticatedOnlyRoute>
+          }
+        />
+        <Route
+          path="/add-workout"
+          element={
+            <AuthenticatedOnlyRoute>
+              <Layout header={<PageHeader heading="Add Workout" />}>
+                <AddWorkoutPage />
               </Layout>
             </AuthenticatedOnlyRoute>
           }
