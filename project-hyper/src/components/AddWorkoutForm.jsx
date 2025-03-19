@@ -1,7 +1,9 @@
+import ExerciseSelector from "../components/ExerciseSelector";
+
 const AddWorkoutForm = () => {
   return (
     <div>
-      <p>Workout Form goes here</p>
+      <ExerciseSelector />
     </div>
   );
 };
