@@ -9,7 +9,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col h-screen justify-center">
       <h1 className="text-center text-xl font-bold">Project Hyper</h1>
       <LoginForm onLoginSuccess={handleSuccessfulLogin} />
     </div>
