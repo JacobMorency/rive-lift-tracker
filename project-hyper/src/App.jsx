@@ -4,8 +4,9 @@ import Layout from "./components/Layout";
 import PageHeader from "./components/PageHeader";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile";
+import ProfilePage from "./pages/ProfilePage";
 import AddWorkoutPage from "./pages/AddWorkoutPage";
+import WorkoutsPage from "./pages/WorkoutsPage";
 import { AuthenticatedOnlyRoute } from "./components/AuthenticatedOnlyRoute";
 
 function App() {
@@ -24,7 +25,17 @@ function App() {
           }
         />
         <Route
-          path="/add-workout"
+          path="/workouts"
+          element={
+            <AuthenticatedOnlyRoute>
+              <Layout header={<PageHeader heading="Workouts" />}>
+                <WorkoutsPage />
+              </Layout>
+            </AuthenticatedOnlyRoute>
+          }
+        />
+        <Route
+          path="/add-workout/:workoutId"
           element={
             <AuthenticatedOnlyRoute>
               <Layout header={<PageHeader heading="Add Workout" />}>
@@ -38,7 +49,7 @@ function App() {
           element={
             <AuthenticatedOnlyRoute>
               <Layout header={<PageHeader heading="Profile" />}>
-                <Profile />
+                <ProfilePage />
               </Layout>
             </AuthenticatedOnlyRoute>
           }

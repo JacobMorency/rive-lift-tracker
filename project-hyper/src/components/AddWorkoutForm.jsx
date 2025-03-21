@@ -2,11 +2,11 @@ import ExerciseSelector from "../components/ExerciseSelector";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../context/AuthContext";
 
-const AddWorkoutForm = () => {
+const AddWorkoutForm = ({ workoutId }) => {
   const [exerciseName, setExerciseName] = useState("");
   const [exerciseId, setExerciseId] = useState(null);
   //   const [exerciseOptions, setExerciseOptions] = useState([]);
@@ -17,35 +17,21 @@ const AddWorkoutForm = () => {
   const [exercisesInWorkout, setExercisesInWorkout] = useState([]);
   const { user } = useAuth();
 
-  const getWorkoutId = async () => {
-    const { data, error } = await supabase
-      .from("workouts")
-      .select("id")
-      .eq("user_id", user.id)
-      .order("date", { ascending: false })
-      .limit(1);
-    if (error) {
-      console.error("Error fetching workout ID:", error.message);
-      return;
-    }
-    return data?.id;
-  };
+  // const createNewWorkout = async () => {
+  //   console.log(user.id);
+  //   const { data, error } = await supabase
+  //     .from("workouts")
+  //     .insert([{ user_id: user.id, date: new Date() }])
+  //     .select("id", "user_id", "date")
+  //     .single();
 
-  const createNewWorkout = async () => {
-    console.log(user.id);
-    const { data, error } = await supabase
-      .from("workouts")
-      .insert([{ user_id: user.id, date: new Date() }])
-      .select("id", "user_id", "date")
-      .single();
-
-    if (error) {
-      console.error("Error creating new workout:", error.message);
-      return null;
-    }
-    console.log(data);
-    return data?.id;
-  };
+  //   if (error) {
+  //     console.error("Error creating new workout:", error.message);
+  //     return null;
+  //   }
+  //   console.log(data);
+  //   return data?.id;
+  // };
 
   // TODO: Error handling
   const handleAddSet = () => {
@@ -67,16 +53,13 @@ const AddWorkoutForm = () => {
   };
 
   const handleAddExerciseToWorkout = async () => {
-    let workoutId = await getWorkoutId();
-    if (!workoutId) {
-      workoutId = await createNewWorkout();
-    }
     const { data: workoutExercisesData, error } = await supabase
       .from("workout_exercises")
       .insert([
         {
           exercise_id: exerciseId,
           workout_id: workoutId, // TODO: Update this to the actual workout ID
+          created_at: new Date(),
         },
       ])
       .select("id");
@@ -105,6 +88,20 @@ const AddWorkoutForm = () => {
 
     setSets([]);
     resetFormFields();
+    // setExercisesInWorkout((prevExercises) => [...prevExercises, exerciseName]);
+  };
+
+  const fetchCompletedExercises = async () => {
+    const { data, error } = await supabase
+      .from("workout_exercises")
+      .select("exercise_id")
+      .eq("workout_id")
+      .order("created_at", { ascending: false });
+    if (error) {
+      console.error("Error fetching completed exercises:", error.message);
+      return;
+    }
+    return data;
   };
 
   const handleSaveWorkout = async () => {
@@ -130,6 +127,10 @@ const AddWorkoutForm = () => {
     setWeight("");
     setPartialReps("");
   };
+
+  useEffect(() => {
+    // fetchCompletedExercises();
+  });
 
   return (
     <div>
@@ -216,6 +217,11 @@ const AddWorkoutForm = () => {
           <h3 className="font-bold text-lg my-3">
             Exercise Completed This Workout:
           </h3>
+          <ul>
+            {exercisesInWorkout.map((exercise, index) => (
+              <li key={index}>{exercise}</li>
+            ))}
+          </ul>
         </div>
       </form>
     </div>
