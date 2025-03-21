@@ -104,10 +104,7 @@ const AddWorkoutForm = () => {
     }
 
     setSets([]);
-    setReps("");
-    setWeight("");
-    setPartialReps("");
-    setExerciseName("");
+    resetFormFields();
   };
 
   const handleSaveWorkout = async () => {
@@ -125,6 +122,13 @@ const AddWorkoutForm = () => {
       return;
     }
     console.log("Workout saved successfully:", data);
+  };
+
+  const resetFormFields = () => {
+    setExerciseName("");
+    setReps("");
+    setWeight("");
+    setPartialReps("");
   };
 
   return (
