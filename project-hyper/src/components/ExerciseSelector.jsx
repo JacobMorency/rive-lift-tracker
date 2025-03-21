@@ -17,7 +17,7 @@ import { ChevronsUpDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 
-const ExerciseSelector = ({ exerciseName, setExerciseName }) => {
+const ExerciseSelector = ({ exerciseName, setExerciseName, setExerciseId }) => {
   const [exerciseOptions, setExerciseOptionsState] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(false);
 
@@ -36,6 +36,7 @@ const ExerciseSelector = ({ exerciseName, setExerciseName }) => {
   // TODO: Handle the select
   const handleSelect = (exercise) => {
     setExerciseName(exercise.name);
+    setExerciseId(exercise.id);
     setOpenDropdown(false);
   };
 
