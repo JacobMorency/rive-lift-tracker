@@ -1,23 +1,61 @@
-import { useState } from "react";
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Layout from "./components/Layout";
+import PageHeader from "./components/PageHeader";
+import LoginPage from "./pages/LoginPage";
+import Dashboard from "./pages/Dashboard";
+import ProfilePage from "./pages/ProfilePage";
+import AddWorkoutPage from "./pages/AddWorkoutPage";
+import WorkoutsPage from "./pages/WorkoutsPage";
+import { AuthenticatedOnlyRoute } from "./components/AuthenticatedOnlyRoute";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <AuthenticatedOnlyRoute>
+              <Layout header={<PageHeader heading="Dashboard" />}>
+                <Dashboard />
+              </Layout>
+            </AuthenticatedOnlyRoute>
+          }
+        />
+        <Route
+          path="/workouts"
+          element={
+            <AuthenticatedOnlyRoute>
+              <Layout header={<PageHeader heading="Workouts" />}>
+                <WorkoutsPage />
+              </Layout>
+            </AuthenticatedOnlyRoute>
+          }
+        />
+        <Route
+          path="/add-workout/:workoutId"
+          element={
+            <AuthenticatedOnlyRoute>
+              <Layout header={<PageHeader heading="Add Workout" />}>
+                <AddWorkoutPage />
+              </Layout>
+            </AuthenticatedOnlyRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <AuthenticatedOnlyRoute>
+              <Layout header={<PageHeader heading="Profile" />}>
+                <ProfilePage />
+              </Layout>
+            </AuthenticatedOnlyRoute>
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 
