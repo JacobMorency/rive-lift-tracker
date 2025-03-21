@@ -88,20 +88,49 @@ const AddWorkoutForm = ({ workoutId }) => {
 
     setSets([]);
     resetFormFields();
-    // setExercisesInWorkout((prevExercises) => [...prevExercises, exerciseName]);
+    fetchCompletedExercises();
   };
 
   const fetchCompletedExercises = async () => {
+    if (!workoutId) {
+      console.error("No workout ID provided.");
+      return;
+    }
+
     const { data, error } = await supabase
       .from("workout_exercises")
       .select("exercise_id")
-      .eq("workout_id")
+      .eq("workout_id", workoutId)
       .order("created_at", { ascending: false });
     if (error) {
       console.error("Error fetching completed exercises:", error.message);
       return;
     }
-    return data;
+
+    const exerciseNames = await Promise.all(
+      data.map(async (exercise) => {
+        const exerciseName = await getExerciseNameById(exercise.exercise_id);
+        return {
+          id: exercise.exercise_id,
+          name: exerciseName,
+        };
+      })
+    );
+
+    setExercisesInWorkout(exerciseNames);
+  };
+
+  const getExerciseNameById = async (exerciseId) => {
+    const { data, error } = await supabase
+      .from("exercise_library")
+      .select("name")
+      .eq("id", exerciseId)
+      .single();
+    if (error) {
+      console.error("Error fetching exercise name:", error.message);
+      return;
+    }
+    return data.name;
   };
 
   const handleSaveWorkout = async () => {
@@ -129,8 +158,10 @@ const AddWorkoutForm = ({ workoutId }) => {
   };
 
   useEffect(() => {
-    // fetchCompletedExercises();
-  });
+    if (workoutId) {
+      fetchCompletedExercises();
+    }
+  }, [workoutId]);
 
   return (
     <div>
@@ -215,12 +246,16 @@ const AddWorkoutForm = ({ workoutId }) => {
         )}
         <div>
           <h3 className="font-bold text-lg my-3">
-            Exercise Completed This Workout:
+            Exercises Completed This Workout:
           </h3>
           <ul>
-            {exercisesInWorkout.map((exercise, index) => (
-              <li key={index}>{exercise}</li>
-            ))}
+            {exercisesInWorkout.length > 0 ? (
+              exercisesInWorkout.map((exercise) => (
+                <li key={exercise.id}>{exercise.name}</li>
+              ))
+            ) : (
+              <li>No exercises completed yet.</li>
+            )}
           </ul>
         </div>
       </form>
