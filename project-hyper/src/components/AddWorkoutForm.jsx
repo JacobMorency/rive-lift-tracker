@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../context/AuthContext";
+import { SquarePen, Trash2 } from "lucide-react";
 
 const AddWorkoutForm = ({ workoutId }) => {
   const [exerciseName, setExerciseName] = useState("");
@@ -222,11 +223,30 @@ const AddWorkoutForm = ({ workoutId }) => {
                   </h3>
                   <ul>
                     {sets.map((set, index) => (
-                      <li key={index}>
-                        <span className="font-bold">Set {index + 1}:</span>{" "}
-                        {set.reps} reps at {set.weight} lbs
-                        {set.partialReps > 0 &&
-                          ` with ${set.partialReps} partial reps`}
+                      <li
+                        key={index}
+                        className="rounded border py-3 px-2 my-1 flex items-center justify-between"
+                      >
+                        <p>
+                          <span className="font-bold">Set {index + 1}:</span>{" "}
+                          {set.reps} reps at {set.weight} lbs
+                          {set.partialReps > 0 &&
+                            ` with ${set.partialReps} partial reps`}
+                        </p>
+                        <span className="flex gap-2">
+                          <Button
+                            className="bg-clear border hover:bg-neutral-300"
+                            type="button"
+                          >
+                            <SquarePen className="text-black" />
+                          </Button>
+                          <Button
+                            className="bg-red-500 hover:bg-red-900"
+                            type="button"
+                          >
+                            <Trash2 />
+                          </Button>
+                        </span>
                       </li>
                     ))}
                   </ul>
