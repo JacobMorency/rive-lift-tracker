@@ -11,7 +11,7 @@ const BottomNav = () => {
         </Link>
       </div>
       <div className="">
-        <Link to="/dashboard" className="text-white flex flex-col items-center">
+        <Link to="/workouts" className="text-white flex flex-col items-center">
           <Dumbbell color="white" size={24} />
           <p>Workouts</p>
         </Link>
