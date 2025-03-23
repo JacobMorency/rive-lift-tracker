@@ -52,6 +52,23 @@ const AddWorkoutForm = ({ workoutId }) => {
     setUpdateSetIndex(index);
   };
 
+  const handleSaveUpdatedSet = () => {
+    const updatedSet = {
+      reps: parseInt(reps),
+      weight: Number(weight),
+      partialReps: Number(partialReps) || 0,
+    };
+    const updatedSets = sets.map((set, index) =>
+      index === updateSetIndex ? updatedSet : set
+    );
+    setSets(updatedSets);
+    setIsSetUpdating(false);
+    setReps("");
+    setWeight("");
+    setPartialReps("");
+    setUpdateSetIndex(null);
+  };
+
   const handleAddExerciseToWorkout = async () => {
     const { data: workoutExercisesData, error } = await supabase
       .from("workout_exercises")
@@ -216,18 +233,29 @@ const AddWorkoutForm = ({ workoutId }) => {
                 />
               </div>
             </div>
-            <div className="flex flex-col space-y-1">
-              <Button className="w-full" onClick={handleAddSet} type="button">
-                {isSetUpdating ? `Update Set ${updateSetIndex + 1}` : "Add Set"}
-              </Button>
-              {isSetUpdating && (
-                <Button
-                  className="w-full bg-clear border hover:bg-neutral-300 text-black"
-                  type="button"
-                  onClick={cancelUpdateSet}
-                >
-                  Cancel
+            <div>
+              {!isSetUpdating && (
+                <Button className="w-full" onClick={handleAddSet} type="button">
+                  Add Set
                 </Button>
+              )}
+              {isSetUpdating && (
+                <div className="flex flex-col space-y-1">
+                  <Button
+                    className="w-full"
+                    onClick={handleSaveUpdatedSet}
+                    type="button"
+                  >
+                    Update Set {updateSetIndex + 1}
+                  </Button>
+                  <Button
+                    className="w-full bg-clear border hover:bg-neutral-300 text-black"
+                    type="button"
+                    onClick={cancelUpdateSet}
+                  >
+                    Cancel
+                  </Button>
+                </div>
               )}
             </div>
             {sets.length > 0 && (
