@@ -2,6 +2,15 @@ import ExerciseSelector from "../components/ExerciseSelector";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../context/AuthContext";
@@ -18,7 +27,8 @@ const AddWorkoutForm = ({ workoutId }) => {
   const [exercisesInWorkout, setExercisesInWorkout] = useState([]);
   const [updateSetIndex, setUpdateSetIndex] = useState(null);
   const [isSetUpdating, setIsSetUpdating] = useState(false);
-  const [updatedSet, setUpdatedSet] = useState(null);
+  const [deleteSetIndex, setDeleteSetIndex] = useState(null);
+  const [isDeleteSetDialogOpen, setIsDeleteSetDialogOpen] = useState(false);
 
   const { user } = useAuth();
 
@@ -48,7 +58,6 @@ const AddWorkoutForm = ({ workoutId }) => {
     setPartialReps(setToUpdate.partialReps);
     setUpdateSetIndex(index);
     setIsSetUpdating(true); // TODO: Might need to change implementation
-    // setUpdatedSet(setToUpdate);
     setUpdateSetIndex(index);
   };
 
@@ -67,6 +76,17 @@ const AddWorkoutForm = ({ workoutId }) => {
     setWeight("");
     setPartialReps("");
     setUpdateSetIndex(null);
+  };
+
+  const handleDeleteSet = (index) => {
+    setIsDeleteSetDialogOpen(true);
+    setDeleteSetIndex(index);
+  };
+
+  const handleConfirmDeleteSet = () => {
+    const updatedSets = sets.filter((set, i) => i !== deleteSetIndex);
+    setSets(updatedSets);
+    setIsDeleteSetDialogOpen(false);
   };
 
   const handleAddExerciseToWorkout = async () => {
@@ -285,12 +305,63 @@ const AddWorkoutForm = ({ workoutId }) => {
                           >
                             <SquarePen className="text-black" />
                           </Button>
-                          <Button
-                            className="bg-red-500 hover:bg-red-900"
-                            type="button"
+                          <Dialog
+                            open={isDeleteSetDialogOpen}
+                            onOpenChange={setIsDeleteSetDialogOpen}
                           >
-                            <Trash2 />
-                          </Button>
+                            <DialogTrigger asChild>
+                              <div>
+                                <Button
+                                  className="bg-red-500 hover:bg-red-900"
+                                  type="button"
+                                  onClick={() => handleDeleteSet(index)}
+                                >
+                                  <Trash2 />
+                                </Button>
+                              </div>
+                            </DialogTrigger>
+                            {deleteSetIndex !== null && (
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    Delete Set {deleteSetIndex + 1}
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    Are you sure you want to delete this set?
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div>
+                                  <p>
+                                    <span className="font-bold">
+                                      Set {deleteSetIndex + 1}:
+                                    </span>{" "}
+                                    {sets[deleteSetIndex].reps} reps at{" "}
+                                    {sets[deleteSetIndex].weight} lbs
+                                    {sets[deleteSetIndex].partialReps > 0 &&
+                                      ` with ${sets[deleteSetIndex].partialReps} partial reps`}
+                                  </p>
+                                </div>
+
+                                <DialogFooter>
+                                  <Button
+                                    className="bg-clear border hover:bg-neutral-300 text-black"
+                                    onClick={() =>
+                                      setIsDeleteSetDialogOpen(false)
+                                    }
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button
+                                    className="bg-red-500 hover:bg-red-900"
+                                    onClick={handleConfirmDeleteSet}
+                                    type="button"
+                                  >
+                                    Delete
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            )}
+                          </Dialog>
                         </span>
                       </li>
                     ))}
