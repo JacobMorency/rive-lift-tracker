@@ -2,9 +2,19 @@ import ExerciseSelector from "../components/ExerciseSelector";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../context/AuthContext";
+import { SquarePen, Trash2 } from "lucide-react";
 
 const AddWorkoutForm = ({ workoutId }) => {
   const [exerciseName, setExerciseName] = useState("");
@@ -15,23 +25,12 @@ const AddWorkoutForm = ({ workoutId }) => {
   const [weight, setWeight] = useState("");
   const [partialReps, setPartialReps] = useState("");
   const [exercisesInWorkout, setExercisesInWorkout] = useState([]);
+  const [updateSetIndex, setUpdateSetIndex] = useState(null);
+  const [isSetUpdating, setIsSetUpdating] = useState(false);
+  const [deleteSetIndex, setDeleteSetIndex] = useState(null);
+  const [isDeleteSetDialogOpen, setIsDeleteSetDialogOpen] = useState(false);
+
   const { user } = useAuth();
-
-  // const createNewWorkout = async () => {
-  //   console.log(user.id);
-  //   const { data, error } = await supabase
-  //     .from("workouts")
-  //     .insert([{ user_id: user.id, date: new Date() }])
-  //     .select("id", "user_id", "date")
-  //     .single();
-
-  //   if (error) {
-  //     console.error("Error creating new workout:", error.message);
-  //     return null;
-  //   }
-  //   console.log(data);
-  //   return data?.id;
-  // };
 
   // TODO: Error handling
   const handleAddSet = () => {
@@ -50,6 +49,44 @@ const AddWorkoutForm = ({ workoutId }) => {
     setReps("");
     setWeight("");
     setPartialReps("");
+  };
+
+  const handleUpdateSet = (index) => {
+    const setToUpdate = sets[index];
+    setReps(setToUpdate.reps);
+    setWeight(setToUpdate.weight);
+    setPartialReps(setToUpdate.partialReps);
+    setUpdateSetIndex(index);
+    setIsSetUpdating(true); // TODO: Might need to change implementation
+    setUpdateSetIndex(index);
+  };
+
+  const handleSaveUpdatedSet = () => {
+    const updatedSet = {
+      reps: parseInt(reps),
+      weight: Number(weight),
+      partialReps: Number(partialReps) || 0,
+    };
+    const updatedSets = sets.map((set, index) =>
+      index === updateSetIndex ? updatedSet : set
+    );
+    setSets(updatedSets);
+    setIsSetUpdating(false);
+    setReps("");
+    setWeight("");
+    setPartialReps("");
+    setUpdateSetIndex(null);
+  };
+
+  const handleDeleteSet = (index) => {
+    setIsDeleteSetDialogOpen(true);
+    setDeleteSetIndex(index);
+  };
+
+  const handleConfirmDeleteSet = () => {
+    const updatedSets = sets.filter((set, i) => i !== deleteSetIndex);
+    setSets(updatedSets);
+    setIsDeleteSetDialogOpen(false);
   };
 
   const handleAddExerciseToWorkout = async () => {
@@ -157,6 +194,13 @@ const AddWorkoutForm = ({ workoutId }) => {
     setPartialReps("");
   };
 
+  const cancelUpdateSet = () => {
+    setIsSetUpdating(false);
+    setReps("");
+    setWeight("");
+    setPartialReps("");
+  };
+
   useEffect(() => {
     if (workoutId) {
       fetchCompletedExercises();
@@ -171,6 +215,7 @@ const AddWorkoutForm = ({ workoutId }) => {
             exerciseName={exerciseName}
             setExerciseName={setExerciseName}
             setExerciseId={setExerciseId}
+            isSetUpdating={isSetUpdating}
           />
         </div>
         {exerciseName && (
@@ -209,9 +254,29 @@ const AddWorkoutForm = ({ workoutId }) => {
               </div>
             </div>
             <div>
-              <Button className="w-full" onClick={handleAddSet} type="button">
-                Add Set
-              </Button>
+              {!isSetUpdating && (
+                <Button className="w-full" onClick={handleAddSet} type="button">
+                  Add Set
+                </Button>
+              )}
+              {isSetUpdating && (
+                <div className="flex flex-col space-y-1">
+                  <Button
+                    className="w-full"
+                    onClick={handleSaveUpdatedSet}
+                    type="button"
+                  >
+                    Update Set {updateSetIndex + 1}
+                  </Button>
+                  <Button
+                    className="w-full bg-clear border hover:bg-neutral-300 text-black"
+                    type="button"
+                    onClick={cancelUpdateSet}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              )}
             </div>
             {sets.length > 0 && (
               <div>
@@ -222,20 +287,94 @@ const AddWorkoutForm = ({ workoutId }) => {
                   </h3>
                   <ul>
                     {sets.map((set, index) => (
-                      <li key={index}>
-                        <span className="font-bold">Set {index + 1}:</span>{" "}
-                        {set.reps} reps at {set.weight} lbs
-                        {set.partialReps > 0 &&
-                          ` with ${set.partialReps} partial reps`}
+                      <li
+                        key={index}
+                        className="rounded border py-3 px-2 my-1 flex items-center justify-between"
+                      >
+                        <p>
+                          <span className="font-bold">Set {index + 1}:</span>{" "}
+                          {set.reps} reps at {set.weight} lbs
+                          {set.partialReps > 0 &&
+                            ` with ${set.partialReps} partial reps`}
+                        </p>
+                        <span className="flex gap-2">
+                          <Button
+                            className="bg-clear border hover:bg-neutral-300"
+                            type="button"
+                            onClick={() => handleUpdateSet(index)}
+                          >
+                            <SquarePen className="text-black" />
+                          </Button>
+                          <Dialog
+                            open={isDeleteSetDialogOpen}
+                            onOpenChange={setIsDeleteSetDialogOpen}
+                          >
+                            <DialogTrigger asChild>
+                              <div>
+                                <Button
+                                  className="bg-red-500 hover:bg-red-900"
+                                  type="button"
+                                  onClick={() => handleDeleteSet(index)}
+                                >
+                                  <Trash2 />
+                                </Button>
+                              </div>
+                            </DialogTrigger>
+                            {deleteSetIndex !== null && (
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    Delete Set {deleteSetIndex + 1}
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    Are you sure you want to delete this set?
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div>
+                                  <p>
+                                    <span className="font-bold">
+                                      Set {deleteSetIndex + 1}:
+                                    </span>{" "}
+                                    {sets[deleteSetIndex].reps} reps at{" "}
+                                    {sets[deleteSetIndex].weight} lbs
+                                    {sets[deleteSetIndex].partialReps > 0 &&
+                                      ` with ${sets[deleteSetIndex].partialReps} partial reps`}
+                                  </p>
+                                </div>
+
+                                <DialogFooter>
+                                  <Button
+                                    className="bg-clear border hover:bg-neutral-300 text-black"
+                                    onClick={() =>
+                                      setIsDeleteSetDialogOpen(false)
+                                    }
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button
+                                    className="bg-red-500 hover:bg-red-900"
+                                    onClick={handleConfirmDeleteSet}
+                                    type="button"
+                                  >
+                                    Delete
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            )}
+                          </Dialog>
+                        </span>
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div>
+                  {/* TODO: Maybe add a function to check if the button should be
+                  disabled */}
                   <Button
                     className="w-full my-3"
                     type="button"
                     onClick={handleAddExerciseToWorkout}
+                    disabled={sets.length === 0 || isSetUpdating}
                   >
                     Add Exercise to Workout
                   </Button>
