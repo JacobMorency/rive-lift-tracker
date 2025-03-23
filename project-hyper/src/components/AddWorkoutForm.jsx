@@ -16,23 +16,11 @@ const AddWorkoutForm = ({ workoutId }) => {
   const [weight, setWeight] = useState("");
   const [partialReps, setPartialReps] = useState("");
   const [exercisesInWorkout, setExercisesInWorkout] = useState([]);
+  const [updateSetIndex, setUpdateSetIndex] = useState(null);
+  const [isSetUpdating, setIsSetUpdating] = useState(false);
+  const [updatedSet, setUpdatedSet] = useState(null);
+
   const { user } = useAuth();
-
-  // const createNewWorkout = async () => {
-  //   console.log(user.id);
-  //   const { data, error } = await supabase
-  //     .from("workouts")
-  //     .insert([{ user_id: user.id, date: new Date() }])
-  //     .select("id", "user_id", "date")
-  //     .single();
-
-  //   if (error) {
-  //     console.error("Error creating new workout:", error.message);
-  //     return null;
-  //   }
-  //   console.log(data);
-  //   return data?.id;
-  // };
 
   // TODO: Error handling
   const handleAddSet = () => {
@@ -51,6 +39,17 @@ const AddWorkoutForm = ({ workoutId }) => {
     setReps("");
     setWeight("");
     setPartialReps("");
+  };
+
+  const handleUpdateSet = (index) => {
+    const setToUpdate = sets[index];
+    setReps(setToUpdate.reps);
+    setWeight(setToUpdate.weight);
+    setPartialReps(setToUpdate.partialReps);
+    setUpdateSetIndex(index);
+    setIsSetUpdating(true); // TODO: Might need to change implementation
+    // setUpdatedSet(setToUpdate);
+    setUpdateSetIndex(index);
   };
 
   const handleAddExerciseToWorkout = async () => {
@@ -158,6 +157,13 @@ const AddWorkoutForm = ({ workoutId }) => {
     setPartialReps("");
   };
 
+  const cancelUpdateSet = () => {
+    setIsSetUpdating(false);
+    setReps("");
+    setWeight("");
+    setPartialReps("");
+  };
+
   useEffect(() => {
     if (workoutId) {
       fetchCompletedExercises();
@@ -172,6 +178,7 @@ const AddWorkoutForm = ({ workoutId }) => {
             exerciseName={exerciseName}
             setExerciseName={setExerciseName}
             setExerciseId={setExerciseId}
+            isSetUpdating={isSetUpdating}
           />
         </div>
         {exerciseName && (
@@ -209,10 +216,19 @@ const AddWorkoutForm = ({ workoutId }) => {
                 />
               </div>
             </div>
-            <div>
+            <div className="flex flex-col space-y-1">
               <Button className="w-full" onClick={handleAddSet} type="button">
-                Add Set
+                {isSetUpdating ? `Update Set ${updateSetIndex + 1}` : "Add Set"}
               </Button>
+              {isSetUpdating && (
+                <Button
+                  className="w-full bg-clear border hover:bg-neutral-300 text-black"
+                  type="button"
+                  onClick={cancelUpdateSet}
+                >
+                  Cancel
+                </Button>
+              )}
             </div>
             {sets.length > 0 && (
               <div>
@@ -237,6 +253,7 @@ const AddWorkoutForm = ({ workoutId }) => {
                           <Button
                             className="bg-clear border hover:bg-neutral-300"
                             type="button"
+                            onClick={() => handleUpdateSet(index)}
                           >
                             <SquarePen className="text-black" />
                           </Button>
@@ -252,10 +269,13 @@ const AddWorkoutForm = ({ workoutId }) => {
                   </ul>
                 </div>
                 <div>
+                  {/* TODO: Maybe add a function to check if the button should be
+                  disabled */}
                   <Button
                     className="w-full my-3"
                     type="button"
                     onClick={handleAddExerciseToWorkout}
+                    disabled={sets.length === 0 || isSetUpdating}
                   >
                     Add Exercise to Workout
                   </Button>
