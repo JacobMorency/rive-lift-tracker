@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --color-error: oklch(0.602 0.842 0);
+}
+
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));

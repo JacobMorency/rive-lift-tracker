@@ -71,7 +71,7 @@ const LoginForm = ({ onLoginSuccess }) => {
         <CardContent>
           <form onSubmit={handleLogin}>
             {errorMessage && (
-              <p className="text-center text-red-800 italic text-sm">
+              <p className="text-center text-error italic text-sm">
                 {errorMessage}
               </p>
             )}
@@ -81,10 +81,10 @@ const LoginForm = ({ onLoginSuccess }) => {
                 type="email"
                 placeholder="Email"
                 onChange={(e) => setEmail(e.target.value)}
-                className={emailEmpty ? "border-red-500" : ""}
+                className={emailEmpty ? "border-error" : ""}
               />
               {emailEmpty && (
-                <p className="text-red-500 italic text-sm">Email is required</p>
+                <p className="text-error italic text-sm">Email is required</p>
               )}
             </div>
             <div className="space-y-1.5 my-3">
@@ -93,10 +93,10 @@ const LoginForm = ({ onLoginSuccess }) => {
                 type="password"
                 placeholder="Password"
                 onChange={(e) => setPassword(e.target.value)}
-                className={passwordEmpty ? "border-red-500" : ""}
+                className={passwordEmpty ? "border-error" : ""}
               />
               {passwordEmpty && (
-                <p className="text-red-500 italic text-sm">
+                <p className="text-error italic text-sm">
                   Password is required
                 </p>
               )}
