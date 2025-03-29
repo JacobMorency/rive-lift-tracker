@@ -2,14 +2,30 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../context/AuthContext";
+import { useEffect, useState } from "react";
 
 const WorkoutsPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [workoutInProgress, setWorkoutInProgress] = useState(false);
+  const [workoutId, setWorkoutId] = useState(null);
+
+  useEffect(() => {
+    const savedWorkoutId = localStorage.getItem("workoutId");
+    if (savedWorkoutId) {
+      setWorkoutId(savedWorkoutId);
+      setWorkoutInProgress(true);
+    }
+  }, []);
 
   const handleStartNewWorkout = async () => {
-    let workoutId = await createNewWorkout();
-    navigate(`/add-workout/${workoutId}`);
+    let newWorkoutId = await createNewWorkout();
+    if (newWorkoutId) {
+      setWorkoutId(newWorkoutId);
+      localStorage.setItem("workoutId", newWorkoutId);
+      setWorkoutInProgress(true);
+      navigate(`/add-workout/${workoutId}`);
+    }
   };
 
   const createNewWorkout = async () => {

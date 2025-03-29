@@ -6,21 +6,50 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true); // Ensure loading state
 
-  // Fetches the user from Supabase auth state
-  const fetchUser = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    setUser(user);
+  useEffect(() => {
+    const initializeAuth = async () => {
+      setLoading(true);
 
-    // Fetch user data only if user exists
-    if (user) {
-      fetchUserData(user.id);
-    }
-  };
+      // Retrieve session
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
 
-  // Fetches the user data from the "users" table
+      if (error) {
+        console.error("Error fetching session:", error.message);
+      }
+
+      if (session?.user) {
+        setUser(session.user);
+        fetchUserData(session.user.id);
+      }
+
+      setLoading(false);
+    };
+
+    initializeAuth();
+
+    // Listen for auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user || null);
+
+        if (session?.user) {
+          fetchUserData(session.user.id);
+        } else {
+          setUserData(null);
+        }
+      }
+    );
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
   const fetchUserData = async (userId) => {
     const { data, error } = await supabase
       .from("users")
@@ -35,30 +64,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    fetchUser(); // Fetch user on initial mount
-
-    // Listen for auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user || null);
-        if (session?.user) {
-          fetchUserData(session.user.id);
-        } else {
-          setUserData(null); // Clear user data on logout
-        }
-      }
-    );
-
-    // Cleanup listener on unmount
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
-
   return (
-    <AuthContext.Provider value={{ user, userData }}>
-      {children}
+    <AuthContext.Provider value={{ user, userData, loading }}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 };
