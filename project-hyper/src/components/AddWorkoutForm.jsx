@@ -30,6 +30,8 @@ const AddWorkoutForm = ({ workoutId }) => {
   const [deleteSetIndex, setDeleteSetIndex] = useState(null);
   const [isDeleteSetDialogOpen, setIsDeleteSetDialogOpen] = useState(false);
   const [isAddExerciseDialogOpen, setIsAddExerciseDialogOpen] = useState(false);
+  const [isCancelWorkoutDialogOpen, setIsCancelWorkoutDialogOpen] =
+    useState(false);
   const [repsEmpty, setRepsEmpty] = useState(false);
   const [weightEmpty, setWeightEmpty] = useState(false);
   const [repsInvalid, setRepsInvalid] = useState(false);
@@ -45,6 +47,20 @@ const AddWorkoutForm = ({ workoutId }) => {
     localStorage.removeItem("workoutId");
     localStorage.removeItem("workoutProgress");
     navigate("/workouts");
+  };
+
+  const handleSaveWorkout = async () => {
+    const { data, error } = await supabase
+      .from("workouts")
+      .update({ is_complete: true })
+      .eq("id", workoutId)
+      .select();
+    if (error) {
+      console.error("Error saving workout:", error.message);
+      return;
+    }
+    handleCompleteWorkout();
+    console.log("Workout saved successfully:", data);
   };
 
   const handleAddSet = () => {
@@ -233,23 +249,6 @@ const AddWorkoutForm = ({ workoutId }) => {
     return data.name;
   };
 
-  const handleSaveWorkout = async () => {
-    const workoutData = {
-      user_id: user.id,
-      date: new Date(),
-      sets_data: JSON.stringify(sets),
-    };
-
-    const { data, error } = await supabase
-      .from("workouts")
-      .insert([workoutData]);
-    if (error) {
-      console.error("Error saving workout:", error.message);
-      return;
-    }
-    console.log("Workout saved successfully:", data);
-  };
-
   const resetFormFields = () => {
     setExerciseName("");
     setReps("");
@@ -262,6 +261,14 @@ const AddWorkoutForm = ({ workoutId }) => {
     setReps("");
     setWeight("");
     setPartialReps("");
+  };
+
+  // TODO: Remove workout from db if cancelled
+  const confirmCancelWorkout = () => {
+    handleCompleteWorkout();
+  };
+  const handleCancelWorkout = () => {
+    setIsCancelWorkoutDialogOpen(true);
   };
 
   useEffect(() => {
@@ -591,13 +598,52 @@ const AddWorkoutForm = ({ workoutId }) => {
             )}
           </ul>
         </div>
-        <Button
-          className="w-full my-3"
-          type="button"
-          // onClick={handleCompleteWorkout}
-        >
-          Save Workout *Not Working*
-        </Button>
+        <div>
+          <Button
+            className="w-full my-2"
+            type="button"
+            onClick={handleSaveWorkout}
+            disabled={exercisesInWorkout <= 0}
+          >
+            Save Workout
+          </Button>
+          <Button
+            className="w-full bg-error"
+            type="button"
+            onClick={handleCancelWorkout}
+          >
+            Cancel
+          </Button>
+          <Dialog
+            open={isCancelWorkoutDialogOpen}
+            onOpenChange={setIsCancelWorkoutDialogOpen}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Cancel Workout?</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to cancel this workout? Any unsaved
+                  progress will be lost.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  className="bg-clear border hover:bg-neutral-300 text-black"
+                  onClick={() => setIsCancelWorkoutDialogOpen(false)}
+                >
+                  Back
+                </Button>
+                <Button
+                  className="bg-error hover:bg-red-900"
+                  onClick={confirmCancelWorkout}
+                  type="button"
+                >
+                  Cancel Workout
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
       </form>
     </div>
   );
