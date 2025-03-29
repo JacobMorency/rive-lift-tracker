@@ -28,7 +28,8 @@ const WorkoutsPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
+    // height is calculated based on the screen size subtracting the bottom navigation height
+    <div className="flex flex-col items-center justify-center h-[calc(100vh-56px)]">
       <Button onClick={handleStartNewWorkout}>Start New Workout</Button>
     </div>
   );
