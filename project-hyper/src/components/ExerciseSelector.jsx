@@ -22,6 +22,8 @@ const ExerciseSelector = ({
   setExerciseName,
   setExerciseId,
   isSetUpdating,
+  isSetsEmpty,
+  exercisesInWorkout,
 }) => {
   const [exerciseOptions, setExerciseOptionsState] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(false);
@@ -35,6 +37,8 @@ const ExerciseSelector = ({
     }
     setExerciseOptionsState(data);
   };
+
+  // TODO: Potentially filter out exercisesInWorkout from the list instead of disabling
 
   // TODO: Implement search functionality
 
@@ -68,23 +72,32 @@ const ExerciseSelector = ({
         </PopoverTrigger>
         {!isSetUpdating && (
           <PopoverContent>
-            <Command>
-              <CommandInput placeholder="Search for an exercise" />
-              <CommandList>
-                <CommandEmpty>No exercise found.</CommandEmpty>
-                <CommandGroup>
-                  {exerciseOptions.map((exercise) => (
-                    <CommandItem
-                      key={exercise.id}
-                      value={exercise.name}
-                      onSelect={() => handleSelect(exercise)}
-                    >
-                      {exercise.name}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
+            {!isSetsEmpty && (
+              <Command>
+                <CommandInput placeholder="Search for an exercise" />
+                <CommandList>
+                  <CommandEmpty>No exercise found.</CommandEmpty>
+                  <CommandGroup>
+                    {exerciseOptions.map((exercise) => (
+                      <CommandItem
+                        key={exercise.id}
+                        value={exercise.name}
+                        onSelect={() => handleSelect(exercise)}
+                        disabled={exercisesInWorkout.some(
+                          (ex) => ex.name === exercise.name
+                        )}
+                      >
+                        {exercise.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            )}
+            <p>
+              Please add this exercise to the workout or remove the sets to
+              switch exercises.
+            </p>
           </PopoverContent>
         )}
       </Popover>
