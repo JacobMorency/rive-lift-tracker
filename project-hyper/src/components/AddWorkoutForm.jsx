@@ -15,6 +15,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../context/AuthContext";
 import { SquarePen, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const AddWorkoutForm = ({ workoutId }) => {
   const [exerciseName, setExerciseName] = useState("");
@@ -34,10 +35,18 @@ const AddWorkoutForm = ({ workoutId }) => {
   const [repsInvalid, setRepsInvalid] = useState(false);
   const [weightInvalid, setWeightInvalid] = useState(false);
   const [partialRepsInvalid, setPartialRepsInvalid] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isIntialized, setIsInitialized] = useState(false);
 
   const { user } = useAuth();
+  const navigate = useNavigate();
 
-  // TODO: Error handling
+  const handleCompleteWorkout = () => {
+    localStorage.removeItem("workoutId");
+    localStorage.removeItem("workoutProgress");
+    navigate("/workouts");
+  };
+
   const handleAddSet = () => {
     let hasError = false;
     setRepsEmpty(false);
@@ -256,10 +265,87 @@ const AddWorkoutForm = ({ workoutId }) => {
   };
 
   useEffect(() => {
+    const savedProgress = localStorage.getItem("workoutProgress");
+    if (savedProgress) {
+      try {
+        const [
+          savedSets,
+          savedExerciseId,
+          savedExerciseName,
+          savedExercisesInWorkout,
+          savedReps,
+          savedWeight,
+          savedPartialReps,
+        ] = JSON.parse(savedProgress);
+        if (savedSets) {
+          console.log("Saved sets:", savedSets);
+          setSets(savedSets);
+        }
+        if (savedExerciseId) {
+          setExerciseId(savedExerciseId);
+        }
+        if (savedExerciseName) {
+          setExerciseName(savedExerciseName);
+        }
+        if (savedExercisesInWorkout) {
+          setExercisesInWorkout(savedExercisesInWorkout);
+        }
+        if (savedReps) {
+          setReps(savedReps);
+        }
+        if (savedWeight) {
+          setWeight(savedWeight);
+        }
+        if (savedPartialReps) {
+          setPartialReps(savedPartialReps);
+        }
+      } catch (error) {
+        console.error("Error parsing saved progress:", error);
+        return;
+      } finally {
+        setLoading(false);
+        setIsInitialized(true);
+      }
+    } else {
+      setLoading(false);
+      setIsInitialized(true);
+    }
+  }, [isIntialized]);
+
+  useEffect(() => {
+    if (isIntialized) {
+      localStorage.setItem(
+        "workoutProgress",
+        JSON.stringify([
+          sets,
+          exerciseId,
+          exerciseName,
+          exercisesInWorkout,
+          reps,
+          weight,
+          partialReps,
+        ])
+      );
+    }
+  }, [
+    sets,
+    exerciseId,
+    exerciseName,
+    exercisesInWorkout,
+    reps,
+    weight,
+    partialReps,
+  ]);
+
+  useEffect(() => {
     if (workoutId) {
       fetchCompletedExercises();
     }
   }, [workoutId]);
+
+  if (loading) {
+    return <div>Loading...</div>; // Or any other loading indicator
+  }
 
   return (
     <div>
@@ -270,7 +356,7 @@ const AddWorkoutForm = ({ workoutId }) => {
             setExerciseName={setExerciseName}
             setExerciseId={setExerciseId}
             isSetUpdating={isSetUpdating}
-            isSetsEmpty={sets.length == 0 ? false : true}
+            isSetsEmpty={sets.length === 0}
             exercisesInWorkout={exercisesInWorkout}
           />
         </div>
@@ -505,6 +591,13 @@ const AddWorkoutForm = ({ workoutId }) => {
             )}
           </ul>
         </div>
+        <Button
+          className="w-full my-3"
+          type="button"
+          // onClick={handleCompleteWorkout}
+        >
+          Save Workout *Not Working*
+        </Button>
       </form>
     </div>
   );

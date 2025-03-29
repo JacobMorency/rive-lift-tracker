@@ -72,7 +72,7 @@ const ExerciseSelector = ({
         </PopoverTrigger>
         {!isSetUpdating && (
           <PopoverContent>
-            {!isSetsEmpty && (
+            {isSetsEmpty && (
               <Command>
                 <CommandInput placeholder="Search for an exercise" />
                 <CommandList>
