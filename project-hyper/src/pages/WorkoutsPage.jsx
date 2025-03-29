@@ -42,10 +42,26 @@ const WorkoutsPage = () => {
     return data?.id;
   };
 
+  const handleContinueWorkout = () => {
+    if (workoutId) {
+      navigate(`/add-workout/${workoutId}`);
+    }
+  };
+
   return (
     // height is calculated based on the screen size subtracting the bottom navigation height
-    <div className="flex flex-col items-center justify-center h-[calc(100vh-56px)]">
-      <Button onClick={handleStartNewWorkout}>Start New Workout</Button>
+    <div>
+      {workoutInProgress ? (
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-56px)]">
+          <Button onClick={handleContinueWorkout}>
+            Continue Previous Workout
+          </Button>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-[calc(100vh-56px)]">
+          <Button onClick={handleStartNewWorkout}>Start New Workout</Button>
+        </div>
+      )}
     </div>
   );
 };
