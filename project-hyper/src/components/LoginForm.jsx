@@ -14,10 +14,34 @@ import { useState } from "react";
 const LoginForm = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [emailEmpty, setEmailEmpty] = useState(false);
+  const [passwordEmpty, setPasswordEmpty] = useState(false);
 
   // TODO: remove console.log statements
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    setEmailEmpty(false);
+    setPasswordEmpty(false);
+    setErrorMessage("");
+
+    let hasError = false;
+
+    if (!email) {
+      setEmailEmpty(true);
+      hasError = true;
+    }
+
+    if (!password) {
+      setPasswordEmpty(true);
+      hasError = true;
+    }
+
+    // Stops for the form from being submitted so the supabase error message does not appear if a field is blank
+    if (hasError) {
+      return;
+    }
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -30,9 +54,10 @@ const LoginForm = ({ onLoginSuccess }) => {
       }
       onLoginSuccess(data);
     } catch (error) {
-      console.log("Error logging in:", error.message);
+      setErrorMessage("Invalid email or password.");
     }
   };
+
   return (
     <div className="p-4">
       <Card>
@@ -45,13 +70,22 @@ const LoginForm = ({ onLoginSuccess }) => {
 
         <CardContent>
           <form onSubmit={handleLogin}>
+            {errorMessage && (
+              <p className="text-center text-red-800 italic text-sm">
+                {errorMessage}
+              </p>
+            )}
             <div className="space-y-1.5">
               <Label>Email</Label>
               <Input
                 type="email"
                 placeholder="Email"
                 onChange={(e) => setEmail(e.target.value)}
+                className={emailEmpty ? "border-red-500" : ""}
               />
+              {emailEmpty && (
+                <p className="text-red-500 italic text-sm">Email is required</p>
+              )}
             </div>
             <div className="space-y-1.5 my-3">
               <Label>Password</Label>
@@ -59,7 +93,13 @@ const LoginForm = ({ onLoginSuccess }) => {
                 type="password"
                 placeholder="Password"
                 onChange={(e) => setPassword(e.target.value)}
+                className={passwordEmpty ? "border-red-500" : ""}
               />
+              {passwordEmpty && (
+                <p className="text-red-500 italic text-sm">
+                  Password is required
+                </p>
+              )}
             </div>
             <div className="my-3">
               <Button type="submit" className="w-full">
