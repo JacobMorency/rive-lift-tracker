@@ -19,7 +19,6 @@ import { SquarePen, Trash2 } from "lucide-react";
 const AddWorkoutForm = ({ workoutId }) => {
   const [exerciseName, setExerciseName] = useState("");
   const [exerciseId, setExerciseId] = useState(null);
-  //   const [exerciseOptions, setExerciseOptions] = useState([]);
   const [reps, setReps] = useState("");
   const [sets, setSets] = useState([]);
   const [weight, setWeight] = useState("");
@@ -29,6 +28,7 @@ const AddWorkoutForm = ({ workoutId }) => {
   const [isSetUpdating, setIsSetUpdating] = useState(false);
   const [deleteSetIndex, setDeleteSetIndex] = useState(null);
   const [isDeleteSetDialogOpen, setIsDeleteSetDialogOpen] = useState(false);
+  const [isAddExerciseDialogOpen, setIsAddExerciseDialogOpen] = useState(false);
   const [repsEmpty, setRepsEmpty] = useState(false);
   const [weightEmpty, setWeightEmpty] = useState(false);
   const [repsInvalid, setRepsInvalid] = useState(false);
@@ -126,13 +126,30 @@ const AddWorkoutForm = ({ workoutId }) => {
     setIsDeleteSetDialogOpen(false);
   };
 
-  const handleAddExerciseToWorkout = async () => {
+  const checkUnsavedChanges = () => {
+    if (reps || weight || partialReps > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const handleAddExerciseToWorkout = () => {
+    if (!checkUnsavedChanges()) {
+      handleConfirmAddExerciseToWorkout();
+    } else {
+      setIsAddExerciseDialogOpen(true);
+      return;
+    }
+  };
+
+  const handleConfirmAddExerciseToWorkout = async () => {
     const { data: workoutExercisesData, error } = await supabase
       .from("workout_exercises")
       .insert([
         {
           exercise_id: exerciseId,
-          workout_id: workoutId, // TODO: Update this to the actual workout ID
+          workout_id: workoutId,
           created_at: new Date(),
         },
       ])
@@ -431,8 +448,6 @@ const AddWorkoutForm = ({ workoutId }) => {
                   </ul>
                 </div>
                 <div>
-                  {/* TODO: Maybe add a function to check if the button should be
-                  disabled */}
                   <Button
                     className="w-full my-3"
                     type="button"
@@ -441,6 +456,36 @@ const AddWorkoutForm = ({ workoutId }) => {
                   >
                     Add Exercise to Workout
                   </Button>
+                  <Dialog
+                    open={isAddExerciseDialogOpen}
+                    onOpenChange={setIsAddExerciseDialogOpen}
+                  >
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Unsaved Changes</DialogTitle>
+                        <DialogDescription>
+                          You have unsaved changes. If you continue, any unsaved
+                          progress will be lost. Do you still want to add this
+                          exercise?
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <Button
+                          className="bg-clear border hover:bg-neutral-300 text-black"
+                          onClick={() => setIsAddExerciseDialogOpen(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          className="bg-error hover:bg-red-900"
+                          onClick={handleConfirmAddExerciseToWorkout}
+                          type="button"
+                        >
+                          Add Exercise
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
             )}
