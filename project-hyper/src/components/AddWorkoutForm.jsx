@@ -29,11 +29,48 @@ const AddWorkoutForm = ({ workoutId }) => {
   const [isSetUpdating, setIsSetUpdating] = useState(false);
   const [deleteSetIndex, setDeleteSetIndex] = useState(null);
   const [isDeleteSetDialogOpen, setIsDeleteSetDialogOpen] = useState(false);
+  const [repsEmpty, setRepsEmpty] = useState(false);
+  const [weightEmpty, setWeightEmpty] = useState(false);
+  const [repsInvalid, setRepsInvalid] = useState(false);
+  const [weightInvalid, setWeightInvalid] = useState(false);
+  const [partialRepsInvalid, setPartialRepsInvalid] = useState(false);
 
   const { user } = useAuth();
 
   // TODO: Error handling
   const handleAddSet = () => {
+    let hasError = false;
+    setRepsEmpty(false);
+    setWeightEmpty(false);
+    setRepsInvalid(false);
+    setWeightInvalid(false);
+    setPartialRepsInvalid(false);
+
+    if (!reps) {
+      setRepsEmpty(true);
+      hasError = true;
+    } else if (reps <= 0) {
+      setRepsInvalid(true);
+      hasError = true;
+    }
+
+    if (!weight) {
+      setWeightEmpty(true);
+      hasError = true;
+    } else if (weight <= 0) {
+      setWeightInvalid(true);
+      hasError = true;
+    }
+
+    if (partialReps < 0) {
+      setPartialRepsInvalid(true);
+      hasError = true;
+    }
+
+    if (hasError) {
+      return;
+    }
+
     const numReps = parseInt(reps);
     const numWeight = Number(weight);
     if (numReps > 0 && numWeight > 0) {
@@ -216,6 +253,8 @@ const AddWorkoutForm = ({ workoutId }) => {
             setExerciseName={setExerciseName}
             setExerciseId={setExerciseId}
             isSetUpdating={isSetUpdating}
+            isSetsEmpty={sets.length == 0 ? false : true}
+            exercisesInWorkout={exercisesInWorkout}
           />
         </div>
         {exerciseName && (
@@ -229,7 +268,16 @@ const AddWorkoutForm = ({ workoutId }) => {
                   value={reps}
                   onChange={(e) => setReps(e.target.value)}
                   placeholder="0"
+                  className={repsEmpty || repsInvalid ? "border-error" : ""}
                 />
+                {repsEmpty && (
+                  <p className="text-error italic text-sm">Reps required</p>
+                )}
+                {repsInvalid && (
+                  <p className="text-error italic text-sm">
+                    Invalid amount of reps
+                  </p>
+                )}
               </div>
               <div className="my-3">
                 <Label htmlFor="weight">Weight</Label>
@@ -239,7 +287,16 @@ const AddWorkoutForm = ({ workoutId }) => {
                   value={weight}
                   onChange={(e) => setWeight(e.target.value)}
                   placeholder="0 (lbs)"
+                  className={weightEmpty || weightInvalid ? "border-error" : ""}
                 />
+                {weightEmpty && (
+                  <p className="text-error italic text-sm">Weight required</p>
+                )}
+                {weightInvalid && (
+                  <p className="text-error italic text-sm">
+                    Invalid amount of weight
+                  </p>
+                )}
               </div>
               {/* TODO: Add a help icon and potentially a toggle for partial reps */}
               <div className="my-3">
@@ -250,7 +307,13 @@ const AddWorkoutForm = ({ workoutId }) => {
                   value={partialReps}
                   onChange={(e) => setPartialReps(e.target.value)}
                   placeholder="0 (optional)"
+                  className={partialRepsInvalid ? "border-error" : ""}
                 />
+                {partialRepsInvalid && (
+                  <p className="text-error italic text-sm">
+                    Invalid amount of partial reps
+                  </p>
+                )}
               </div>
             </div>
             <div>
