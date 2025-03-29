@@ -15,11 +15,11 @@ import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../context/AuthContext";
 import { SquarePen, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const AddWorkoutForm = ({ workoutId }) => {
   const [exerciseName, setExerciseName] = useState("");
   const [exerciseId, setExerciseId] = useState(null);
-  //   const [exerciseOptions, setExerciseOptions] = useState([]);
   const [reps, setReps] = useState("");
   const [sets, setSets] = useState([]);
   const [weight, setWeight] = useState("");
@@ -29,11 +29,73 @@ const AddWorkoutForm = ({ workoutId }) => {
   const [isSetUpdating, setIsSetUpdating] = useState(false);
   const [deleteSetIndex, setDeleteSetIndex] = useState(null);
   const [isDeleteSetDialogOpen, setIsDeleteSetDialogOpen] = useState(false);
+  const [isAddExerciseDialogOpen, setIsAddExerciseDialogOpen] = useState(false);
+  const [isCancelWorkoutDialogOpen, setIsCancelWorkoutDialogOpen] =
+    useState(false);
+  const [repsEmpty, setRepsEmpty] = useState(false);
+  const [weightEmpty, setWeightEmpty] = useState(false);
+  const [repsInvalid, setRepsInvalid] = useState(false);
+  const [weightInvalid, setWeightInvalid] = useState(false);
+  const [partialRepsInvalid, setPartialRepsInvalid] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isIntialized, setIsInitialized] = useState(false);
 
   const { user } = useAuth();
+  const navigate = useNavigate();
 
-  // TODO: Error handling
+  const handleCompleteWorkout = () => {
+    localStorage.removeItem("workoutId");
+    localStorage.removeItem("workoutProgress");
+    navigate("/workouts");
+  };
+
+  const handleSaveWorkout = async () => {
+    const { data, error } = await supabase
+      .from("workouts")
+      .update({ is_complete: true })
+      .eq("id", workoutId)
+      .select();
+    if (error) {
+      console.error("Error saving workout:", error.message);
+      return;
+    }
+    handleCompleteWorkout();
+    console.log("Workout saved successfully:", data);
+  };
+
   const handleAddSet = () => {
+    let hasError = false;
+    setRepsEmpty(false);
+    setWeightEmpty(false);
+    setRepsInvalid(false);
+    setWeightInvalid(false);
+    setPartialRepsInvalid(false);
+
+    if (!reps) {
+      setRepsEmpty(true);
+      hasError = true;
+    } else if (reps <= 0) {
+      setRepsInvalid(true);
+      hasError = true;
+    }
+
+    if (!weight) {
+      setWeightEmpty(true);
+      hasError = true;
+    } else if (weight <= 0) {
+      setWeightInvalid(true);
+      hasError = true;
+    }
+
+    if (partialReps < 0) {
+      setPartialRepsInvalid(true);
+      hasError = true;
+    }
+
+    if (hasError) {
+      return;
+    }
+
     const numReps = parseInt(reps);
     const numWeight = Number(weight);
     if (numReps > 0 && numWeight > 0) {
@@ -89,13 +151,30 @@ const AddWorkoutForm = ({ workoutId }) => {
     setIsDeleteSetDialogOpen(false);
   };
 
-  const handleAddExerciseToWorkout = async () => {
+  const checkUnsavedChanges = () => {
+    if (reps || weight || partialReps > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const handleAddExerciseToWorkout = () => {
+    if (!checkUnsavedChanges()) {
+      handleConfirmAddExerciseToWorkout();
+    } else {
+      setIsAddExerciseDialogOpen(true);
+      return;
+    }
+  };
+
+  const handleConfirmAddExerciseToWorkout = async () => {
     const { data: workoutExercisesData, error } = await supabase
       .from("workout_exercises")
       .insert([
         {
           exercise_id: exerciseId,
-          workout_id: workoutId, // TODO: Update this to the actual workout ID
+          workout_id: workoutId,
           created_at: new Date(),
         },
       ])
@@ -170,23 +249,6 @@ const AddWorkoutForm = ({ workoutId }) => {
     return data.name;
   };
 
-  const handleSaveWorkout = async () => {
-    const workoutData = {
-      user_id: user.id,
-      date: new Date(),
-      sets_data: JSON.stringify(sets),
-    };
-
-    const { data, error } = await supabase
-      .from("workouts")
-      .insert([workoutData]);
-    if (error) {
-      console.error("Error saving workout:", error.message);
-      return;
-    }
-    console.log("Workout saved successfully:", data);
-  };
-
   const resetFormFields = () => {
     setExerciseName("");
     setReps("");
@@ -201,11 +263,96 @@ const AddWorkoutForm = ({ workoutId }) => {
     setPartialReps("");
   };
 
+  // TODO: Remove workout from db if cancelled
+  const confirmCancelWorkout = () => {
+    handleCompleteWorkout();
+  };
+  const handleCancelWorkout = () => {
+    setIsCancelWorkoutDialogOpen(true);
+  };
+
+  useEffect(() => {
+    const savedProgress = localStorage.getItem("workoutProgress");
+    if (savedProgress) {
+      try {
+        const [
+          savedSets,
+          savedExerciseId,
+          savedExerciseName,
+          savedExercisesInWorkout,
+          savedReps,
+          savedWeight,
+          savedPartialReps,
+        ] = JSON.parse(savedProgress);
+        if (savedSets) {
+          console.log("Saved sets:", savedSets);
+          setSets(savedSets);
+        }
+        if (savedExerciseId) {
+          setExerciseId(savedExerciseId);
+        }
+        if (savedExerciseName) {
+          setExerciseName(savedExerciseName);
+        }
+        if (savedExercisesInWorkout) {
+          setExercisesInWorkout(savedExercisesInWorkout);
+        }
+        if (savedReps) {
+          setReps(savedReps);
+        }
+        if (savedWeight) {
+          setWeight(savedWeight);
+        }
+        if (savedPartialReps) {
+          setPartialReps(savedPartialReps);
+        }
+      } catch (error) {
+        console.error("Error parsing saved progress:", error);
+        return;
+      } finally {
+        setLoading(false);
+        setIsInitialized(true);
+      }
+    } else {
+      setLoading(false);
+      setIsInitialized(true);
+    }
+  }, [isIntialized]);
+
+  useEffect(() => {
+    if (isIntialized) {
+      localStorage.setItem(
+        "workoutProgress",
+        JSON.stringify([
+          sets,
+          exerciseId,
+          exerciseName,
+          exercisesInWorkout,
+          reps,
+          weight,
+          partialReps,
+        ])
+      );
+    }
+  }, [
+    sets,
+    exerciseId,
+    exerciseName,
+    exercisesInWorkout,
+    reps,
+    weight,
+    partialReps,
+  ]);
+
   useEffect(() => {
     if (workoutId) {
       fetchCompletedExercises();
     }
   }, [workoutId]);
+
+  if (loading) {
+    return <div>Loading...</div>; // Or any other loading indicator
+  }
 
   return (
     <div>
@@ -216,6 +363,8 @@ const AddWorkoutForm = ({ workoutId }) => {
             setExerciseName={setExerciseName}
             setExerciseId={setExerciseId}
             isSetUpdating={isSetUpdating}
+            isSetsEmpty={sets.length === 0}
+            exercisesInWorkout={exercisesInWorkout}
           />
         </div>
         {exerciseName && (
@@ -229,7 +378,16 @@ const AddWorkoutForm = ({ workoutId }) => {
                   value={reps}
                   onChange={(e) => setReps(e.target.value)}
                   placeholder="0"
+                  className={repsEmpty || repsInvalid ? "border-error" : ""}
                 />
+                {repsEmpty && (
+                  <p className="text-error italic text-sm">Reps required</p>
+                )}
+                {repsInvalid && (
+                  <p className="text-error italic text-sm">
+                    Invalid amount of reps
+                  </p>
+                )}
               </div>
               <div className="my-3">
                 <Label htmlFor="weight">Weight</Label>
@@ -239,7 +397,16 @@ const AddWorkoutForm = ({ workoutId }) => {
                   value={weight}
                   onChange={(e) => setWeight(e.target.value)}
                   placeholder="0 (lbs)"
+                  className={weightEmpty || weightInvalid ? "border-error" : ""}
                 />
+                {weightEmpty && (
+                  <p className="text-error italic text-sm">Weight required</p>
+                )}
+                {weightInvalid && (
+                  <p className="text-error italic text-sm">
+                    Invalid amount of weight
+                  </p>
+                )}
               </div>
               {/* TODO: Add a help icon and potentially a toggle for partial reps */}
               <div className="my-3">
@@ -250,7 +417,13 @@ const AddWorkoutForm = ({ workoutId }) => {
                   value={partialReps}
                   onChange={(e) => setPartialReps(e.target.value)}
                   placeholder="0 (optional)"
+                  className={partialRepsInvalid ? "border-error" : ""}
                 />
+                {partialRepsInvalid && (
+                  <p className="text-error italic text-sm">
+                    Invalid amount of partial reps
+                  </p>
+                )}
               </div>
             </div>
             <div>
@@ -368,8 +541,6 @@ const AddWorkoutForm = ({ workoutId }) => {
                   </ul>
                 </div>
                 <div>
-                  {/* TODO: Maybe add a function to check if the button should be
-                  disabled */}
                   <Button
                     className="w-full my-3"
                     type="button"
@@ -378,6 +549,36 @@ const AddWorkoutForm = ({ workoutId }) => {
                   >
                     Add Exercise to Workout
                   </Button>
+                  <Dialog
+                    open={isAddExerciseDialogOpen}
+                    onOpenChange={setIsAddExerciseDialogOpen}
+                  >
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Unsaved Changes</DialogTitle>
+                        <DialogDescription>
+                          You have unsaved changes. If you continue, any unsaved
+                          progress will be lost. Do you still want to add this
+                          exercise?
+                        </DialogDescription>
+                      </DialogHeader>
+                      <DialogFooter>
+                        <Button
+                          className="bg-clear border hover:bg-neutral-300 text-black"
+                          onClick={() => setIsAddExerciseDialogOpen(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          className="bg-error hover:bg-red-900"
+                          onClick={handleConfirmAddExerciseToWorkout}
+                          type="button"
+                        >
+                          Add Exercise
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
             )}
@@ -396,6 +597,52 @@ const AddWorkoutForm = ({ workoutId }) => {
               <li>No exercises completed yet.</li>
             )}
           </ul>
+        </div>
+        <div>
+          <Button
+            className="w-full my-2"
+            type="button"
+            onClick={handleSaveWorkout}
+            disabled={exercisesInWorkout <= 0}
+          >
+            Save Workout
+          </Button>
+          <Button
+            className="w-full bg-error"
+            type="button"
+            onClick={handleCancelWorkout}
+          >
+            Cancel
+          </Button>
+          <Dialog
+            open={isCancelWorkoutDialogOpen}
+            onOpenChange={setIsCancelWorkoutDialogOpen}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Cancel Workout?</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to cancel this workout? Any unsaved
+                  progress will be lost.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  className="bg-clear border hover:bg-neutral-300 text-black"
+                  onClick={() => setIsCancelWorkoutDialogOpen(false)}
+                >
+                  Back
+                </Button>
+                <Button
+                  className="bg-error hover:bg-red-900"
+                  onClick={confirmCancelWorkout}
+                  type="button"
+                >
+                  Cancel Workout
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </form>
     </div>

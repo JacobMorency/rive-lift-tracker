@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const BottomNav = () => {
   return (
-    <div className="bg-black flex justify-around items-center py-2 fixed bottom-0 right-0 left-0">
+    <div className="bg-black flex justify-around items-center py-2 fixed bottom-0 right-0 left-0 h-[56px]">
       <div className="">
         <Link to="/dashboard" className="text-white flex flex-col items-center">
           <House color="white" size={24} />
