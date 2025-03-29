@@ -23,7 +23,6 @@ const WorkoutsPage = () => {
       console.error("Error creating new workout:", error.message);
       return null;
     }
-    console.log(data);
     return data?.id;
   };
 
