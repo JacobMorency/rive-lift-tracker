@@ -25,6 +25,7 @@ const AddWorkoutForm = ({ workoutId }) => {
   const [weight, setWeight] = useState("");
   const [partialReps, setPartialReps] = useState("");
   const [exercisesInWorkout, setExercisesInWorkout] = useState([]);
+  const [completedSets, setCompletedSets] = useState([]);
   const [updateSetIndex, setUpdateSetIndex] = useState(null);
   const [isSetUpdating, setIsSetUpdating] = useState(false);
   const [deleteSetIndex, setDeleteSetIndex] = useState(null);
@@ -50,7 +51,44 @@ const AddWorkoutForm = ({ workoutId }) => {
   };
 
   const handleSaveWorkout = async () => {
-    const { data, error } = await supabase
+    for (const completedSet of completedSets) {
+      const { data: workoutExercisesData, error: exerciseError } =
+        await supabase
+          .from("workout_exercises")
+          .insert([
+            {
+              exercise_id: completedSet.exerciseId,
+              workout_id: workoutId,
+              created_at: new Date(),
+            },
+          ])
+          .select("id")
+          .single();
+      if (exerciseError) {
+        console.error("Error adding exercise to workout:", error.message);
+        return;
+      }
+
+      const setsData = completedSet.sets.map((set, index) => ({
+        workout_exercise_id: workoutExercisesData.id,
+        set_number: index + 1,
+        weight: set.weight,
+        reps: set.reps,
+        partial_reps: set.partialReps,
+        exercise_name: completedSet.exerciseName,
+        workout_id: workoutId,
+      }));
+
+      const { error: setsError } = await supabase.from("sets").insert(setsData);
+      if (setsError) {
+        console.error("Error adding sets to workout:", setsError.message);
+        return;
+      } else {
+        console.log("Sets added to workout successfully");
+      }
+    }
+
+    const { data: workoutData, error } = await supabase
       .from("workouts")
       .update({ is_complete: true })
       .eq("id", workoutId)
@@ -60,7 +98,6 @@ const AddWorkoutForm = ({ workoutId }) => {
       return;
     }
     handleCompleteWorkout();
-    console.log("Workout saved successfully:", data);
   };
 
   const handleAddSet = () => {
@@ -102,6 +139,7 @@ const AddWorkoutForm = ({ workoutId }) => {
       setSets((prevSets) => [
         ...prevSets,
         {
+          exerciseId: exerciseId,
           reps: numReps,
           weight: numWeight,
           partialReps: Number(partialReps) || 0, // Default to 0 if partial reps is empty
@@ -169,42 +207,20 @@ const AddWorkoutForm = ({ workoutId }) => {
   };
 
   const handleConfirmAddExerciseToWorkout = async () => {
-    const { data: workoutExercisesData, error } = await supabase
-      .from("workout_exercises")
-      .insert([
-        {
-          exercise_id: exerciseId,
-          workout_id: workoutId,
-          created_at: new Date(),
-        },
-      ])
-      .select("id");
-    if (error) {
-      console.error("Error adding exercise to workout:", error.message);
-      return;
-    }
-
-    const workoutExerciseId = workoutExercisesData[0].id;
-
-    const setsData = sets.map((set, index) => ({
-      workout_exercise_id: workoutExerciseId,
-      set_number: index + 1,
-      weight: set.weight,
-      reps: set.reps,
-      partial_reps: set.partialReps,
-      exercise_name: exerciseName,
-      workout_id: workoutId,
-    }));
-
-    const { error: setsError } = await supabase.from("sets").insert(setsData);
-    if (setsError) {
-      console.error("Error adding sets to workout:", setsError.message);
-      return;
-    }
-
+    setCompletedSets((prev) => [
+      ...prev,
+      {
+        exerciseId: exerciseId,
+        exerciseName: exerciseName,
+        sets: sets,
+      },
+    ]);
+    setExercisesInWorkout((prev) => [
+      ...prev,
+      { id: exerciseId, name: exerciseName },
+    ]);
     setSets([]);
     resetFormFields();
-    fetchCompletedExercises();
   };
 
   const fetchCompletedExercises = async () => {
@@ -276,7 +292,7 @@ const AddWorkoutForm = ({ workoutId }) => {
     if (savedProgress) {
       try {
         const [
-          savedSets,
+          savedCompletedSets,
           savedExerciseId,
           savedExerciseName,
           savedExercisesInWorkout,
@@ -284,9 +300,8 @@ const AddWorkoutForm = ({ workoutId }) => {
           savedWeight,
           savedPartialReps,
         ] = JSON.parse(savedProgress);
-        if (savedSets) {
-          console.log("Saved sets:", savedSets);
-          setSets(savedSets);
+        if (savedCompletedSets) {
+          setSets(savedCompletedSets);
         }
         if (savedExerciseId) {
           setExerciseId(savedExerciseId);
@@ -324,7 +339,7 @@ const AddWorkoutForm = ({ workoutId }) => {
       localStorage.setItem(
         "workoutProgress",
         JSON.stringify([
-          sets,
+          completedSets,
           exerciseId,
           exerciseName,
           exercisesInWorkout,
@@ -335,7 +350,7 @@ const AddWorkoutForm = ({ workoutId }) => {
       );
     }
   }, [
-    sets,
+    completedSets,
     exerciseId,
     exerciseName,
     exercisesInWorkout,
