@@ -1,5 +1,6 @@
-import ExerciseSelector from "../components/ExerciseSelector";
+import ExerciseSelector from "../components/workoutform/ExerciseSelector";
 import SetList from "../components/workoutform/SetList";
+import CompletedExerciseList from "./workoutform/CompletedExerciseList";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -15,7 +16,6 @@ import {
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../context/AuthContext";
-import { SquarePen, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const AddWorkoutForm = ({ workoutId }) => {
@@ -29,6 +29,7 @@ const AddWorkoutForm = ({ workoutId }) => {
   const [completedSets, setCompletedSets] = useState([]);
   const [updateSetIndex, setUpdateSetIndex] = useState(null);
   const [isSetUpdating, setIsSetUpdating] = useState(false);
+
   const [isAddExerciseDialogOpen, setIsAddExerciseDialogOpen] = useState(false);
   const [isCancelWorkoutDialogOpen, setIsCancelWorkoutDialogOpen] =
     useState(false);
@@ -460,29 +461,28 @@ const AddWorkoutForm = ({ workoutId }) => {
               )}
             </div>
             {sets.length > 0 && (
-              <SetList
-                sets={sets}
-                handleUpdateSet={handleUpdateSet}
-                handleDeleteSet={handleDeleteSet}
-                exerciseName={exerciseName}
-              />
+              <div>
+                <SetList
+                  sets={sets}
+                  handleUpdateSet={handleUpdateSet}
+                  handleDeleteSet={handleDeleteSet}
+                  exerciseName={exerciseName}
+                />
+                <div>
+                  <Button
+                    className="w-full my-3"
+                    type="button"
+                    onClick={handleAddExerciseToWorkout}
+                    disabled={sets.length === 0 || isSetUpdating}
+                  >
+                    Add Exercise to Workout
+                  </Button>
+                </div>
+              </div>
             )}
           </div>
         )}
-        <div>
-          <h3 className="font-bold text-lg my-3">
-            Exercises Completed This Workout:
-          </h3>
-          <ul>
-            {exercisesInWorkout.length > 0 ? (
-              exercisesInWorkout.map((exercise) => (
-                <li key={exercise.id}>{exercise.name}</li>
-              ))
-            ) : (
-              <li>No exercises completed yet.</li>
-            )}
-          </ul>
-        </div>
+        <CompletedExerciseList exercisesInWorkout={exercisesInWorkout} />
         <div>
           <Button
             className="w-full my-2"
