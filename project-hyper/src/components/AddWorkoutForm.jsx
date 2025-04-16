@@ -1,18 +1,10 @@
 import ExerciseSelector from "../components/workoutform/ExerciseSelector";
 import SetList from "../components/workoutform/SetList";
 import CompletedExerciseList from "./workoutform/CompletedExerciseList";
+import WorkoutActionButtons from "./workoutform/WorkoutActionButtons";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../context/AuthContext";
@@ -29,10 +21,6 @@ const AddWorkoutForm = ({ workoutId }) => {
   const [completedSets, setCompletedSets] = useState([]);
   const [updateSetIndex, setUpdateSetIndex] = useState(null);
   const [isSetUpdating, setIsSetUpdating] = useState(false);
-
-  const [isAddExerciseDialogOpen, setIsAddExerciseDialogOpen] = useState(false);
-  const [isCancelWorkoutDialogOpen, setIsCancelWorkoutDialogOpen] =
-    useState(false);
   const [repsEmpty, setRepsEmpty] = useState(false);
   const [weightEmpty, setWeightEmpty] = useState(false);
   const [repsInvalid, setRepsInvalid] = useState(false);
@@ -277,9 +265,6 @@ const AddWorkoutForm = ({ workoutId }) => {
   const confirmCancelWorkout = () => {
     handleCompleteWorkout();
   };
-  const handleCancelWorkout = () => {
-    setIsCancelWorkoutDialogOpen(true);
-  };
 
   useEffect(() => {
     const savedProgress = localStorage.getItem("workoutProgress");
@@ -483,52 +468,11 @@ const AddWorkoutForm = ({ workoutId }) => {
           </div>
         )}
         <CompletedExerciseList exercisesInWorkout={exercisesInWorkout} />
-        <div>
-          <Button
-            className="w-full my-2"
-            type="button"
-            onClick={handleSaveWorkout}
-            disabled={exercisesInWorkout <= 0}
-          >
-            Save Workout
-          </Button>
-          <Button
-            className="w-full bg-error"
-            type="button"
-            onClick={handleCancelWorkout}
-          >
-            Cancel
-          </Button>
-          <Dialog
-            open={isCancelWorkoutDialogOpen}
-            onOpenChange={setIsCancelWorkoutDialogOpen}
-          >
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Cancel Workout?</DialogTitle>
-                <DialogDescription>
-                  Are you sure you want to cancel this workout? Any unsaved
-                  progress will be lost.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button
-                  className="bg-clear border hover:bg-neutral-300 text-black"
-                  onClick={() => setIsCancelWorkoutDialogOpen(false)}
-                >
-                  Back
-                </Button>
-                <Button
-                  className="bg-error hover:bg-red-900"
-                  onClick={confirmCancelWorkout}
-                  type="button"
-                >
-                  Cancel Workout
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
+        <WorkoutActionButtons
+          handleSaveWorkout={handleSaveWorkout}
+          exercisesInWorkout={exercisesInWorkout}
+          confirmCancelWorkout={confirmCancelWorkout}
+        />
       </form>
     </div>
   );
