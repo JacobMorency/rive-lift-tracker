@@ -1,4 +1,5 @@
 import ExerciseSelector from "../components/ExerciseSelector";
+import SetList from "../components/workoutform/SetList";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -28,8 +29,6 @@ const AddWorkoutForm = ({ workoutId }) => {
   const [completedSets, setCompletedSets] = useState([]);
   const [updateSetIndex, setUpdateSetIndex] = useState(null);
   const [isSetUpdating, setIsSetUpdating] = useState(false);
-  const [deleteSetIndex, setDeleteSetIndex] = useState(null);
-  const [isDeleteSetDialogOpen, setIsDeleteSetDialogOpen] = useState(false);
   const [isAddExerciseDialogOpen, setIsAddExerciseDialogOpen] = useState(false);
   const [isCancelWorkoutDialogOpen, setIsCancelWorkoutDialogOpen] =
     useState(false);
@@ -179,14 +178,8 @@ const AddWorkoutForm = ({ workoutId }) => {
   };
 
   const handleDeleteSet = (index) => {
-    setIsDeleteSetDialogOpen(true);
-    setDeleteSetIndex(index);
-  };
-
-  const handleConfirmDeleteSet = () => {
-    const updatedSets = sets.filter((set, i) => i !== deleteSetIndex);
+    const updatedSets = sets.filter((set, i) => i !== index);
     setSets(updatedSets);
-    setIsDeleteSetDialogOpen(false);
   };
 
   const checkUnsavedChanges = () => {
@@ -467,135 +460,12 @@ const AddWorkoutForm = ({ workoutId }) => {
               )}
             </div>
             {sets.length > 0 && (
-              <div>
-                {/* TODO: make this a list or table */}
-                <div>
-                  <h3 className="font-bold text-lg my-3">
-                    Sets for {exerciseName}:
-                  </h3>
-                  <ul>
-                    {sets.map((set, index) => (
-                      <li
-                        key={index}
-                        className="rounded border py-3 px-2 my-1 flex items-center justify-between"
-                      >
-                        <p>
-                          <span className="font-bold">Set {index + 1}:</span>{" "}
-                          {set.reps} reps at {set.weight} lbs
-                          {set.partialReps > 0 &&
-                            ` with ${set.partialReps} partial reps`}
-                        </p>
-                        <span className="flex gap-2">
-                          <Button
-                            className="bg-clear border hover:bg-neutral-300"
-                            type="button"
-                            onClick={() => handleUpdateSet(index)}
-                          >
-                            <SquarePen className="text-black" />
-                          </Button>
-                          <Dialog
-                            open={isDeleteSetDialogOpen}
-                            onOpenChange={setIsDeleteSetDialogOpen}
-                          >
-                            <DialogTrigger asChild>
-                              <div>
-                                <Button
-                                  className="bg-red-500 hover:bg-red-900"
-                                  type="button"
-                                  onClick={() => handleDeleteSet(index)}
-                                >
-                                  <Trash2 />
-                                </Button>
-                              </div>
-                            </DialogTrigger>
-                            {deleteSetIndex !== null && (
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>
-                                    Delete Set {deleteSetIndex + 1}
-                                  </DialogTitle>
-                                  <DialogDescription>
-                                    Are you sure you want to delete this set?
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <div>
-                                  <p>
-                                    <span className="font-bold">
-                                      Set {deleteSetIndex + 1}:
-                                    </span>{" "}
-                                    {sets[deleteSetIndex].reps} reps at{" "}
-                                    {sets[deleteSetIndex].weight} lbs
-                                    {sets[deleteSetIndex].partialReps > 0 &&
-                                      ` with ${sets[deleteSetIndex].partialReps} partial reps`}
-                                  </p>
-                                </div>
-
-                                <DialogFooter>
-                                  <Button
-                                    className="bg-clear border hover:bg-neutral-300 text-black"
-                                    onClick={() =>
-                                      setIsDeleteSetDialogOpen(false)
-                                    }
-                                  >
-                                    Cancel
-                                  </Button>
-                                  <Button
-                                    className="bg-red-500 hover:bg-red-900"
-                                    onClick={handleConfirmDeleteSet}
-                                    type="button"
-                                  >
-                                    Delete
-                                  </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            )}
-                          </Dialog>
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <Button
-                    className="w-full my-3"
-                    type="button"
-                    onClick={handleAddExerciseToWorkout}
-                    disabled={sets.length === 0 || isSetUpdating}
-                  >
-                    Add Exercise to Workout
-                  </Button>
-                  <Dialog
-                    open={isAddExerciseDialogOpen}
-                    onOpenChange={setIsAddExerciseDialogOpen}
-                  >
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Unsaved Changes</DialogTitle>
-                        <DialogDescription>
-                          You have unsaved changes. If you continue, any unsaved
-                          progress will be lost. Do you still want to add this
-                          exercise?
-                        </DialogDescription>
-                      </DialogHeader>
-                      <DialogFooter>
-                        <Button
-                          className="bg-clear border hover:bg-neutral-300 text-black"
-                          onClick={() => setIsAddExerciseDialogOpen(false)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          className="bg-error hover:bg-red-900"
-                          onClick={handleConfirmAddExerciseToWorkout}
-                          type="button"
-                        >
-                          Add Exercise
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </div>
+              <SetList
+                sets={sets}
+                handleUpdateSet={handleUpdateSet}
+                handleDeleteSet={handleDeleteSet}
+                exerciseName={exerciseName}
+              />
             )}
           </div>
         )}
