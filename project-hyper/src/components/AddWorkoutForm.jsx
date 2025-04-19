@@ -2,9 +2,7 @@ import ExerciseSelector from "../components/workoutform/ExerciseSelector";
 import SetList from "../components/workoutform/SetList";
 import CompletedExerciseList from "./workoutform/CompletedExerciseList";
 import WorkoutActionButtons from "./workoutform/WorkoutActionButtons";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import SetInputForm from "./workoutform/SetInputForm";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../context/AuthContext";
@@ -362,111 +360,31 @@ const AddWorkoutForm = ({ workoutId }) => {
           />
         </div>
         {exerciseName && (
-          <div>
-            <div className="flex space-x-3 my-3">
-              <div className="my-3">
-                <Label htmlFor="reps">Reps</Label>
-                <Input
-                  type="number"
-                  id="reps"
-                  value={reps}
-                  onChange={(e) => setReps(e.target.value)}
-                  placeholder="0"
-                  className={repsEmpty || repsInvalid ? "border-error" : ""}
-                />
-                {repsEmpty && (
-                  <p className="text-error italic text-sm">Reps required</p>
-                )}
-                {repsInvalid && (
-                  <p className="text-error italic text-sm">
-                    Invalid amount of reps
-                  </p>
-                )}
-              </div>
-              <div className="my-3">
-                <Label htmlFor="weight">Weight</Label>
-                <Input
-                  type="number"
-                  id="weight"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                  placeholder="0 (lbs)"
-                  className={weightEmpty || weightInvalid ? "border-error" : ""}
-                />
-                {weightEmpty && (
-                  <p className="text-error italic text-sm">Weight required</p>
-                )}
-                {weightInvalid && (
-                  <p className="text-error italic text-sm">
-                    Invalid amount of weight
-                  </p>
-                )}
-              </div>
-              {/* TODO: Add a help icon and potentially a toggle for partial reps */}
-              <div className="my-3">
-                <Label htmlFor="partialReps">Partial Reps</Label>
-                <Input
-                  type="number"
-                  id="partialReps"
-                  value={partialReps}
-                  onChange={(e) => setPartialReps(e.target.value)}
-                  placeholder="0 (optional)"
-                  className={partialRepsInvalid ? "border-error" : ""}
-                />
-                {partialRepsInvalid && (
-                  <p className="text-error italic text-sm">
-                    Invalid amount of partial reps
-                  </p>
-                )}
-              </div>
-            </div>
-            <div>
-              {!isSetUpdating && (
-                <Button className="w-full" onClick={handleAddSet} type="button">
-                  Add Set
-                </Button>
-              )}
-              {isSetUpdating && (
-                <div className="flex flex-col space-y-1">
-                  <Button
-                    className="w-full"
-                    onClick={handleSaveUpdatedSet}
-                    type="button"
-                  >
-                    Update Set {updateSetIndex + 1}
-                  </Button>
-                  <Button
-                    className="w-full bg-clear border hover:bg-neutral-300 text-black"
-                    type="button"
-                    onClick={cancelUpdateSet}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              )}
-            </div>
-            {sets.length > 0 && (
-              <div>
-                <SetList
-                  sets={sets}
-                  handleUpdateSet={handleUpdateSet}
-                  handleDeleteSet={handleDeleteSet}
-                  exerciseName={exerciseName}
-                />
-                <div>
-                  <Button
-                    className="w-full my-3"
-                    type="button"
-                    onClick={handleAddExerciseToWorkout}
-                    disabled={sets.length === 0 || isSetUpdating}
-                  >
-                    Add Exercise to Workout
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
+          <SetInputForm
+            reps={reps}
+            weight={weight}
+            partialReps={partialReps}
+            setReps={setReps}
+            setWeight={setWeight}
+            setPartialReps={setPartialReps}
+            repsEmpty={repsEmpty}
+            weightEmpty={weightEmpty}
+            partialRepsInvalid={partialRepsInvalid}
+            weightInvalid={weightInvalid}
+            repsInvalid={repsInvalid}
+            isSetUpdating={isSetUpdating}
+            handleAddSet={handleAddSet}
+            handleSaveUpdatedSet={handleSaveUpdatedSet}
+            cancelUpdateSet={cancelUpdateSet}
+            updateSetIndex={updateSetIndex}
+          />
         )}
+        <SetList
+          sets={sets}
+          handleUpdateSet={handleUpdateSet}
+          handleDeleteSet={handleDeleteSet}
+          exerciseName={exerciseName}
+        />
         <CompletedExerciseList exercisesInWorkout={exercisesInWorkout} />
         <WorkoutActionButtons
           handleSaveWorkout={handleSaveWorkout}
