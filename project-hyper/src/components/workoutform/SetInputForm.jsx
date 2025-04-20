@@ -14,11 +14,6 @@ const SetInputForm = (props) => {
     partialRepsInvalid,
     weightInvalid,
     repsInvalid,
-    isSetUpdating,
-    handleAddSet,
-    handleSaveUpdatedSet,
-    cancelUpdateSet,
-    updateSetIndex,
   } = props;
   return (
     <div>
