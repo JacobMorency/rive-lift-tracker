@@ -3,6 +3,7 @@ import SetList from "../components/workoutform/SetList";
 import CompletedExerciseList from "./workoutform/CompletedExerciseList";
 import WorkoutActionButtons from "./workoutform/WorkoutActionButtons";
 import SetInputForm from "./workoutform/SetInputForm";
+import AddExerciseButton from "./workoutform/AddExerciseButton";
 import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { useAuth } from "../context/AuthContext";
@@ -264,6 +265,7 @@ const AddWorkoutForm = ({ workoutId }) => {
     handleCompleteWorkout();
   };
 
+  // Get previous workout progress from local storage so its persisted upon refresh
   useEffect(() => {
     const savedProgress = localStorage.getItem("workoutProgress");
     if (savedProgress) {
@@ -276,9 +278,15 @@ const AddWorkoutForm = ({ workoutId }) => {
           savedReps,
           savedWeight,
           savedPartialReps,
+          savedSets,
         ] = JSON.parse(savedProgress);
         if (savedCompletedSets) {
-          setSets(savedCompletedSets);
+          setCompletedSets(savedCompletedSets);
+          const derivedExercises = savedCompletedSets.map((ex) => ({
+            id: ex.exerciseId,
+            name: ex.exerciseName,
+          }));
+          setExercisesInWorkout(derivedExercises);
         }
         if (savedExerciseId) {
           setExerciseId(savedExerciseId);
@@ -286,9 +294,9 @@ const AddWorkoutForm = ({ workoutId }) => {
         if (savedExerciseName) {
           setExerciseName(savedExerciseName);
         }
-        if (savedExercisesInWorkout) {
-          setExercisesInWorkout(savedExercisesInWorkout);
-        }
+        // if (savedExercisesInWorkout) {
+        //   setExercisesInWorkout(savedExercisesInWorkout);
+        // }
         if (savedReps) {
           setReps(savedReps);
         }
@@ -297,6 +305,9 @@ const AddWorkoutForm = ({ workoutId }) => {
         }
         if (savedPartialReps) {
           setPartialReps(savedPartialReps);
+        }
+        if (savedSets) {
+          setSets(savedSets);
         }
       } catch (error) {
         console.error("Error parsing saved progress:", error);
@@ -311,6 +322,7 @@ const AddWorkoutForm = ({ workoutId }) => {
     }
   }, [isIntialized]);
 
+  // Save the current workout progress to local storage so that it can be retrieved upon refresh or page change
   useEffect(() => {
     if (isIntialized) {
       localStorage.setItem(
@@ -323,6 +335,7 @@ const AddWorkoutForm = ({ workoutId }) => {
           reps,
           weight,
           partialReps,
+          sets,
         ])
       );
     }
@@ -334,13 +347,15 @@ const AddWorkoutForm = ({ workoutId }) => {
     reps,
     weight,
     partialReps,
+    sets,
   ]);
 
-  useEffect(() => {
-    if (workoutId) {
-      fetchCompletedExercises();
-    }
-  }, [workoutId]);
+  // TODO: query supabase instead of relying on local storage
+  // useEffect(() => {
+  //   if (workoutId) {
+  //     fetchCompletedExercises();
+  //   }
+  // }, [workoutId]);
 
   if (loading) {
     return <div>Loading...</div>; // Or any other loading indicator
@@ -359,6 +374,7 @@ const AddWorkoutForm = ({ workoutId }) => {
             exercisesInWorkout={exercisesInWorkout}
           />
         </div>
+        {/* Only display the form once an exercise has been chosen */}
         {exerciseName && (
           <SetInputForm
             reps={reps}
@@ -379,12 +395,21 @@ const AddWorkoutForm = ({ workoutId }) => {
             updateSetIndex={updateSetIndex}
           />
         )}
-        <SetList
-          sets={sets}
-          handleUpdateSet={handleUpdateSet}
-          handleDeleteSet={handleDeleteSet}
-          exerciseName={exerciseName}
-        />
+        {sets.length > 0 && (
+          <div>
+            <SetList
+              sets={sets}
+              handleUpdateSet={handleUpdateSet}
+              handleDeleteSet={handleDeleteSet}
+              exerciseName={exerciseName}
+            />
+            <AddExerciseButton
+              handleAddExerciseToWorkout={handleAddExerciseToWorkout}
+              isSetUpdating={isSetUpdating}
+              sets={sets}
+            />
+          </div>
+        )}
         <CompletedExerciseList exercisesInWorkout={exercisesInWorkout} />
         <WorkoutActionButtons
           handleSaveWorkout={handleSaveWorkout}
