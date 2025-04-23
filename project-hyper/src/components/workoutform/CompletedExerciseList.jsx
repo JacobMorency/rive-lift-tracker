@@ -11,8 +11,17 @@ import {
 import { SquarePen, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-const CompletedExerciseList = ({ exercisesInWorkout }) => {
+const CompletedExerciseList = ({
+  exercisesInWorkout,
+  handleDeleteExercise,
+}) => {
   const [isDeleteSetDialogOpen, setIsDeleteSetDialogOpen] = useState(false);
+  const [deleteExerciseIndex, setDeleteExerciseIndex] = useState(null);
+
+  const handleConfirmDeleteExercise = () => {
+    handleDeleteExercise(deleteExerciseIndex);
+    setIsDeleteSetDialogOpen(false);
+  };
   return (
     <div>
       <h3 className="font-bold text-lg my-3">
@@ -20,7 +29,7 @@ const CompletedExerciseList = ({ exercisesInWorkout }) => {
       </h3>
       <ul>
         {exercisesInWorkout.length > 0 ? (
-          exercisesInWorkout.map((exercise) => (
+          exercisesInWorkout.map((exercise, index) => (
             <li
               key={exercise.id}
               className="rounded border py-3 px-2 my-1 flex items-center justify-between"
@@ -43,6 +52,10 @@ const CompletedExerciseList = ({ exercisesInWorkout }) => {
                       <Button
                         className="bg-red-500 hover:bg-red-900"
                         type="button"
+                        onClick={() => {
+                          setDeleteExerciseIndex(index);
+                          setIsDeleteSetDialogOpen(true);
+                        }}
                       >
                         <Trash2 />
                       </Button>
@@ -69,6 +82,7 @@ const CompletedExerciseList = ({ exercisesInWorkout }) => {
                       <Button
                         className="bg-red-500 hover:bg-red-900"
                         type="button"
+                        onClick={handleConfirmDeleteExercise}
                       >
                         Remove
                       </Button>

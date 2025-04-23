@@ -170,6 +170,16 @@ const AddWorkoutForm = ({ workoutId }) => {
     setSets(updatedSets);
   };
 
+  const handleDeleteExercise = (index) => {
+    const updatedExercisesInWorkout = exercisesInWorkout.filter(
+      (exercise, i) => i !== index
+    );
+    const updatedCompletedSets = completedSets.filter((set, i) => i !== index);
+
+    setExercisesInWorkout(updatedExercisesInWorkout);
+    setCompletedSets(updatedCompletedSets);
+  };
+
   const checkUnsavedChanges = () => {
     if (reps || weight || partialReps > 0) {
       return true;
@@ -410,7 +420,10 @@ const AddWorkoutForm = ({ workoutId }) => {
             />
           </div>
         )}
-        <CompletedExerciseList exercisesInWorkout={exercisesInWorkout} />
+        <CompletedExerciseList
+          exercisesInWorkout={exercisesInWorkout}
+          handleDeleteExercise={handleDeleteExercise}
+        />
         <WorkoutActionButtons
           handleSaveWorkout={handleSaveWorkout}
           exercisesInWorkout={exercisesInWorkout}
