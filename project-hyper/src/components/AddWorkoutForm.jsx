@@ -20,6 +20,8 @@ const AddWorkoutForm = ({ workoutId }) => {
   const [completedSets, setCompletedSets] = useState([]);
   const [updateSetIndex, setUpdateSetIndex] = useState(null);
   const [isSetUpdating, setIsSetUpdating] = useState(false);
+  const [updateExerciseIndex, setUpdateExerciseIndex] = useState(null);
+  const [isExerciseUpdating, setIsExerciseUpdating] = useState(false);
   const [repsEmpty, setRepsEmpty] = useState(false);
   const [weightEmpty, setWeightEmpty] = useState(false);
   const [repsInvalid, setRepsInvalid] = useState(false);
@@ -168,6 +170,34 @@ const AddWorkoutForm = ({ workoutId }) => {
   const handleDeleteSet = (index) => {
     const updatedSets = sets.filter((set, i) => i !== index);
     setSets(updatedSets);
+
+    if (updatedSets.length === 0 && isExerciseUpdating) {
+      setIsExerciseUpdating(false);
+      setUpdateExerciseIndex(null);
+      resetFormFields();
+      if (updateExerciseIndex !== null) {
+        handleDeleteExercise(updateExerciseIndex);
+      }
+    }
+  };
+
+  const handleDeleteExercise = (index) => {
+    const updatedExercisesInWorkout = exercisesInWorkout.filter(
+      (exercise, i) => i !== index
+    );
+    const updatedCompletedSets = completedSets.filter((set, i) => i !== index);
+
+    setExercisesInWorkout(updatedExercisesInWorkout);
+    setCompletedSets(updatedCompletedSets);
+  };
+
+  const handleUpdateExercise = (index) => {
+    const completedSet = completedSets[index];
+    setExerciseName(completedSet.exerciseName);
+    setExerciseId(completedSet.exerciseId);
+    setSets(completedSet.sets);
+    setIsExerciseUpdating(true);
+    setUpdateExerciseIndex(index);
   };
 
   const checkUnsavedChanges = () => {
@@ -188,62 +218,40 @@ const AddWorkoutForm = ({ workoutId }) => {
   };
 
   const handleConfirmAddExerciseToWorkout = async () => {
-    setCompletedSets((prev) => [
-      ...prev,
-      {
-        exerciseId: exerciseId,
-        exerciseName: exerciseName,
-        sets: sets,
-      },
-    ]);
-    setExercisesInWorkout((prev) => [
-      ...prev,
-      { id: exerciseId, name: exerciseName },
-    ]);
+    if (isExerciseUpdating && updateExerciseIndex !== null) {
+      // Replaces the old completedSet with a new one with updates
+      const updatedCompletedSets = [...completedSets];
+      updatedCompletedSets[updateExerciseIndex] = {
+        exerciseId,
+        exerciseName,
+        sets,
+      };
+      setCompletedSets(updatedCompletedSets);
+
+      const updatedExercisesInWorkout = [...exercisesInWorkout];
+      updatedExercisesInWorkout[updateExerciseIndex] = {
+        id: exerciseId,
+        name: exerciseName,
+      };
+      setExercisesInWorkout(updatedExercisesInWorkout);
+    } else {
+      setCompletedSets((prev) => [
+        ...prev,
+        {
+          exerciseId: exerciseId,
+          exerciseName: exerciseName,
+          sets: sets,
+        },
+      ]);
+      setExercisesInWorkout((prev) => [
+        ...prev,
+        { id: exerciseId, name: exerciseName },
+      ]);
+    }
+    setIsExerciseUpdating(false);
+    setUpdateExerciseIndex(null);
     setSets([]);
     resetFormFields();
-  };
-
-  const fetchCompletedExercises = async () => {
-    if (!workoutId) {
-      console.error("No workout ID provided.");
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from("workout_exercises")
-      .select("exercise_id")
-      .eq("workout_id", workoutId)
-      .order("created_at", { ascending: false });
-    if (error) {
-      console.error("Error fetching completed exercises:", error.message);
-      return;
-    }
-
-    const exerciseNames = await Promise.all(
-      data.map(async (exercise) => {
-        const exerciseName = await getExerciseNameById(exercise.exercise_id);
-        return {
-          id: exercise.exercise_id,
-          name: exerciseName,
-        };
-      })
-    );
-
-    setExercisesInWorkout(exerciseNames);
-  };
-
-  const getExerciseNameById = async (exerciseId) => {
-    const { data, error } = await supabase
-      .from("exercise_library")
-      .select("name")
-      .eq("id", exerciseId)
-      .single();
-    if (error) {
-      console.error("Error fetching exercise name:", error.message);
-      return;
-    }
-    return data.name;
   };
 
   const resetFormFields = () => {
@@ -407,10 +415,15 @@ const AddWorkoutForm = ({ workoutId }) => {
               handleAddExerciseToWorkout={handleAddExerciseToWorkout}
               isSetUpdating={isSetUpdating}
               sets={sets}
+              isExerciseUpdating={isExerciseUpdating}
             />
           </div>
         )}
-        <CompletedExerciseList exercisesInWorkout={exercisesInWorkout} />
+        <CompletedExerciseList
+          exercisesInWorkout={exercisesInWorkout}
+          handleDeleteExercise={handleDeleteExercise}
+          handleUpdateExercise={handleUpdateExercise}
+        />
         <WorkoutActionButtons
           handleSaveWorkout={handleSaveWorkout}
           exercisesInWorkout={exercisesInWorkout}
