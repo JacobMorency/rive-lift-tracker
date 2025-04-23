@@ -21,7 +21,7 @@ const SetList = ({ sets, handleUpdateSet, handleDeleteSet, exerciseName }) => {
   };
   return (
     <div>
-      <h3 className="font-bold text-lg my-3">Sets for {exerciseName}</h3>
+      <h3 className="font-bold text-lg my-3">Sets for {exerciseName}:</h3>
       <ul>
         {sets.map((set, index) => (
           <li

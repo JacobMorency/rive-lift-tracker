@@ -14,9 +14,11 @@ import { useState } from "react";
 const CompletedExerciseList = ({
   exercisesInWorkout,
   handleDeleteExercise,
+  handleUpdateExercise,
 }) => {
   const [isDeleteSetDialogOpen, setIsDeleteSetDialogOpen] = useState(false);
   const [deleteExerciseIndex, setDeleteExerciseIndex] = useState(null);
+  const [updateExerciseIndex, setUpdateExerciseIndex] = useState(null);
 
   const handleConfirmDeleteExercise = () => {
     handleDeleteExercise(deleteExerciseIndex);
@@ -39,7 +41,7 @@ const CompletedExerciseList = ({
                 <Button
                   className="bg-clear border hover:bg-neutral-300"
                   type="button"
-                  onClick={() => handleUpdateSet(index)}
+                  onClick={() => handleUpdateExercise(index)}
                 >
                   <SquarePen className="text-black" />
                 </Button>
