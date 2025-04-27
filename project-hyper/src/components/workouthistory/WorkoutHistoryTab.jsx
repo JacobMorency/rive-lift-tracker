@@ -4,9 +4,6 @@ import { useState, useEffect } from "react";
 import WorkoutHistoryCard from "./WorkoutHistoryCard";
 
 const WorkoutHistoryTab = ({ workouts }) => {
-  const [isWeekActive, setIsWeekActive] = useState(true);
-  const [isMonthActive, setIsMonthActive] = useState(false);
-  const [isAllActive, setIsAllActive] = useState(false);
   const [selectedWorkouts, setSelectedWorkouts] = useState([]);
 
   const handleTabChange = (value) => {
@@ -76,11 +73,9 @@ const WorkoutHistoryTab = ({ workouts }) => {
           <TabsTrigger value="all">All Time</TabsTrigger>
         </TabsList>
         <TabsContent value="week">
-          <TabsContent value="week">
-            {selectedWorkouts.map((workout) => (
-              <WorkoutHistoryCard key={workout.id} workout={workout} />
-            ))}
-          </TabsContent>
+          {selectedWorkouts.map((workout) => (
+            <WorkoutHistoryCard key={workout.id} workout={workout} />
+          ))}
         </TabsContent>
         <TabsContent value="month">
           {selectedWorkouts.map((workout) => (

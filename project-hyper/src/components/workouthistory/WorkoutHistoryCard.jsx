@@ -31,7 +31,7 @@ const WorkoutHistoryCard = ({ workout }) => {
   }, []);
 
   return (
-    <div className="">
+    <div className="mb-3">
       <Card className="px-6">
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <div className="flex items-center justify-between py-2">
