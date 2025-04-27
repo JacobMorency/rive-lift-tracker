@@ -36,7 +36,8 @@ const WorkoutHistoryCard = ({ workout }) => {
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
           <div className="flex items-center justify-between py-2">
             <span className="font-medium text-xl">
-              {workout.date} - # exercises
+              {workout.date} - {workoutData.length}{" "}
+              {workoutData.length > 1 ? "Exercises" : "Exercise"}
             </span>
             <Button variant="ghost" onClick={() => setIsOpen(!isOpen)}>
               {isOpen ? <ChevronUp /> : <ChevronDown />}
@@ -51,6 +52,9 @@ const WorkoutHistoryCard = ({ workout }) => {
                   ))}
                 </div>
               )}
+              <div className="flex justify-end">
+                <CardActionButtons />
+              </div>
             </div>
           )}
         </Collapsible>

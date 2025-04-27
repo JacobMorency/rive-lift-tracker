@@ -67,25 +67,49 @@ const WorkoutHistoryTab = ({ workouts }) => {
         onValueChange={(value) => handleTabChange(value)}
         className="mt-3"
       >
-        <TabsList>
+        <TabsList className="w-full">
           <TabsTrigger value="week">This Week</TabsTrigger>
           <TabsTrigger value="month">This Month</TabsTrigger>
           <TabsTrigger value="all">All Time</TabsTrigger>
         </TabsList>
         <TabsContent value="week">
-          {selectedWorkouts.map((workout) => (
-            <WorkoutHistoryCard key={workout.id} workout={workout} />
-          ))}
+          {selectedWorkouts.length > 0 ? (
+            <div className="pb-24">
+              {selectedWorkouts.map((workout) => (
+                <WorkoutHistoryCard key={workout.id} workout={workout} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500 mt-4">
+              No workouts this week.
+            </p>
+          )}
         </TabsContent>
+
         <TabsContent value="month">
-          {selectedWorkouts.map((workout) => (
-            <WorkoutHistoryCard key={workout.id} workout={workout} />
-          ))}
+          {selectedWorkouts.length > 0 ? (
+            <div className="pb-24">
+              {selectedWorkouts.map((workout) => (
+                <WorkoutHistoryCard key={workout.id} workout={workout} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500 mt-4">
+              No workouts this month.
+            </p>
+          )}
         </TabsContent>
+
         <TabsContent value="all">
-          {selectedWorkouts.map((workout) => (
-            <WorkoutHistoryCard key={workout.id} workout={workout} />
-          ))}
+          {selectedWorkouts.length > 0 ? (
+            <div className="pb-24">
+              {selectedWorkouts.map((workout) => (
+                <WorkoutHistoryCard key={workout.id} workout={workout} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-gray-500 mt-4">No workouts yet.</p>
+          )}
         </TabsContent>
       </Tabs>
     </div>
