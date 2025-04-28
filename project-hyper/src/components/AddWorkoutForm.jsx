@@ -269,7 +269,17 @@ const AddWorkoutForm = ({ workoutId }) => {
   };
 
   // TODO: Remove workout from db if cancelled
-  const confirmCancelWorkout = () => {
+  const confirmCancelWorkout = async () => {
+    const { error } = await supabase
+      .from("workouts")
+      .delete()
+      .eq("id", workoutId);
+
+    if (error) {
+      console.error("Error deleting workout:", error.message);
+    } else {
+      console.log("Workout deleted successfully.");
+    }
     handleCompleteWorkout();
   };
 
