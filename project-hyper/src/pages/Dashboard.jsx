@@ -1,7 +1,11 @@
+import DashboardHeader from "../components/dashboard/DashboardHeader";
+import DashboardContent from "../components/dashboard/DashboardContent";
+
 const Dashboard = () => {
   return (
     <div>
-      <h1 className="text-center">Dashboard</h1>
+      <DashboardHeader />
+      <DashboardContent />
     </div>
   );
 };
