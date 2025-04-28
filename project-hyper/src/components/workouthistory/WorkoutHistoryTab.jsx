@@ -65,6 +65,12 @@ const WorkoutHistoryTab = ({ workouts }) => {
     setSelectedWorkouts(workouts);
   };
 
+  useEffect(() => {
+    if (workouts.length > 0) {
+      fetchWeeklyWorkouts();
+    }
+  }, [workouts]);
+
   return (
     <div>
       <Tabs
