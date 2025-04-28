@@ -4,6 +4,8 @@ import { supabase } from "../supabaseClient";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 
+import WorkoutHistory from "../components/WorkoutHistory";
+
 const WorkoutsPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -49,19 +51,19 @@ const WorkoutsPage = () => {
   };
 
   return (
-    // height is calculated based on the screen size subtracting the bottom navigation height
     <div>
       {workoutInProgress ? (
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-56px)]">
+        <div className="flex items-center">
           <Button onClick={handleContinueWorkout}>
             Continue Previous Workout
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center h-[calc(100vh-56px)]">
+        <div className="flex items-center justify-center mt-3">
           <Button onClick={handleStartNewWorkout}>Start New Workout</Button>
         </div>
       )}
+      <WorkoutHistory />
     </div>
   );
 };
