@@ -1,9 +1,9 @@
-import Image from "next/image";
+import LoginPage from "@/app/login/page";
 
 export default function Home() {
   return (
-    <div>
-      <p className="bg-secondary">Test</p>
-    </div>
+    <main>
+      <LoginPage />
+    </main>
   );
 }
