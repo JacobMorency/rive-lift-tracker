@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="pj-pink">
+    <html lang="en" data-theme="projecthyperpink">
       <body>
         <AuthProvider>
           <ClientLayout>{children}</ClientLayout>

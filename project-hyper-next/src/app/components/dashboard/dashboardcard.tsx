@@ -1,7 +1,7 @@
 const DashboardCard = ({ title, content, description, icon }) => {
   return (
     <div>
-      <div className="card card-border bg-base-200">
+      <div className="card card-border bg-primary">
         <div className="card-body">
           <div className="flex items-center justify-between w-full">
             <span className="card-title">{title}</span>

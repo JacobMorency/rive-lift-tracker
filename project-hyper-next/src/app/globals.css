@@ -2,42 +2,42 @@
 @plugin "daisyui";
 
 @plugin "daisyui/theme" {
-  name: "pj-pink";
+  name: "projecthyperpink";
   default: false;
   prefersdark: false;
-  color-scheme: "pj-pink";
+  color-scheme: "dark";
 
-  --color-base-100: oklch(20.83% 0.016 356.66); /* background-900 */
-  --color-base-200: oklch(15.52% 0.007 1.15); /* background-950 */
-  --color-base-300: oklch(30.94% 0.025 358.11); /* background-800 */
-  --color-base-content: oklch(91.54% 0.016 352); /* text-100 */
+  /* Simplified color palette using HEX values */
+  --color-base-100: #10090b;
+  --color-base-200: #10090b;
+  --color-base-300: #311c22;
+  --color-base-content: #f3f3f3; /* Choose a readable light color for text */
 
-  --color-primary: oklch(56.88% 0.187 3.16); /* primary-500 */
-  --color-primary-content: oklch(90.63% 0.035 352.91); /* primary-100 */
+  --color-primary: #bd3265;
+  --color-primary-content: #ffffff;
 
-  --color-secondary: oklch(59.09% 0.222 6.05); /* secondary-500 */
-  --color-secondary-content: oklch(90.1% 0.048 352.97); /* secondary-100 */
+  --color-secondary: #7d123b;
+  --color-secondary-content: #ffffff;
 
-  --color-accent: oklch(62.04% 0.245 9.94); /* accent-500 */
-  --color-accent-content: oklch(89.7% 0.058 353.37); /* accent-100 */
+  --color-accent: #be094e;
+  --color-accent-content: #ffffff;
 
-  --color-neutral: oklch(
-    15.38% 0.011 356.62
-  ); /* text-950 as a soft dark neutral */
-  --color-neutral-content: oklch(83.09% 0.03 350.66); /* text-200 */
+  --color-neutral: #311c22;
+  --color-neutral-content: #f3f3f3;
 
-  --color-info: oklch(56.88% 0.187 3.16); /* reused primary */
-  --color-info-content: oklch(20.22% 0.051 358.91); /* primary-900 */
+  --color-info: #2094f3;
+  --color-info-content: #ffffff;
 
-  --color-success: oklch(52.51% 0.207 9.39); /* accent-600 */
-  --color-success-content: oklch(20.57% 0.078 2.76); /* accent-900 */
+  --color-success: #009485;
+  --color-success-content: #ffffff;
 
-  --color-warning: oklch(64.47% 0.195 0.76); /* secondary-400 */
-  --color-warning-content: oklch(20.37% 0.066 1.06); /* secondary-900 */
+  --color-warning: #ff9900;
+  --color-warning-content: #ffffff;
 
-  --color-error: oklch(48.42% 0.157 3.09); /* primary-600 */
-  --color-error-content: oklch(20.22% 0.051 358.91); /* primary-900 */
+  --color-error: #ff5724;
+  --color-error-content: #ffffff;
 
+  /* Keep radius, size, and other values unchanged */
   --radius-selector: 0.5rem;
   --radius-field: 0.25rem;
   --radius-box: 0.5rem;
