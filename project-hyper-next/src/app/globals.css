@@ -7,11 +7,10 @@
   prefersdark: false;
   color-scheme: "dark";
 
-  /* Simplified color palette using HEX values */
   --color-base-100: #10090b;
   --color-base-200: #10090b;
   --color-base-300: #311c22;
-  --color-base-content: #f3f3f3; /* Choose a readable light color for text */
+  --color-base-content: #f3f3f3;
 
   --color-primary: #bd3265;
   --color-primary-content: #ffffff;
@@ -34,10 +33,9 @@
   --color-warning: #ff9900;
   --color-warning-content: #ffffff;
 
-  --color-error: #ff5724;
+  --color-error: #dc2626;
   --color-error-content: #ffffff;
 
-  /* Keep radius, size, and other values unchanged */
   --radius-selector: 0.5rem;
   --radius-field: 0.25rem;
   --radius-box: 0.5rem;

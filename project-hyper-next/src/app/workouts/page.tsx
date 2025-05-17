@@ -5,7 +5,9 @@ import supabase from "@/app/lib/supabaseClient";
 import { useAuth } from "@/app/context/authcontext";
 import { useEffect, useState } from "react";
 
-import WorkoutHistory from "@/app/components/workouthistory/workouthistory";
+import WorkoutHistory from "@/app/components/workouthistory";
+import PageHeader from "@/app/components/pageheader";
+import ClientLayout from "@/app/components/clientlayout";
 
 const WorkoutsPage = () => {
   const router = useRouter();
@@ -48,25 +50,29 @@ const WorkoutsPage = () => {
 
   const handleContinueWorkout = () => {
     if (workoutId) {
-      navigate(`/add-workout/${workoutId}`);
+      router.push(`/addworkout/${workoutId}`);
     }
   };
 
   return (
-    <div>
-      {workoutInProgress ? (
-        <div className="flex items-center">
-          <button onClick={handleContinueWorkout}>
-            Continue Previous Workout
-          </button>
-        </div>
-      ) : (
-        <div className="flex items-center justify-center mt-3">
-          <button onClick={handleStartNewWorkout}>Start New Workout</button>
-        </div>
-      )}
-      <WorkoutHistory />
-    </div>
+    <ClientLayout header={<PageHeader heading="Workouts" />}>
+      <div>
+        {workoutInProgress ? (
+          <div className="flex items-center">
+            <button className="btn btn-primary" onClick={handleContinueWorkout}>
+              Continue Previous Workout
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center mt-3">
+            <button className="btn btn-primary" onClick={handleStartNewWorkout}>
+              Start New Workout
+            </button>
+          </div>
+        )}
+        <WorkoutHistory />
+      </div>
+    </ClientLayout>
   );
 };
 

@@ -1,10 +1,12 @@
 import ProfileCard from "@/app/components/profile/profilecard";
+import ClientLayout from "@/app/components/clientlayout";
+import PageHeader from "@/app/components/pageheader";
 
 const Profile = () => {
   return (
-    <div>
+    <ClientLayout header={<PageHeader heading="Profile" />}>
       <ProfileCard />
-    </div>
+    </ClientLayout>
   );
 };
 
