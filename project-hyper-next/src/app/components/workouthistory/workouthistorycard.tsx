@@ -30,7 +30,7 @@ const WorkoutHistoryCard = ({ workout }) => {
 
   return (
     <div className="mb-3">
-      <div className="card bg-base-200 shadow-md">
+      <div className="card bg-secondary shadow-md w-full">
         <div className="card-body px-6 py-4">
           <div className="flex items-center justify-between">
             <h2 className="card-title text-lg font-semibold">

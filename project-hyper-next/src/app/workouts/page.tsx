@@ -30,7 +30,7 @@ const WorkoutsPage = () => {
       setWorkoutId(newWorkoutId);
       localStorage.setItem("workoutId", newWorkoutId);
       setWorkoutInProgress(true);
-      navigate(`/add-workout/${workoutId}`);
+      router.push(`/addworkout/${newWorkoutId}`);
     }
   };
 
@@ -58,7 +58,7 @@ const WorkoutsPage = () => {
     <ClientLayout header={<PageHeader heading="Workouts" />}>
       <div>
         {workoutInProgress ? (
-          <div className="flex items-center">
+          <div className="flex items-center justify-center mt-3">
             <button className="btn btn-primary" onClick={handleContinueWorkout}>
               Continue Previous Workout
             </button>

@@ -1,0 +1,31 @@
+"use client";
+
+import AddWorkoutForm from "@/app/components/addworkoutform";
+import { useParams } from "next/navigation";
+import ClientLayout from "@/app/components/clientlayout";
+import PageHeader from "@/app/components/pageheader";
+
+const AddWorkoutPage = () => {
+  const params = useParams();
+  const workoutId = params?.id;
+  // const [workoutId, setWorkoutId] = useState(null);
+
+  // useEffect(() => {
+  //   const savedWorkoutId = localStorage.getItem("workoutId");
+  //   if (savedWorkoutId) {
+  //     setWorkoutId(savedWorkoutId);
+  //   }
+  // }, []);
+
+  return (
+    <div>
+      <ClientLayout header={<PageHeader heading="Add Workout" />}>
+        <div className="flex-1 flex flex-col">
+          {workoutId && <AddWorkoutForm workoutId={workoutId} />}
+        </div>
+      </ClientLayout>
+    </div>
+  );
+};
+
+export default AddWorkoutPage;

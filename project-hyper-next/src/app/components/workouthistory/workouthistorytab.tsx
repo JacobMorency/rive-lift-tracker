@@ -79,32 +79,34 @@ const WorkoutHistoryTab = ({ workouts }) => {
   }, [selectedTab]);
 
   return (
-    <div className="w-full mt-3">
-      <div role="tablist" className="tabs tabs-boxed w-full">
-        <button
-          role="tab"
-          className={`tab ${selectedTab === "week" ? "tab-active" : ""}`}
-          onClick={() => setSelectedTab("week")}
-        >
-          This Week
-        </button>
-        <button
-          role="tab"
-          className={`tab ${selectedTab === "month" ? "tab-active" : ""}`}
-          onClick={() => setSelectedTab("month")}
-        >
-          This Month
-        </button>
-        <button
-          role="tab"
-          className={`tab ${selectedTab === "all" ? "tab-active" : ""}`}
-          onClick={() => setSelectedTab("all")}
-        >
-          All Time
-        </button>
+    <div className="mt-3">
+      <div className="flex justify-center">
+        <div role="tablist" className="tabs tabs-box bg-secondary">
+          <button
+            role="tab"
+            className={`tab ${selectedTab === "week" ? "tab-active" : ""}`}
+            onClick={() => setSelectedTab("week")}
+          >
+            This Week
+          </button>
+          <button
+            role="tab"
+            className={`tab ${selectedTab === "month" ? "tab-active" : ""}`}
+            onClick={() => setSelectedTab("month")}
+          >
+            This Month
+          </button>
+          <button
+            role="tab"
+            className={`tab ${selectedTab === "all" ? "tab-active" : ""}`}
+            onClick={() => setSelectedTab("all")}
+          >
+            All Time
+          </button>
+        </div>
       </div>
 
-      <div className="mt-4 pb-24">
+      <div className="max-w-md mx-auto mt-4 pb-24">
         {selectedWorkouts.length > 0 ? (
           selectedWorkouts.map((workout) => (
             <WorkoutHistoryCard key={workout.id} workout={workout} />
