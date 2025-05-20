@@ -1,6 +1,6 @@
 const DashboardCard = ({ title, content, description, icon }) => {
   return (
-    <div>
+    <div className="p-4">
       <div className="card card-border bg-primary">
         <div className="card-body">
           <div className="flex items-center justify-between w-full">

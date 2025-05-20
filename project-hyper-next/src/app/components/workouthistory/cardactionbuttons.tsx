@@ -3,8 +3,8 @@
 const CardActionButtons = () => {
   return (
     <div className="flex gap-2">
-      <button className="">Edit</button>
-      <button className="bg-error">Delete</button>
+      <button className="btn btn-primary">Edit</button>
+      <button className="btn btn-error">Delete</button>
     </div>
   );
 };

@@ -14,7 +14,7 @@ const DashboardHeader = () => {
   }
 
   return (
-    <div>
+    <div className="px-4">
       <h1 className="text-3xl font-bold my-3">Hiya, {userData.first_name}</h1>
     </div>
   );
