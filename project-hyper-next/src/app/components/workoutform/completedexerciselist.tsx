@@ -51,7 +51,7 @@ const CompletedExerciseList = ({
             </li>
           ))
         ) : (
-          <li className="px-4">No exercises completed yet.</li>
+          <li>No exercises completed yet.</li>
         )}
       </ul>
 
