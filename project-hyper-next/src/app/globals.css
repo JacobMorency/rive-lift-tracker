@@ -7,18 +7,18 @@
   prefersdark: false;
   color-scheme: "dark";
 
-  --color-base-100: #10090b;
+  --color-base-100: #131313;
   --color-base-200: #10090b;
   --color-base-300: #311c22;
   --color-base-content: #f3f3f3;
 
-  --color-primary: #bd3265;
+  --color-primary: #db0151;
   --color-primary-content: #ffffff;
 
-  --color-secondary: #7d123b;
+  --color-secondary: #841e47;
   --color-secondary-content: #ffffff;
 
-  --color-accent: #be094e;
+  --color-accent: ##e94788;
   --color-accent-content: #ffffff;
 
   --color-neutral: #311c22;
