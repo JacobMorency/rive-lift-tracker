@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="projecthyperpink">
-      <body>
+      <body className="bg-base-200">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

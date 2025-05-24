@@ -7,35 +7,37 @@
   prefersdark: false;
   color-scheme: "dark";
 
-  --color-base-100: #131313;
-  --color-base-200: #10090b;
-  --color-base-300: #311c22;
-  --color-base-content: #f3f3f3;
+  /* Core Theme Colors */
+  --color-base-100: #1b1b1b; /* Deep dark blue */
+  --color-base-200: #1b1b1b; /* Charcoal surface */
+  --color-base-300: #2d2d2d; /* Card/Panel background */
+  --color-base-content: #fefbee; /* Creamy text for readability */
 
-  --color-primary: #db0151;
+  --color-primary: #ff4b8c; /* Vibrant fitness pink */
   --color-primary-content: #ffffff;
 
-  --color-secondary: #841e47;
-  --color-secondary-content: #ffffff;
+  --color-secondary: #f7c548; /* Sunny gold for subtle highlights */
+  --color-secondary-content: #002d40;
 
-  --color-accent: ##e94788;
+  --color-accent: #00c2cb; /* Aqua for vibrant contrast */
   --color-accent-content: #ffffff;
 
-  --color-neutral: #311c22;
-  --color-neutral-content: #f3f3f3;
+  --color-neutral: #3b3b3b; /* Mid-gray for borders, neutral areas */
+  --color-neutral-content: #fefbee;
 
-  --color-info: #2094f3;
-  --color-info-content: #ffffff;
+  --color-info: #38bdf8; /* Light blue for helpful tips/info */
+  --color-info-content: #002d40;
 
-  --color-success: #009485;
-  --color-success-content: #ffffff;
+  --color-success: #22c55e; /* Green for achievements */
+  --color-success-content: #002d40;
 
-  --color-warning: #ff9900;
-  --color-warning-content: #ffffff;
+  --color-warning: #facc15; /* Yellow for caution/fatigue */
+  --color-warning-content: #002d40;
 
-  --color-error: #dc2626;
+  --color-error: #ef4444; /* Red for errors */
   --color-error-content: #ffffff;
 
+  /* Keep your existing radius and sizing values */
   --radius-selector: 0.5rem;
   --radius-field: 0.25rem;
   --radius-box: 0.5rem;
