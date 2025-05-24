@@ -81,24 +81,30 @@ const WorkoutHistoryTab = ({ workouts }) => {
   return (
     <div className="mt-3">
       <div className="flex justify-center">
-        <div role="tablist" className="tabs tabs-box bg-secondary">
+        <div role="tablist" className="tabs tabs-box bg-base-300 shadow-md">
           <button
             role="tab"
-            className={`tab ${selectedTab === "week" ? "tab-active" : ""}`}
+            className={`tab ${
+              selectedTab === "week" ? "tab-active !bg-primary" : ""
+            }`}
             onClick={() => setSelectedTab("week")}
           >
             This Week
           </button>
           <button
             role="tab"
-            className={`tab ${selectedTab === "month" ? "tab-active" : ""}`}
+            className={`tab ${
+              selectedTab === "month" ? "tab-active !bg-primary" : ""
+            }`}
             onClick={() => setSelectedTab("month")}
           >
             This Month
           </button>
           <button
             role="tab"
-            className={`tab ${selectedTab === "all" ? "tab-active" : ""}`}
+            className={`tab ${
+              selectedTab === "all" ? "tab-active !bg-primary" : ""
+            }`}
             onClick={() => setSelectedTab("all")}
           >
             All Time

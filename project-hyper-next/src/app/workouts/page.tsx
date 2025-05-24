@@ -58,13 +58,18 @@ const WorkoutsPage = () => {
     <ClientLayout header={<PageHeader heading="Workouts" />}>
       <div>
         {workoutInProgress ? (
-          <div className="flex items-center justify-center mt-3">
-            <button className="btn btn-primary" onClick={handleContinueWorkout}>
-              Continue Previous Workout
-            </button>
+          <div className="flex justify-center mt-3">
+            <div className="w-full max-w-md">
+              <button
+                className="btn btn-primary w-full"
+                onClick={handleContinueWorkout}
+              >
+                Continue Previous Workout
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="flex items-center justify-center mt-3">
+          <div className="flex justify-center mt-3">
             <button className="btn btn-primary" onClick={handleStartNewWorkout}>
               Start New Workout
             </button>
