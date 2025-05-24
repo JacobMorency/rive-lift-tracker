@@ -8,14 +8,6 @@ import PageHeader from "@/app/components/pageheader";
 const AddWorkoutPage = () => {
   const params = useParams();
   const workoutId = params?.id;
-  // const [workoutId, setWorkoutId] = useState(null);
-
-  // useEffect(() => {
-  //   const savedWorkoutId = localStorage.getItem("workoutId");
-  //   if (savedWorkoutId) {
-  //     setWorkoutId(savedWorkoutId);
-  //   }
-  // }, []);
 
   return (
     <div>
