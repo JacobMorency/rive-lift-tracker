@@ -22,7 +22,7 @@ const ProfileCard = () => {
 
   return (
     <div className="p-4">
-      <div className="card card-border bg-secondary">
+      <div className="card card-border bg-base-300 shadow-md">
         <div className="card-body">
           <h2 className="card-title">
             {userData?.first_name} {userData?.last_name}
