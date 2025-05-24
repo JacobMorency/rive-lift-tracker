@@ -41,7 +41,7 @@ const ExerciseSelector = ({
   };
 
   return (
-    <div className="my-3 dropdown dropdown-center w-full px-4">
+    <div className="dropdown dropdown-center w-full px-4">
       <label
         tabIndex={0}
         className={`bg-primary btn w-full ${

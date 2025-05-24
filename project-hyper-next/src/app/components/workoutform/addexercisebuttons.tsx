@@ -9,7 +9,7 @@ const AddExerciseButton = ({
       {isExerciseUpdating ? (
         <div>
           <button
-            className="w-full my-3 btn btn-primary"
+            className="w-full btn btn-primary"
             type="button"
             onClick={handleAddExerciseToWorkout}
             disabled={sets.length === 0 || isSetUpdating}
@@ -19,7 +19,7 @@ const AddExerciseButton = ({
         </div>
       ) : (
         <button
-          className="w-full my-3 btn btn-primary"
+          className="w-full btn btn-primary"
           type="button"
           onClick={handleAddExerciseToWorkout}
           disabled={sets.length === 0 || isSetUpdating}

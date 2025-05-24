@@ -17,15 +17,13 @@ const CompletedExerciseList = ({
   };
   return (
     <div className="px-4">
-      <h3 className="font-bold text-lg my-3">
-        Exercises Completed This Workout:
-      </h3>
+      <h3 className="font-bold text-lg">Exercises Completed This Workout:</h3>
       <ul>
         {exercisesInWorkout.length > 0 ? (
           exercisesInWorkout.map((exercise, index) => (
             <li
               key={exercise.id}
-              className="rounded py-3 px-2 my-1 flex items-center justify-between bg-secondary"
+              className="rounded py-3 px-2 my-3 flex items-center justify-between bg-base-100"
             >
               <p>{exercise.name}</p>
               <span className="flex gap-2">

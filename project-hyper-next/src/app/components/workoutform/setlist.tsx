@@ -21,12 +21,12 @@ const SetList = ({ sets, handleUpdateSet, handleDeleteSet, exerciseName }) => {
   };
   return (
     <div className="px-4">
-      <h3 className="font-bold text-lg my-3">Sets for {exerciseName}:</h3>
+      <h3 className="font-bold text-lg">Sets for {exerciseName}:</h3>
       <ul>
         {sets.map((set, index) => (
           <li
             key={index}
-            className="rounded bg-secondary py-3 px-2 my-1 flex items-center justify-between"
+            className="rounded bg-base-100 py-3 px-2 my-3 flex items-center justify-between"
           >
             <p>
               <span className="font-bold">Set {index + 1}:</span> {set.reps}{" "}
