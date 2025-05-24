@@ -1,0 +1,49 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@plugin "daisyui/theme" {
+  name: "projecthyperpink";
+  default: false;
+  prefersdark: false;
+  color-scheme: "dark";
+
+  /* Core Theme Colors */
+  --color-base-100: #1b1b1b; /* Deep dark blue */
+  --color-base-200: #1b1b1b; /* Charcoal surface */
+  --color-base-300: #2d2d2d; /* Card/Panel background */
+  --color-base-content: #fefbee; /* Creamy text for readability */
+
+  --color-primary: #ff4b8c; /* Vibrant fitness pink */
+  --color-primary-content: #ffffff;
+
+  --color-secondary: #f7c548; /* Sunny gold for subtle highlights */
+  --color-secondary-content: #002d40;
+
+  --color-accent: #00c2cb; /* Aqua for vibrant contrast */
+  --color-accent-content: #ffffff;
+
+  --color-neutral: #3b3b3b; /* Mid-gray for borders, neutral areas */
+  --color-neutral-content: #fefbee;
+
+  --color-info: #38bdf8; /* Light blue for helpful tips/info */
+  --color-info-content: #002d40;
+
+  --color-success: #22c55e; /* Green for achievements */
+  --color-success-content: #002d40;
+
+  --color-warning: #facc15; /* Yellow for caution/fatigue */
+  --color-warning-content: #002d40;
+
+  --color-error: #ef4444; /* Red for errors */
+  --color-error-content: #ffffff;
+
+  /* Keep your existing radius and sizing values */
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
