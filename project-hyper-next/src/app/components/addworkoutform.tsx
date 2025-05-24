@@ -381,40 +381,47 @@ const AddWorkoutForm = ({ workoutId }) => {
 
   return (
     <div>
-      <form action="">
-        <div className="my-3">
-          <ExerciseSelector
-            exerciseName={exerciseName}
-            setExerciseName={setExerciseName}
-            setExerciseId={setExerciseId}
-            isSetUpdating={isSetUpdating}
-            isSetsEmpty={sets.length === 0}
-            exercisesInWorkout={exercisesInWorkout}
-          />
-        </div>
-        {/* Only display the form once an exercise has been chosen */}
-        {exerciseName && (
-          <SetInputForm
-            reps={reps}
-            weight={weight}
-            partialReps={partialReps}
-            setReps={setReps}
-            setWeight={setWeight}
-            setPartialReps={setPartialReps}
-            repsEmpty={repsEmpty}
-            weightEmpty={weightEmpty}
-            partialRepsInvalid={partialRepsInvalid}
-            weightInvalid={weightInvalid}
-            repsInvalid={repsInvalid}
-            isSetUpdating={isSetUpdating}
-            handleAddSet={handleAddSet}
-            handleSaveUpdatedSet={handleSaveUpdatedSet}
-            cancelUpdateSet={cancelUpdateSet}
-            updateSetIndex={updateSetIndex}
-          />
-        )}
-        {sets.length > 0 && (
+      <form
+        action=""
+        className="overflow-y-auto max-h-[calc(100vh-4rem)] pb-24"
+      >
+        <div className="bg-base-300 rounded-lg py-3 mt-3">
+          <div className="mb-3">
+            <ExerciseSelector
+              exerciseName={exerciseName}
+              setExerciseName={setExerciseName}
+              setExerciseId={setExerciseId}
+              isSetUpdating={isSetUpdating}
+              isSetsEmpty={sets.length === 0}
+              exercisesInWorkout={exercisesInWorkout}
+            />
+          </div>
+          {/* Only display the form once an exercise has been chosen */}
           <div>
+            {exerciseName && (
+              <SetInputForm
+                reps={reps}
+                weight={weight}
+                partialReps={partialReps}
+                setReps={setReps}
+                setWeight={setWeight}
+                setPartialReps={setPartialReps}
+                repsEmpty={repsEmpty}
+                weightEmpty={weightEmpty}
+                partialRepsInvalid={partialRepsInvalid}
+                weightInvalid={weightInvalid}
+                repsInvalid={repsInvalid}
+                isSetUpdating={isSetUpdating}
+                handleAddSet={handleAddSet}
+                handleSaveUpdatedSet={handleSaveUpdatedSet}
+                cancelUpdateSet={cancelUpdateSet}
+                updateSetIndex={updateSetIndex}
+              />
+            )}
+          </div>
+        </div>
+        {sets.length > 0 && (
+          <div className="bg-base-300 rounded-lg py-3 mt-3">
             <SetList
               sets={sets}
               handleUpdateSet={handleUpdateSet}
@@ -429,16 +436,19 @@ const AddWorkoutForm = ({ workoutId }) => {
             />
           </div>
         )}
-        <CompletedExerciseList
-          exercisesInWorkout={exercisesInWorkout}
-          handleDeleteExercise={handleDeleteExercise}
-          handleUpdateExercise={handleUpdateExercise}
-        />
-        <WorkoutActionButtons
-          handleSaveWorkout={handleSaveWorkout}
-          exercisesInWorkout={exercisesInWorkout}
-          confirmCancelWorkout={confirmCancelWorkout}
-        />
+
+        <div className="bg-base-300 rounded-lg py-3 mt-3">
+          <CompletedExerciseList
+            exercisesInWorkout={exercisesInWorkout}
+            handleDeleteExercise={handleDeleteExercise}
+            handleUpdateExercise={handleUpdateExercise}
+          />
+          <WorkoutActionButtons
+            handleSaveWorkout={handleSaveWorkout}
+            exercisesInWorkout={exercisesInWorkout}
+            confirmCancelWorkout={confirmCancelWorkout}
+          />
+        </div>
       </form>
     </div>
   );
