@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { ExercisesInWorkout } from "@/types/workout";
 
 type WorkoutActionButtonsProps = {
@@ -34,7 +33,7 @@ const WorkoutActionButtons = ({
         Cancel
       </button>
 
-      <dialog id="cancel_modal" className="modal modal-open">
+      <dialog id="cancel_modal" className="modal">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Cancel Workout?</h3>
           <p className="py-2">
