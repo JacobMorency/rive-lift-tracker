@@ -1,4 +1,16 @@
-const DashboardCard = ({ title, content, description, icon }) => {
+type DashboardCardProps = {
+  title: string;
+  content: string;
+  description: string;
+  icon?: React.ReactNode;
+};
+
+const DashboardCard = ({
+  title,
+  content,
+  description,
+  icon,
+}: DashboardCardProps) => {
   return (
     <div className="p-4">
       <div className="card card-border bg-base-300">
