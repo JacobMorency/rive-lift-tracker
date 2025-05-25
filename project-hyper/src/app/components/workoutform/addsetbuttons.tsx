@@ -1,4 +1,12 @@
-// import { Button } from "@/components/ui/button";
+import { NullableNumber } from "@/types/workout";
+
+export type AddSetButtonProps = {
+  isSetUpdating: boolean;
+  handleAddSet: () => void;
+  handleSaveUpdatedSet: () => void;
+  cancelUpdateSet: () => void;
+  updateSetIndex: NullableNumber;
+};
 
 const AddSetButtons = ({
   isSetUpdating,
@@ -6,7 +14,7 @@ const AddSetButtons = ({
   handleSaveUpdatedSet,
   cancelUpdateSet,
   updateSetIndex,
-}) => {
+}: AddSetButtonProps) => {
   return (
     <div>
       {!isSetUpdating && (

@@ -7,7 +7,7 @@ import PageHeader from "@/app/components/pageheader";
 
 const AddWorkoutPage = () => {
   const params = useParams();
-  const workoutId = params?.id;
+  const workoutId = params?.id ? Number(params.id) : null;
 
   return (
     <div>

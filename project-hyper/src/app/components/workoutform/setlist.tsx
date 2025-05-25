@@ -1,23 +1,26 @@
-// import { Button } from "@/components/ui/button";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogDescription,
-//   DialogFooter,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-// } from "@/components/ui/dialog";
 import { SquarePen, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Set } from "@/types/workout";
 
-const SetList = ({ sets, handleUpdateSet, handleDeleteSet, exerciseName }) => {
-  const [deleteSetIndex, setDeleteSetIndex] = useState(null);
-  const [isDeleteSetDialogOpen, setIsDeleteSetDialogOpen] = useState(false);
+type SetListProps = {
+  sets: Set[];
+  handleUpdateSet: (index: number) => void;
+  handleDeleteSet: (index: number) => void;
+  exerciseName: string;
+};
 
-  const handleConfirmDeleteSet = () => {
-    handleDeleteSet(deleteSetIndex);
-    setIsDeleteSetDialogOpen(false);
+const SetList = ({
+  sets,
+  handleUpdateSet,
+  handleDeleteSet,
+  exerciseName,
+}: SetListProps) => {
+  const [deleteSetIndex, setDeleteSetIndex] = useState<number | null>(null);
+
+  const handleConfirmDeleteSet = (): void => {
+    if (deleteSetIndex !== null) {
+      handleDeleteSet(deleteSetIndex);
+    }
   };
   return (
     <div className="px-4">
@@ -46,8 +49,9 @@ const SetList = ({ sets, handleUpdateSet, handleDeleteSet, exerciseName }) => {
                 type="button"
                 onClick={() => {
                   setDeleteSetIndex(index);
-                  setIsDeleteSetDialogOpen(true);
-                  document.getElementById("delete_modal").showModal();
+                  (
+                    document.getElementById("delete_modal") as HTMLDialogElement
+                  )?.showModal();
                 }}
               >
                 <Trash2 />
@@ -77,8 +81,9 @@ const SetList = ({ sets, handleUpdateSet, handleDeleteSet, exerciseName }) => {
               className="btn btn-primary"
               type="button"
               onClick={() => {
-                setIsDeleteSetDialogOpen(false);
-                document.getElementById("delete_modal").close();
+                (
+                  document.getElementById("delete_modal") as HTMLDialogElement
+                )?.close();
               }}
             >
               Cancel

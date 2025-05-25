@@ -6,31 +6,42 @@ import SetInputForm from "@/app/components/workoutform/setinputform";
 import AddExerciseButton from "@/app/components/workoutform/addexercisebuttons";
 import { useState, useEffect } from "react";
 import supabase from "@/app/lib/supabaseClient";
-import { useAuth } from "@/app/context/authcontext";
 import { useRouter } from "next/navigation";
+import {
+  Set,
+  ExercisesInWorkout,
+  NullableNumber,
+  CompletedSet,
+} from "@/types/workout";
 
-const AddWorkoutForm = ({ workoutId }) => {
-  const [exerciseName, setExerciseName] = useState("");
-  const [exerciseId, setExerciseId] = useState(null);
-  const [reps, setReps] = useState("");
-  const [sets, setSets] = useState([]);
-  const [weight, setWeight] = useState("");
-  const [partialReps, setPartialReps] = useState("");
-  const [exercisesInWorkout, setExercisesInWorkout] = useState([]);
-  const [completedSets, setCompletedSets] = useState([]);
-  const [updateSetIndex, setUpdateSetIndex] = useState(null);
-  const [isSetUpdating, setIsSetUpdating] = useState(false);
-  const [updateExerciseIndex, setUpdateExerciseIndex] = useState(null);
-  const [isExerciseUpdating, setIsExerciseUpdating] = useState(false);
-  const [repsEmpty, setRepsEmpty] = useState(false);
-  const [weightEmpty, setWeightEmpty] = useState(false);
-  const [repsInvalid, setRepsInvalid] = useState(false);
-  const [weightInvalid, setWeightInvalid] = useState(false);
-  const [partialRepsInvalid, setPartialRepsInvalid] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [isIntialized, setIsInitialized] = useState(false);
+type AddWorkoutFormProps = {
+  workoutId: number;
+};
 
-  const { user } = useAuth();
+const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
+  const [exerciseName, setExerciseName] = useState<string>("");
+  const [exerciseId, setExerciseId] = useState<NullableNumber>(null);
+  const [reps, setReps] = useState<NullableNumber>(null);
+  const [sets, setSets] = useState<Set[]>([]);
+  const [weight, setWeight] = useState<NullableNumber>(null);
+  const [partialReps, setPartialReps] = useState<NullableNumber>(null);
+  const [exercisesInWorkout, setExercisesInWorkout] = useState<
+    ExercisesInWorkout[]
+  >([]);
+  const [completedSets, setCompletedSets] = useState<CompletedSet[]>([]);
+  const [updateSetIndex, setUpdateSetIndex] = useState<NullableNumber>(null);
+  const [isSetUpdating, setIsSetUpdating] = useState<boolean>(false);
+  const [updateExerciseIndex, setUpdateExerciseIndex] =
+    useState<NullableNumber>(null);
+  const [isExerciseUpdating, setIsExerciseUpdating] = useState<boolean>(false);
+  const [repsEmpty, setRepsEmpty] = useState<boolean>(false);
+  const [weightEmpty, setWeightEmpty] = useState<boolean>(false);
+  const [repsInvalid, setRepsInvalid] = useState<boolean>(false);
+  const [weightInvalid, setWeightInvalid] = useState<boolean>(false);
+  const [partialRepsInvalid, setPartialRepsInvalid] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isIntialized, setIsInitialized] = useState<boolean>(false);
+
   const router = useRouter();
 
   const handleCompleteWorkout = () => {
@@ -39,7 +50,7 @@ const AddWorkoutForm = ({ workoutId }) => {
     router.push("/workouts");
   };
 
-  const handleSaveWorkout = async () => {
+  const handleSaveWorkout = async (): Promise<void> => {
     for (const completedSet of completedSets) {
       const { data: workoutExercisesData, error: exerciseError } =
         await supabase
@@ -54,7 +65,10 @@ const AddWorkoutForm = ({ workoutId }) => {
           .select("id")
           .single();
       if (exerciseError) {
-        console.error("Error adding exercise to workout:", error.message);
+        console.error(
+          "Error adding exercise to workout:",
+          exerciseError.message
+        );
         return;
       }
 
@@ -77,7 +91,7 @@ const AddWorkoutForm = ({ workoutId }) => {
       }
     }
 
-    const { data: workoutData, error } = await supabase
+    const { error } = await supabase
       .from("workouts")
       .update({ is_complete: true })
       .eq("id", workoutId)
@@ -113,61 +127,68 @@ const AddWorkoutForm = ({ workoutId }) => {
       hasError = true;
     }
 
-    if (partialReps < 0) {
-      setPartialRepsInvalid(true);
-      hasError = true;
+    if (partialReps) {
+      if (partialReps < 0) {
+        setPartialRepsInvalid(true);
+        hasError = true;
+      }
     }
 
     if (hasError) {
       return;
     }
 
-    const numReps = parseInt(reps);
-    const numWeight = Number(weight);
-    if (numReps > 0 && numWeight > 0) {
-      setSets((prevSets) => [
-        ...prevSets,
-        {
-          exerciseId: exerciseId,
-          reps: numReps,
-          weight: numWeight,
-          partialReps: Number(partialReps) || 0, // Default to 0 if partial reps is empty
-        },
-      ]);
+    if (reps && weight) {
+      if (reps > 0 && weight > 0) {
+        setSets((prevSets) => [
+          ...prevSets,
+          {
+            exerciseId: exerciseId,
+            reps: reps,
+            weight: weight,
+            partialReps: partialReps || 0, // Default to 0 if partial reps is empty
+          },
+        ]);
+      }
+      setReps(null);
+      setWeight(null);
+      setPartialReps(null);
     }
-    setReps("");
-    setWeight("");
-    setPartialReps("");
   };
 
-  const handleUpdateSet = (index) => {
-    const setToUpdate = sets[index];
-    setReps(setToUpdate.reps);
-    setWeight(setToUpdate.weight);
-    setPartialReps(setToUpdate.partialReps);
-    setUpdateSetIndex(index);
-    setIsSetUpdating(true); // TODO: Might need to change implementation
-    setUpdateSetIndex(index);
+  const handleUpdateSet = (index: NullableNumber): void => {
+    if (index !== null) {
+      const setToUpdate = sets[index];
+      setReps(setToUpdate.reps);
+      setWeight(setToUpdate.weight);
+      setPartialReps(setToUpdate.partialReps);
+      setUpdateSetIndex(index);
+      setIsSetUpdating(true);
+      setUpdateSetIndex(index);
+    }
   };
 
   const handleSaveUpdatedSet = () => {
+    if (reps === null || weight === null) {
+      return;
+    }
     const updatedSet = {
-      reps: parseInt(reps),
-      weight: Number(weight),
-      partialReps: Number(partialReps) || 0,
+      reps: reps,
+      weight: weight,
+      partialReps: partialReps || 0,
     };
     const updatedSets = sets.map((set, index) =>
       index === updateSetIndex ? updatedSet : set
     );
     setSets(updatedSets);
     setIsSetUpdating(false);
-    setReps("");
-    setWeight("");
-    setPartialReps("");
+    setReps(null);
+    setWeight(null);
+    setPartialReps(null);
     setUpdateSetIndex(null);
   };
 
-  const handleDeleteSet = (index) => {
+  const handleDeleteSet = (index: NullableNumber): void => {
     const updatedSets = sets.filter((set, i) => i !== index);
     setSets(updatedSets);
 
@@ -181,7 +202,7 @@ const AddWorkoutForm = ({ workoutId }) => {
     }
   };
 
-  const handleDeleteExercise = (index) => {
+  const handleDeleteExercise = (index: NullableNumber): void => {
     const updatedExercisesInWorkout = exercisesInWorkout.filter(
       (exercise, i) => i !== index
     );
@@ -191,17 +212,19 @@ const AddWorkoutForm = ({ workoutId }) => {
     setCompletedSets(updatedCompletedSets);
   };
 
-  const handleUpdateExercise = (index) => {
-    const completedSet = completedSets[index];
-    setExerciseName(completedSet.exerciseName);
-    setExerciseId(completedSet.exerciseId);
-    setSets(completedSet.sets);
-    setIsExerciseUpdating(true);
-    setUpdateExerciseIndex(index);
+  const handleUpdateExercise = (index: NullableNumber): void => {
+    if (index !== null) {
+      const completedSet = completedSets[index];
+      setExerciseName(completedSet.exerciseName);
+      setExerciseId(completedSet.exerciseId);
+      setSets(completedSet.sets);
+      setIsExerciseUpdating(true);
+      setUpdateExerciseIndex(index);
+    }
   };
 
   const checkUnsavedChanges = () => {
-    if (reps || weight || partialReps > 0) {
+    if (reps || weight || (partialReps !== null && partialReps > 0)) {
       return true;
     } else {
       return false;
@@ -212,7 +235,6 @@ const AddWorkoutForm = ({ workoutId }) => {
     if (!checkUnsavedChanges()) {
       handleConfirmAddExerciseToWorkout();
     } else {
-      setIsAddExerciseDialogOpen(true);
       return;
     }
   };
@@ -256,16 +278,16 @@ const AddWorkoutForm = ({ workoutId }) => {
 
   const resetFormFields = () => {
     setExerciseName("");
-    setReps("");
-    setWeight("");
-    setPartialReps("");
+    setReps(null);
+    setWeight(null);
+    setPartialReps(null);
   };
 
   const cancelUpdateSet = () => {
     setIsSetUpdating(false);
-    setReps("");
-    setWeight("");
-    setPartialReps("");
+    setReps(null);
+    setWeight(null);
+    setPartialReps(null);
   };
 
   // TODO: Remove workout from db if cancelled
@@ -292,7 +314,6 @@ const AddWorkoutForm = ({ workoutId }) => {
           savedCompletedSets,
           savedExerciseId,
           savedExerciseName,
-          savedExercisesInWorkout,
           savedReps,
           savedWeight,
           savedPartialReps,
@@ -300,10 +321,12 @@ const AddWorkoutForm = ({ workoutId }) => {
         ] = JSON.parse(savedProgress);
         if (savedCompletedSets) {
           setCompletedSets(savedCompletedSets);
-          const derivedExercises = savedCompletedSets.map((ex) => ({
-            id: ex.exerciseId,
-            name: ex.exerciseName,
-          }));
+          const derivedExercises = savedCompletedSets.map(
+            (ex: CompletedSet) => ({
+              id: ex.exerciseId,
+              name: ex.exerciseName,
+            })
+          );
           setExercisesInWorkout(derivedExercises);
         }
         if (savedExerciseId) {
@@ -312,9 +335,6 @@ const AddWorkoutForm = ({ workoutId }) => {
         if (savedExerciseName) {
           setExerciseName(savedExerciseName);
         }
-        // if (savedExercisesInWorkout) {
-        //   setExercisesInWorkout(savedExercisesInWorkout);
-        // }
         if (savedReps) {
           setReps(savedReps);
         }
@@ -368,13 +388,7 @@ const AddWorkoutForm = ({ workoutId }) => {
     sets,
   ]);
 
-  // TODO: query supabase instead of relying on local storage
-  // useEffect(() => {
-  //   if (workoutId) {
-  //     fetchCompletedExercises();
-  //   }
-  // }, [workoutId]);
-
+  // TODO: Centralize the loading state and error handling
   if (loading) {
     return <div>Loading...</div>; // Or any other loading indicator
   }
