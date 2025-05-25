@@ -7,10 +7,10 @@ import { useAuth } from "@/app/context/authcontext";
 import { useState, useEffect } from "react";
 
 const DashboardContent = () => {
-  const [totalWorkouts, setTotalWorkouts] = useState(0);
+  const [totalWorkouts, setTotalWorkouts] = useState<number>(0);
   const { user } = useAuth();
 
-  const fetchTotalWorkouts = async () => {
+  const fetchTotalWorkouts = async (): Promise<void> => {
     const { data, error } = await supabase
       .from("workouts")
       .select("*", { count: "exact" })
