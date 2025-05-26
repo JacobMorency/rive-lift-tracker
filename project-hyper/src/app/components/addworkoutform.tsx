@@ -224,9 +224,6 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
   };
 
   const checkUnsavedChanges = () => {
-    console.log("Reps:", reps);
-    console.log("Weight:", weight);
-    console.log("Partial Reps:", partialReps);
     if (reps || weight || (partialReps !== null && partialReps > 0)) {
       return true;
     } else {
@@ -235,8 +232,6 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
   };
 
   const handleAddExerciseToWorkout = (): void => {
-    console.log("Adding exercise to workout");
-    console.log("Checking for unsaved changes", checkUnsavedChanges());
     if (!checkUnsavedChanges()) {
       handleConfirmAddExerciseToWorkout();
     } else {
