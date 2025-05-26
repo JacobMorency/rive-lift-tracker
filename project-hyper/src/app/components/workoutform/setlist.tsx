@@ -20,6 +20,7 @@ const SetList = ({
   const handleConfirmDeleteSet = (): void => {
     if (deleteSetIndex !== null) {
       handleDeleteSet(deleteSetIndex);
+      (document.getElementById("delete_modal") as HTMLDialogElement)?.close();
     }
   };
   return (
@@ -67,7 +68,7 @@ const SetList = ({
             Delete Set {deleteSetIndex !== null ? deleteSetIndex + 1 : ""}
           </h3>
           <p className="py-2">Are you sure you want to delete this set?</p>
-          {deleteSetIndex !== null && (
+          {deleteSetIndex !== null && sets[deleteSetIndex] && (
             <div className="mb-2">
               <span className="font-bold">Set {deleteSetIndex + 1}:</span>{" "}
               {sets[deleteSetIndex].reps} reps at {sets[deleteSetIndex].weight}{" "}

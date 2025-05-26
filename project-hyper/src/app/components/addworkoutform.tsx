@@ -224,6 +224,9 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
   };
 
   const checkUnsavedChanges = () => {
+    console.log("Reps:", reps);
+    console.log("Weight:", weight);
+    console.log("Partial Reps:", partialReps);
     if (reps || weight || (partialReps !== null && partialReps > 0)) {
       return true;
     } else {
@@ -231,7 +234,9 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
     }
   };
 
-  const handleAddExerciseToWorkout = () => {
+  const handleAddExerciseToWorkout = (): void => {
+    console.log("Adding exercise to workout");
+    console.log("Checking for unsaved changes", checkUnsavedChanges());
     if (!checkUnsavedChanges()) {
       handleConfirmAddExerciseToWorkout();
     } else {
@@ -239,7 +244,7 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
     }
   };
 
-  const handleConfirmAddExerciseToWorkout = async () => {
+  const handleConfirmAddExerciseToWorkout = async (): Promise<void> => {
     if (isExerciseUpdating && updateExerciseIndex !== null) {
       // Replaces the old completedSet with a new one with updates
       const updatedCompletedSets = [...completedSets];
@@ -310,18 +315,10 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
     const savedProgress = localStorage.getItem("workoutProgress");
     if (savedProgress) {
       try {
-        const [
-          savedCompletedSets,
-          savedExerciseId,
-          savedExerciseName,
-          savedReps,
-          savedWeight,
-          savedPartialReps,
-          savedSets,
-        ] = JSON.parse(savedProgress);
-        if (savedCompletedSets) {
-          setCompletedSets(savedCompletedSets);
-          const derivedExercises = savedCompletedSets.map(
+        const progress = JSON.parse(savedProgress);
+        if (progress.completedSets) {
+          setCompletedSets(progress.completedSets);
+          const derivedExercises = progress.completedSets.map(
             (ex: CompletedSet) => ({
               id: ex.exerciseId,
               name: ex.exerciseName,
@@ -329,23 +326,23 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
           );
           setExercisesInWorkout(derivedExercises);
         }
-        if (savedExerciseId) {
-          setExerciseId(savedExerciseId);
+        if (progress.exerciseId) {
+          setExerciseId(progress.exerciseId);
         }
-        if (savedExerciseName) {
-          setExerciseName(savedExerciseName);
+        if (progress.exerciseName) {
+          setExerciseName(progress.exerciseName);
         }
-        if (savedReps) {
-          setReps(savedReps);
+        if (progress.reps) {
+          setReps(progress.reps);
         }
-        if (savedWeight) {
-          setWeight(savedWeight);
+        if (progress.weight) {
+          setWeight(progress.weight);
         }
-        if (savedPartialReps) {
-          setPartialReps(savedPartialReps);
+        if (progress.partialReps) {
+          setPartialReps(progress.partialReps);
         }
-        if (savedSets) {
-          setSets(savedSets);
+        if (progress.sets) {
+          setSets(progress.sets);
         }
       } catch (error) {
         console.error("Error parsing saved progress:", error);
@@ -363,19 +360,17 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
   // Save the current workout progress to local storage so that it can be retrieved upon refresh or page change
   useEffect(() => {
     if (isIntialized) {
-      localStorage.setItem(
-        "workoutProgress",
-        JSON.stringify([
-          completedSets,
-          exerciseId,
-          exerciseName,
-          exercisesInWorkout,
-          reps,
-          weight,
-          partialReps,
-          sets,
-        ])
-      );
+      const progress = {
+        completedSets,
+        exerciseId,
+        exerciseName,
+        exercisesInWorkout,
+        reps,
+        weight,
+        partialReps,
+        sets,
+      };
+      localStorage.setItem("workoutProgress", JSON.stringify(progress));
     }
   }, [
     completedSets,

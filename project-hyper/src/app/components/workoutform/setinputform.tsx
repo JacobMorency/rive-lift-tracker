@@ -39,9 +39,9 @@ const SetInputForm = (props: SetInputFormProps) => {
           <input
             type="number"
             id="reps"
-            value={reps?.toString()}
+            value={reps !== null ? reps : ""}
             onChange={(e) =>
-              setReps(e.target.value ? parseInt(e.target.value) : null)
+              setReps(e.target.value !== "" ? parseInt(e.target.value) : null)
             }
             placeholder="0"
             className={
@@ -60,7 +60,7 @@ const SetInputForm = (props: SetInputFormProps) => {
           <input
             type="number"
             id="weight"
-            value={weight?.toString()}
+            value={weight !== null ? weight : ""}
             onChange={(e) =>
               setWeight(e.target.value ? parseFloat(e.target.value) : null)
             }
@@ -84,7 +84,7 @@ const SetInputForm = (props: SetInputFormProps) => {
           <input
             type="number"
             id="partialReps"
-            value={partialReps?.toString()}
+            value={partialReps !== null ? partialReps : ""}
             onChange={(e) =>
               setPartialReps(e.target.value ? parseInt(e.target.value) : null)
             }
