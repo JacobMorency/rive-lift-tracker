@@ -17,7 +17,11 @@ const BottomNav = () => {
         <span className="dock-label">Home</span>
       </button>
       <button
-        className={pathname === "/workouts" ? "dock-active" : ""}
+        className={
+          pathname === "/workouts" || pathname.includes("addworkout")
+            ? "dock-active"
+            : ""
+        }
         onClick={() => router.push("/workouts")}
       >
         <Dumbbell className="size-[1.2em]" />
