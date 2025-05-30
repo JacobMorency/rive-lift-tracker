@@ -17,7 +17,7 @@ export interface Set extends BaseSet {
 
 // for form inputs (no id, uses exerciseId instead)
 export interface SetInputs extends BaseSet {
-  exerciseId: number;
+  exerciseId: NullableNumber;
 }
 
 export type Exercise = {
