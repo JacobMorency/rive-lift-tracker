@@ -8,47 +8,51 @@ import { useEffect, useState } from "react";
 import WorkoutHistory from "@/app/components/workouthistory";
 import PageHeader from "@/app/components/pageheader";
 import ClientLayout from "@/app/components/clientlayout";
+import { NullableNumber } from "@/types/workout";
 
 const WorkoutsPage = () => {
   const router = useRouter();
   const { user } = useAuth();
 
-  const [workoutInProgress, setWorkoutInProgress] = useState(false);
-  const [workoutId, setWorkoutId] = useState(null);
+  const [workoutInProgress, setWorkoutInProgress] = useState<boolean>(false);
+  const [workoutId, setWorkoutId] = useState<NullableNumber>(null);
 
   useEffect(() => {
     const savedWorkoutId = localStorage.getItem("workoutId");
     if (savedWorkoutId) {
-      setWorkoutId(savedWorkoutId);
+      setWorkoutId(parseInt(savedWorkoutId));
       setWorkoutInProgress(true);
     }
   }, []);
 
-  const handleStartNewWorkout = async () => {
-    let newWorkoutId = await createNewWorkout();
+  const handleStartNewWorkout = async (): Promise<void> => {
+    const newWorkoutId = await createNewWorkout();
     if (newWorkoutId) {
       setWorkoutId(newWorkoutId);
-      localStorage.setItem("workoutId", newWorkoutId);
+      localStorage.setItem("workoutId", newWorkoutId.toString());
       setWorkoutInProgress(true);
       router.push(`/addworkout/${newWorkoutId}`);
     }
   };
 
-  const createNewWorkout = async () => {
-    const { data, error } = await supabase
-      .from("workouts")
-      .insert([{ user_id: user.id, date: new Date() }])
-      .select("id", "user_id", "date")
-      .single();
+  const createNewWorkout = async (): Promise<NullableNumber> => {
+    if (user !== null) {
+      const { data, error } = await supabase
+        .from("workouts")
+        .insert([{ user_id: user.id, date: new Date() }])
+        .select("id, user_id, date")
+        .single();
 
-    if (error) {
-      console.error("Error creating new workout:", error.message);
-      return null;
+      if (error) {
+        console.error("Error creating new workout:", error.message);
+        return null;
+      }
+      return data?.id;
     }
-    return data?.id;
+    return null;
   };
 
-  const handleContinueWorkout = () => {
+  const handleContinueWorkout = (): void => {
     if (workoutId) {
       router.push(`/addworkout/${workoutId}`);
     }

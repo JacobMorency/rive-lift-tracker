@@ -7,7 +7,10 @@ import { User, Session } from "@supabase/supabase-js";
 const LoginPage = () => {
   const router = useRouter();
 
-  const handleLoginSuccess = (user: User | null, session: Session | null) => {
+  const handleLoginSuccess = (
+    user: User | null,
+    session: Session | null
+  ): void => {
     if (user && session) {
       router.push("/dashboard");
     }

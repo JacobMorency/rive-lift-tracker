@@ -1,3 +1,5 @@
+import type { User } from "@supabase/supabase-js";
+
 export type Set = {
   id: number;
   workout_exercise_id: number | null;
@@ -26,4 +28,14 @@ export type Workout = {
   user_id: string;
   date: string; // ISO date string
   is_complete: boolean;
+};
+
+export type AuthContextType = {
+  user: User | null;
+  userData: {
+    first_name: string;
+    last_name: string;
+    email: string;
+  } | null;
+  loading: boolean;
 };
