@@ -9,22 +9,25 @@ const WorkoutHistory = () => {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const { user } = useAuth();
 
-  const fetchWorkoutHistory = async (): Promise<void> => {
-    const { data, error } = await supabase
-      .from("workouts")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("date", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching workouts:", error.message);
-    } else {
-      setWorkouts(data);
-    }
-  };
   useEffect(() => {
+    const fetchWorkoutHistory = async (): Promise<void> => {
+      if (user !== null) {
+        const { data, error } = await supabase
+          .from("workouts")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("date", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching workouts:", error.message);
+        } else {
+          setWorkouts(data);
+        }
+      }
+    };
+
     fetchWorkoutHistory();
-  }, []);
+  }, [user]);
   return (
     <div>
       <WorkoutHistoryTab workouts={workouts} />
