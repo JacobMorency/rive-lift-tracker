@@ -1,15 +1,24 @@
 import type { User } from "@supabase/supabase-js";
 
-export type Set = {
+export interface BaseSet {
+  reps: NullableNumber;
+  weight: NullableNumber;
+  partialReps: NullableNumber;
+}
+
+// for supabase (database schema)
+export interface Set extends BaseSet {
   id: number;
   workout_exercise_id: number | null;
   set_number: number | null;
-  weight: number | null;
-  reps: number | null;
-  partial_reps: number | null;
   exercise_name: string | null;
   workout_id: number | null;
-};
+}
+
+// for form inputs (no id, uses exerciseId instead)
+export interface SetInputs extends BaseSet {
+  exerciseId: number;
+}
 
 export type Exercise = {
   id: number;

@@ -1,9 +1,9 @@
-import type { Set } from "@/types/workout";
+import type { SetInputs } from "@/types/workout";
 
 type AddExerciseButtonProps = {
   handleAddExerciseToWorkout: () => void;
   isSetUpdating: boolean;
-  sets: Set[];
+  sets: SetInputs[];
   isExerciseUpdating: boolean;
 };
 

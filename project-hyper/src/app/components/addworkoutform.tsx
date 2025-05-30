@@ -7,7 +7,7 @@ import AddExerciseButton from "@/app/components/workoutform/addexercisebuttons";
 import { useState, useEffect } from "react";
 import supabase from "@/app/lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import { ExercisesInWorkout, NullableNumber } from "@/types/workout";
+import { ExercisesInWorkout, NullableNumber, SetInputs } from "@/types/workout";
 
 type AddWorkoutFormProps = {
   workoutId: number;
@@ -19,12 +19,12 @@ type CompletedSet = {
   sets: SetInputs[];
 };
 
-type SetInputs = {
-  exerciseId: NullableNumber;
-  reps: NullableNumber;
-  weight: NullableNumber;
-  partialReps: NullableNumber;
-};
+// type SetInputs = {
+//   exerciseId: NullableNumber;
+//   reps: NullableNumber;
+//   weight: NullableNumber;
+//   partialReps: NullableNumber;
+// };
 
 const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
   const [exerciseName, setExerciseName] = useState<string>("");
@@ -48,7 +48,7 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
   const [weightInvalid, setWeightInvalid] = useState<boolean>(false);
   const [partialRepsInvalid, setPartialRepsInvalid] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isIntialized, setIsInitialized] = useState<boolean>(false);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -371,11 +371,11 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
       setLoading(false);
       setIsInitialized(true);
     }
-  }, [isIntialized]);
+  }, [isInitialized]);
 
   // Save the current workout progress to local storage so that it can be retrieved upon refresh or page change
   useEffect(() => {
-    if (isIntialized) {
+    if (isInitialized) {
       const progress = {
         completedSets,
         exerciseId,
@@ -397,6 +397,7 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
     weight,
     partialReps,
     sets,
+    isInitialized,
   ]);
 
   // TODO: Centralize the loading state and error handling

@@ -1,9 +1,9 @@
 import { SquarePen, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Set } from "@/types/workout";
+import { SetInputs } from "@/types/workout";
 
 type SetListProps = {
-  sets: Set[];
+  sets: SetInputs[];
   handleUpdateSet: (index: number) => void;
   handleDeleteSet: (index: number) => void;
   exerciseName: string;
@@ -35,7 +35,9 @@ const SetList = ({
             <p>
               <span className="font-bold">Set {index + 1}:</span> {set.reps}{" "}
               reps at {set.weight} lbs
-              {set.partialReps > 0 && ` with ${set.partialReps} partial reps`}
+              {set.partialReps !== null &&
+                set.partialReps > 0 &&
+                ` with ${set.partialReps} partial reps`}
             </p>
             <span className="flex gap-2">
               <button
@@ -73,7 +75,8 @@ const SetList = ({
               <span className="font-bold">Set {deleteSetIndex + 1}:</span>{" "}
               {sets[deleteSetIndex].reps} reps at {sets[deleteSetIndex].weight}{" "}
               lbs
-              {sets[deleteSetIndex].partialReps > 0 &&
+              {sets[deleteSetIndex].partialReps !== null &&
+                sets[deleteSetIndex].partialReps > 0 &&
                 ` with ${sets[deleteSetIndex].partialReps} partial reps`}
             </div>
           )}
