@@ -3,15 +3,25 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 
 import ExerciseDetails from "@/app/components/workouthistory/exercisedetails";
 import CardActionButtons from "@/app/components/workouthistory/cardactionbuttons";
-
 import { useState, useEffect } from "react";
 import supabase from "@/app/lib/supabaseClient";
+import { Workout } from "@/types/workout";
 
-const WorkoutHistoryCard = ({ workout }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [workoutData, setWorkoutData] = useState([]);
+type WorkoutHistoryCardProps = {
+  workout: Workout;
+};
 
-  const fetchWorkoutInfo = async () => {
+type WorkoutExercise = {
+  id: number;
+  exercise_id: number;
+  workout_id: number;
+};
+
+const WorkoutHistoryCard = ({ workout }: WorkoutHistoryCardProps) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [workoutData, setWorkoutData] = useState<WorkoutExercise[]>([]);
+
+  const fetchWorkoutInfo = async (): Promise<void> => {
     const { data, error } = await supabase
       .from("workout_exercises")
       .select("*")

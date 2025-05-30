@@ -4,12 +4,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/authcontext";
 import supabase from "@/app/lib/supabaseClient";
 import { useState } from "react";
-import { Span } from "next/dist/trace";
 
 const ProfileCard = () => {
-  const { user, userData } = useAuth();
+  const { userData } = useAuth();
   const router = useRouter();
-  const [isLoggingOut, setIsLoggingOut] = useState<Boolean>(false);
+  const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
 
   const handleLogout = async (): Promise<void> => {
     setIsLoggingOut(true);

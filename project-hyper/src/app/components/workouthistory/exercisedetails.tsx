@@ -3,13 +3,24 @@
 import { useState, useEffect } from "react";
 import supabase from "@/app/lib/supabaseClient";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { Set } from "@/types/workout";
 
-const ExerciseDetails = ({ exercise }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [exerciseName, setExerciseName] = useState("");
-  const [sets, setSets] = useState([]);
+type ExerciseDetailsProps = {
+  exercise: WorkoutExercise;
+};
 
-  const fetchExerciseName = async () => {
+type WorkoutExercise = {
+  id: number;
+  exercise_id: number;
+  workout_id: number;
+};
+
+const ExerciseDetails = ({ exercise }: ExerciseDetailsProps) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [exerciseName, setExerciseName] = useState<string>("");
+  const [sets, setSets] = useState<Set[]>([]);
+
+  const fetchExerciseName = async (): Promise<void> => {
     const { data, error } = await supabase
       .from("exercise_library")
       .select("name")
@@ -23,7 +34,7 @@ const ExerciseDetails = ({ exercise }) => {
     }
   };
 
-  const fetchSets = async () => {
+  const fetchSets = async (): Promise<void> => {
     const { data, error } = await supabase
       .from("sets")
       .select("*")
@@ -61,7 +72,7 @@ const ExerciseDetails = ({ exercise }) => {
             <li key={set.id}>
               Set {set.set_number}: {set.reps} {set.reps === 1 ? "rep" : "reps"}{" "}
               at {set.weight}lbs
-              {set.partial_reps > 0 && (
+              {set.partial_reps != null && set.partial_reps > 0 && (
                 <span>
                   {" "}
                   + {set.partial_reps}{" "}

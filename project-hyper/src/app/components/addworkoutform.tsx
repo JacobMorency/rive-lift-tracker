@@ -7,22 +7,30 @@ import AddExerciseButton from "@/app/components/workoutform/addexercisebuttons";
 import { useState, useEffect } from "react";
 import supabase from "@/app/lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import {
-  Set,
-  ExercisesInWorkout,
-  NullableNumber,
-  CompletedSet,
-} from "@/types/workout";
+import { ExercisesInWorkout, NullableNumber } from "@/types/workout";
 
 type AddWorkoutFormProps = {
   workoutId: number;
+};
+
+type CompletedSet = {
+  exerciseId: NullableNumber;
+  exerciseName: string;
+  sets: SetInputs[];
+};
+
+type SetInputs = {
+  exerciseId: NullableNumber;
+  reps: NullableNumber;
+  weight: NullableNumber;
+  partialReps: NullableNumber;
 };
 
 const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
   const [exerciseName, setExerciseName] = useState<string>("");
   const [exerciseId, setExerciseId] = useState<NullableNumber>(null);
   const [reps, setReps] = useState<NullableNumber>(null);
-  const [sets, setSets] = useState<Set[]>([]);
+  const [sets, setSets] = useState<SetInputs[]>([]);
   const [weight, setWeight] = useState<NullableNumber>(null);
   const [partialReps, setPartialReps] = useState<NullableNumber>(null);
   const [exercisesInWorkout, setExercisesInWorkout] = useState<
@@ -44,7 +52,7 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
 
   const router = useRouter();
 
-  const handleCompleteWorkout = () => {
+  const handleCompleteWorkout = (): void => {
     localStorage.removeItem("workoutId");
     localStorage.removeItem("workoutProgress");
     router.push("/workouts");
@@ -103,7 +111,7 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
     handleCompleteWorkout();
   };
 
-  const handleAddSet = () => {
+  const handleAddSet = (): void => {
     let hasError = false;
     setRepsEmpty(false);
     setWeightEmpty(false);
@@ -168,11 +176,12 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
     }
   };
 
-  const handleSaveUpdatedSet = () => {
+  const handleSaveUpdatedSet = (): void => {
     if (reps === null || weight === null) {
       return;
     }
     const updatedSet = {
+      exerciseId: exerciseId,
       reps: reps,
       weight: weight,
       partialReps: partialReps || 0,
@@ -217,13 +226,20 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
       const completedSet = completedSets[index];
       setExerciseName(completedSet.exerciseName);
       setExerciseId(completedSet.exerciseId);
-      setSets(completedSet.sets);
+      setSets(
+        completedSet.sets.map((set) => ({
+          exerciseId: completedSet.exerciseId,
+          reps: set.reps,
+          weight: set.weight,
+          partialReps: set.partialReps || 0, // Default to 0 if partial reps is empty
+        }))
+      );
       setIsExerciseUpdating(true);
       setUpdateExerciseIndex(index);
     }
   };
 
-  const checkUnsavedChanges = () => {
+  const checkUnsavedChanges = (): boolean => {
     if (reps || weight || (partialReps !== null && partialReps > 0)) {
       return true;
     } else {
@@ -243,10 +259,16 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
     if (isExerciseUpdating && updateExerciseIndex !== null) {
       // Replaces the old completedSet with a new one with updates
       const updatedCompletedSets = [...completedSets];
+
       updatedCompletedSets[updateExerciseIndex] = {
         exerciseId,
         exerciseName,
-        sets,
+        sets: sets.map((set) => ({
+          exerciseId,
+          reps: set.reps,
+          weight: set.weight,
+          partialReps: set.partialReps || 0,
+        })),
       };
       setCompletedSets(updatedCompletedSets);
 
@@ -276,22 +298,21 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
     resetFormFields();
   };
 
-  const resetFormFields = () => {
+  const resetFormFields = (): void => {
     setExerciseName("");
     setReps(null);
     setWeight(null);
     setPartialReps(null);
   };
 
-  const cancelUpdateSet = () => {
+  const cancelUpdateSet = (): void => {
     setIsSetUpdating(false);
     setReps(null);
     setWeight(null);
     setPartialReps(null);
   };
 
-  // TODO: Remove workout from db if cancelled
-  const confirmCancelWorkout = async () => {
+  const confirmCancelWorkout = async (): Promise<void> => {
     const { error } = await supabase
       .from("workouts")
       .delete()

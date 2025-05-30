@@ -3,11 +3,13 @@ import WorkoutHistoryTab from "@/app/components/workouthistory/workouthistorytab
 import supabase from "@/app/lib/supabaseClient";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/app/context/authcontext";
+import { Workout } from "@/types/workout";
 
 const WorkoutHistory = () => {
-  const [workouts, setWorkouts] = useState([]);
+  const [workouts, setWorkouts] = useState<Workout[]>([]);
   const { user } = useAuth();
-  const fetchWorkoutHistory = async () => {
+
+  const fetchWorkoutHistory = async (): Promise<void> => {
     const { data, error } = await supabase
       .from("workouts")
       .select("*")
