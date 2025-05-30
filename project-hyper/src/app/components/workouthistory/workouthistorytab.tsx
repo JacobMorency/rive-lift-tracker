@@ -1,25 +1,19 @@
 "use client";
-import { useState, useEffect } from "react";
 
+import { useState, useEffect } from "react";
 import WorkoutHistoryCard from "@/app/components/workouthistory/workouthistorycard";
 
-const WorkoutHistoryTab = ({ workouts }) => {
-  const [selectedWorkouts, setSelectedWorkouts] = useState([]);
-  const [selectedTab, setSelectedTab] = useState("week");
+import { Workout } from "@/types/workout";
 
-  const handleTabChange = (value) => {
-    if (value === "week") {
-      fetchWeeklyWorkouts();
-    }
-    if (value === "month") {
-      fetchMonthlyWorkouts();
-    }
-    if (value === "all") {
-      fetchAllWorkouts();
-    }
-  };
+type WorkoutHistoryTabProps = {
+  workouts: Workout[];
+};
 
-  const fetchWeeklyWorkouts = () => {
+const WorkoutHistoryTab = ({ workouts }: WorkoutHistoryTabProps) => {
+  const [selectedWorkouts, setSelectedWorkouts] = useState<Workout[]>([]);
+  const [selectedTab, setSelectedTab] = useState<string>("week");
+
+  const fetchWeeklyWorkouts = (): void => {
     const today = new Date();
     const currentYear = today.getFullYear();
 
@@ -46,7 +40,7 @@ const WorkoutHistoryTab = ({ workouts }) => {
     setSelectedWorkouts(weeklyWorkouts);
   };
 
-  const fetchMonthlyWorkouts = () => {
+  const fetchMonthlyWorkouts = (): void => {
     const today = new Date();
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
@@ -62,7 +56,7 @@ const WorkoutHistoryTab = ({ workouts }) => {
     setSelectedWorkouts(monthlyWorkouts);
   };
 
-  const fetchAllWorkouts = () => {
+  const fetchAllWorkouts = (): void => {
     setSelectedWorkouts(workouts);
   };
 
