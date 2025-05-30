@@ -21,22 +21,22 @@ const WorkoutHistoryCard = ({ workout }: WorkoutHistoryCardProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [workoutData, setWorkoutData] = useState<WorkoutExercise[]>([]);
 
-  const fetchWorkoutInfo = async (): Promise<void> => {
-    const { data, error } = await supabase
-      .from("workout_exercises")
-      .select("*")
-      .eq("workout_id", workout.id);
-
-    if (error) {
-      console.error("Error fetching workout data:", error.message);
-    } else {
-      setWorkoutData(data);
-    }
-  };
-
   useEffect(() => {
+    const fetchWorkoutInfo = async (): Promise<void> => {
+      const { data, error } = await supabase
+        .from("workout_exercises")
+        .select("*")
+        .eq("workout_id", workout.id);
+
+      if (error) {
+        console.error("Error fetching workout data:", error.message);
+      } else {
+        setWorkoutData(data);
+      }
+    };
+
     fetchWorkoutInfo();
-  }, []);
+  }, [workout.id]);
 
   return (
     <div className="mb-3">

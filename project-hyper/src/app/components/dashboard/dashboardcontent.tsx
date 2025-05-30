@@ -10,29 +10,31 @@ const DashboardContent = () => {
   const [totalWorkouts, setTotalWorkouts] = useState<number>(0);
   const { user } = useAuth();
 
-  const fetchTotalWorkouts = async (): Promise<void> => {
-    const { data, error } = await supabase
-      .from("workouts")
-      .select("*", { count: "exact" })
-      .eq("user_id", user.id);
-
-    if (error) {
-      console.error("Error fetching workouts:", error.message);
-    } else {
-      setTotalWorkouts(data.length);
-    }
-  };
-
   useEffect(() => {
+    const fetchTotalWorkouts = async (): Promise<void> => {
+      if (user !== null) {
+        const { data, error } = await supabase
+          .from("workouts")
+          .select("*", { count: "exact" })
+          .eq("user_id", user.id);
+
+        if (error) {
+          console.error("Error fetching workouts:", error.message);
+        } else {
+          setTotalWorkouts(data.length);
+        }
+      }
+    };
+
     fetchTotalWorkouts();
-  }, []);
+  }, [user]);
 
   return (
     <div>
       <DashboardCard
         title={"Total Workouts"}
         description={"Your total amount of workouts."}
-        content={totalWorkouts}
+        content={totalWorkouts.toString()}
         icon={<Dumbbell />}
       />
     </div>
