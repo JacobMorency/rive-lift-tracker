@@ -71,11 +71,11 @@ const ExerciseDetails = ({ exercise }: ExerciseDetailsProps) => {
             <li key={set.id}>
               Set {set.set_number}: {set.reps} {set.reps === 1 ? "rep" : "reps"}{" "}
               at {set.weight}lbs
-              {set.partial_reps != null && set.partial_reps > 0 && (
+              {set.partialReps != null && set.partialReps > 0 && (
                 <span>
                   {" "}
-                  + {set.partial_reps}{" "}
-                  {set.partial_reps === 1 ? "partial" : "partials"}
+                  + {set.partialReps}{" "}
+                  {set.partialReps === 1 ? "partial" : "partials"}
                 </span>
               )}
             </li>
