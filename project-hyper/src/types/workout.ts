@@ -1,7 +1,12 @@
 export type Set = {
-  reps: number;
-  weight: number;
-  partialReps: number;
+  id: number;
+  workout_exercise_id: number | null;
+  set_number: number | null;
+  weight: number | null;
+  reps: number | null;
+  partial_reps: number | null;
+  exercise_name: string | null;
+  workout_id: number | null;
 };
 
 export type Exercise = {
@@ -14,10 +19,11 @@ export type ExercisesInWorkout = {
   name: string;
 };
 
-export type CompletedSet = {
-  exerciseId: NullableNumber;
-  exerciseName: string;
-  sets: Set[];
-};
-
 export type NullableNumber = number | null;
+
+export type Workout = {
+  id: number;
+  user_id: string;
+  date: string; // ISO date string
+  is_complete: boolean;
+};
