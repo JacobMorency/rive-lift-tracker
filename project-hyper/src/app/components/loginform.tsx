@@ -2,9 +2,10 @@
 
 import supabase from "@/app/lib/supabaseClient";
 import { FormEvent, useState } from "react";
+import { User, Session } from "@supabase/supabase-js";
 
 type LoginFormProps = {
-  onLoginSuccess: (data: any) => void;
+  onLoginSuccess: (user: User | null, session: Session | null) => void;
 };
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
@@ -14,7 +15,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const [emailEmpty, setEmailEmpty] = useState(false);
   const [passwordEmpty, setPasswordEmpty] = useState(false);
 
-  const handleLogin = async (e: FormEvent) => {
+  const handleLogin = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
 
     setEmailEmpty(false);
@@ -47,7 +48,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       if (error) {
         throw error;
       }
-      onLoginSuccess(data);
+      onLoginSuccess(data.user, data.session);
     } catch (error) {
       setErrorMessage("Invalid email or password.");
     }
