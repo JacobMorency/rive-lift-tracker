@@ -50,6 +50,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       }
       onLoginSuccess(data.user, data.session);
     } catch (error) {
+      // TODO: Handle error more gracefully
+      console.error("Login error:", error);
       setErrorMessage("Invalid email or password.");
     }
   };
