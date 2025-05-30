@@ -33,7 +33,7 @@ const AddSetButtons = ({
             onClick={handleSaveUpdatedSet}
             type="button"
           >
-            Update Set {updateSetIndex + 1}
+            {updateSetIndex !== null && `Update Set ${updateSetIndex + 1}`}
           </button>
           <button
             className="w-full btn btn-error"
