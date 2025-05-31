@@ -17,9 +17,17 @@ const LoginPage = () => {
     // TODO: Handle case where login fails or user is null
   };
 
+  // TODO: Implement forgot password functionality
+  const handleForgotPassword = (): void => {
+    router.push("/underconstruction");
+  };
+
   return (
     <div>
-      <LoginForm onLoginSuccess={handleLoginSuccess} />
+      <LoginForm
+        onLoginSuccess={handleLoginSuccess}
+        handleForgotPassword={handleForgotPassword}
+      />
     </div>
   );
 };
