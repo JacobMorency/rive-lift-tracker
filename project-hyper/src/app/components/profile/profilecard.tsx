@@ -3,21 +3,23 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/authcontext";
 import supabase from "@/app/lib/supabaseClient";
+import { useState } from "react";
 
 const ProfileCard = () => {
-  const { user, userData } = useAuth();
+  const { userData } = useAuth();
   const router = useRouter();
-  const handleLogout = async () => {
+  const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
+
+  const handleLogout = async (): Promise<void> => {
+    setIsLoggingOut(true);
+
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.log("Error logging out:", error.message);
+      setIsLoggingOut(false);
       return;
     }
     router.push("/");
-
-    if (!userData) {
-      return <p>Loading...</p>; // TODO: Add loading spinner or skeleton
-    }
   };
 
   return (
@@ -28,11 +30,17 @@ const ProfileCard = () => {
             {userData?.first_name} {userData?.last_name}
           </h2>
           <p>{userData?.email}</p>
-          <div className="card-actions justify-end">
-            <button onClick={handleLogout} className="btn btn-primary">
-              Logout
-            </button>
-          </div>
+          {isLoggingOut ? (
+            <div className="card-actions justify-center">
+              <span className="loading loading-spinner"></span>
+            </div>
+          ) : (
+            <div className="card-actions justify-end">
+              <button onClick={handleLogout} className="btn btn-primary">
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

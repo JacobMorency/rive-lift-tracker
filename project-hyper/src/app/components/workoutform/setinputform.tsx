@@ -1,6 +1,23 @@
 import AddSetButtons from "@/app/components/workoutform/addsetbuttons";
+import { AddSetButtonProps } from "@/app/components/workoutform/addsetbuttons";
+import { NullableNumber } from "@/types/workout";
 
-const SetInputForm = (props) => {
+// Imports types for the AddSetButtonProps and new ones for the spread at the bottom
+type SetInputFormProps = AddSetButtonProps & {
+  reps: NullableNumber;
+  weight: NullableNumber;
+  partialReps: NullableNumber;
+  setReps: (value: NullableNumber) => void;
+  setWeight: (value: NullableNumber) => void;
+  setPartialReps: (value: NullableNumber) => void;
+  repsEmpty: boolean;
+  weightEmpty: boolean;
+  partialRepsInvalid: boolean;
+  weightInvalid: boolean;
+  repsInvalid: boolean;
+};
+
+const SetInputForm = (props: SetInputFormProps) => {
   const {
     reps,
     weight,
@@ -22,8 +39,10 @@ const SetInputForm = (props) => {
           <input
             type="number"
             id="reps"
-            value={reps}
-            onChange={(e) => setReps(e.target.value)}
+            value={reps !== null ? reps : ""}
+            onChange={(e) =>
+              setReps(e.target.value !== "" ? parseInt(e.target.value) : null)
+            }
             placeholder="0"
             className={
               repsEmpty || repsInvalid ? "border-error input" : "input"
@@ -41,8 +60,10 @@ const SetInputForm = (props) => {
           <input
             type="number"
             id="weight"
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
+            value={weight !== null ? weight : ""}
+            onChange={(e) =>
+              setWeight(e.target.value ? parseFloat(e.target.value) : null)
+            }
             placeholder="0 (lbs)"
             className={
               weightEmpty || weightInvalid ? "border-error input" : "input"
@@ -63,8 +84,10 @@ const SetInputForm = (props) => {
           <input
             type="number"
             id="partialReps"
-            value={partialReps}
-            onChange={(e) => setPartialReps(e.target.value)}
+            value={partialReps !== null ? partialReps : ""}
+            onChange={(e) =>
+              setPartialReps(e.target.value ? parseInt(e.target.value) : null)
+            }
             placeholder="0 (optional)"
             className={partialRepsInvalid ? "border-error input" : "input"}
           />

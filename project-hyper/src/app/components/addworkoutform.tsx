@@ -6,40 +6,59 @@ import SetInputForm from "@/app/components/workoutform/setinputform";
 import AddExerciseButton from "@/app/components/workoutform/addexercisebuttons";
 import { useState, useEffect } from "react";
 import supabase from "@/app/lib/supabaseClient";
-import { useAuth } from "@/app/context/authcontext";
 import { useRouter } from "next/navigation";
+import { ExercisesInWorkout, NullableNumber, SetInputs } from "@/types/workout";
 
-const AddWorkoutForm = ({ workoutId }) => {
-  const [exerciseName, setExerciseName] = useState("");
-  const [exerciseId, setExerciseId] = useState(null);
-  const [reps, setReps] = useState("");
-  const [sets, setSets] = useState([]);
-  const [weight, setWeight] = useState("");
-  const [partialReps, setPartialReps] = useState("");
-  const [exercisesInWorkout, setExercisesInWorkout] = useState([]);
-  const [completedSets, setCompletedSets] = useState([]);
-  const [updateSetIndex, setUpdateSetIndex] = useState(null);
-  const [isSetUpdating, setIsSetUpdating] = useState(false);
-  const [updateExerciseIndex, setUpdateExerciseIndex] = useState(null);
-  const [isExerciseUpdating, setIsExerciseUpdating] = useState(false);
-  const [repsEmpty, setRepsEmpty] = useState(false);
-  const [weightEmpty, setWeightEmpty] = useState(false);
-  const [repsInvalid, setRepsInvalid] = useState(false);
-  const [weightInvalid, setWeightInvalid] = useState(false);
-  const [partialRepsInvalid, setPartialRepsInvalid] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [isIntialized, setIsInitialized] = useState(false);
+type AddWorkoutFormProps = {
+  workoutId: number;
+};
 
-  const { user } = useAuth();
+type CompletedSet = {
+  exerciseId: NullableNumber;
+  exerciseName: string;
+  sets: SetInputs[];
+};
+
+// type SetInputs = {
+//   exerciseId: NullableNumber;
+//   reps: NullableNumber;
+//   weight: NullableNumber;
+//   partialReps: NullableNumber;
+// };
+
+const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
+  const [exerciseName, setExerciseName] = useState<string>("");
+  const [exerciseId, setExerciseId] = useState<NullableNumber>(null);
+  const [reps, setReps] = useState<NullableNumber>(null);
+  const [sets, setSets] = useState<SetInputs[]>([]);
+  const [weight, setWeight] = useState<NullableNumber>(null);
+  const [partialReps, setPartialReps] = useState<NullableNumber>(null);
+  const [exercisesInWorkout, setExercisesInWorkout] = useState<
+    ExercisesInWorkout[]
+  >([]);
+  const [completedSets, setCompletedSets] = useState<CompletedSet[]>([]);
+  const [updateSetIndex, setUpdateSetIndex] = useState<NullableNumber>(null);
+  const [isSetUpdating, setIsSetUpdating] = useState<boolean>(false);
+  const [updateExerciseIndex, setUpdateExerciseIndex] =
+    useState<NullableNumber>(null);
+  const [isExerciseUpdating, setIsExerciseUpdating] = useState<boolean>(false);
+  const [repsEmpty, setRepsEmpty] = useState<boolean>(false);
+  const [weightEmpty, setWeightEmpty] = useState<boolean>(false);
+  const [repsInvalid, setRepsInvalid] = useState<boolean>(false);
+  const [weightInvalid, setWeightInvalid] = useState<boolean>(false);
+  const [partialRepsInvalid, setPartialRepsInvalid] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
+
   const router = useRouter();
 
-  const handleCompleteWorkout = () => {
+  const handleCompleteWorkout = (): void => {
     localStorage.removeItem("workoutId");
     localStorage.removeItem("workoutProgress");
     router.push("/workouts");
   };
 
-  const handleSaveWorkout = async () => {
+  const handleSaveWorkout = async (): Promise<void> => {
     for (const completedSet of completedSets) {
       const { data: workoutExercisesData, error: exerciseError } =
         await supabase
@@ -54,7 +73,10 @@ const AddWorkoutForm = ({ workoutId }) => {
           .select("id")
           .single();
       if (exerciseError) {
-        console.error("Error adding exercise to workout:", error.message);
+        console.error(
+          "Error adding exercise to workout:",
+          exerciseError.message
+        );
         return;
       }
 
@@ -77,7 +99,7 @@ const AddWorkoutForm = ({ workoutId }) => {
       }
     }
 
-    const { data: workoutData, error } = await supabase
+    const { error } = await supabase
       .from("workouts")
       .update({ is_complete: true })
       .eq("id", workoutId)
@@ -89,7 +111,7 @@ const AddWorkoutForm = ({ workoutId }) => {
     handleCompleteWorkout();
   };
 
-  const handleAddSet = () => {
+  const handleAddSet = (): void => {
     let hasError = false;
     setRepsEmpty(false);
     setWeightEmpty(false);
@@ -113,61 +135,69 @@ const AddWorkoutForm = ({ workoutId }) => {
       hasError = true;
     }
 
-    if (partialReps < 0) {
-      setPartialRepsInvalid(true);
-      hasError = true;
+    if (partialReps) {
+      if (partialReps < 0) {
+        setPartialRepsInvalid(true);
+        hasError = true;
+      }
     }
 
     if (hasError) {
       return;
     }
 
-    const numReps = parseInt(reps);
-    const numWeight = Number(weight);
-    if (numReps > 0 && numWeight > 0) {
-      setSets((prevSets) => [
-        ...prevSets,
-        {
-          exerciseId: exerciseId,
-          reps: numReps,
-          weight: numWeight,
-          partialReps: Number(partialReps) || 0, // Default to 0 if partial reps is empty
-        },
-      ]);
+    if (reps && weight) {
+      if (reps > 0 && weight > 0) {
+        setSets((prevSets) => [
+          ...prevSets,
+          {
+            exerciseId: exerciseId,
+            reps: reps,
+            weight: weight,
+            partialReps: partialReps || 0, // Default to 0 if partial reps is empty
+          },
+        ]);
+      }
+      setReps(null);
+      setWeight(null);
+      setPartialReps(null);
     }
-    setReps("");
-    setWeight("");
-    setPartialReps("");
   };
 
-  const handleUpdateSet = (index) => {
-    const setToUpdate = sets[index];
-    setReps(setToUpdate.reps);
-    setWeight(setToUpdate.weight);
-    setPartialReps(setToUpdate.partialReps);
-    setUpdateSetIndex(index);
-    setIsSetUpdating(true); // TODO: Might need to change implementation
-    setUpdateSetIndex(index);
+  const handleUpdateSet = (index: NullableNumber): void => {
+    if (index !== null) {
+      const setToUpdate = sets[index];
+      setReps(setToUpdate.reps);
+      setWeight(setToUpdate.weight);
+      setPartialReps(setToUpdate.partialReps);
+      setUpdateSetIndex(index);
+      setIsSetUpdating(true);
+      setUpdateSetIndex(index);
+    }
   };
 
-  const handleSaveUpdatedSet = () => {
+  const handleSaveUpdatedSet = (): void => {
+    if (reps === null || weight === null) {
+      return;
+    }
     const updatedSet = {
-      reps: parseInt(reps),
-      weight: Number(weight),
-      partialReps: Number(partialReps) || 0,
+      exerciseId: exerciseId,
+      reps: reps,
+      weight: weight,
+      partialReps: partialReps || 0,
     };
     const updatedSets = sets.map((set, index) =>
       index === updateSetIndex ? updatedSet : set
     );
     setSets(updatedSets);
     setIsSetUpdating(false);
-    setReps("");
-    setWeight("");
-    setPartialReps("");
+    setReps(null);
+    setWeight(null);
+    setPartialReps(null);
     setUpdateSetIndex(null);
   };
 
-  const handleDeleteSet = (index) => {
+  const handleDeleteSet = (index: NullableNumber): void => {
     const updatedSets = sets.filter((set, i) => i !== index);
     setSets(updatedSets);
 
@@ -181,7 +211,7 @@ const AddWorkoutForm = ({ workoutId }) => {
     }
   };
 
-  const handleDeleteExercise = (index) => {
+  const handleDeleteExercise = (index: NullableNumber): void => {
     const updatedExercisesInWorkout = exercisesInWorkout.filter(
       (exercise, i) => i !== index
     );
@@ -191,40 +221,54 @@ const AddWorkoutForm = ({ workoutId }) => {
     setCompletedSets(updatedCompletedSets);
   };
 
-  const handleUpdateExercise = (index) => {
-    const completedSet = completedSets[index];
-    setExerciseName(completedSet.exerciseName);
-    setExerciseId(completedSet.exerciseId);
-    setSets(completedSet.sets);
-    setIsExerciseUpdating(true);
-    setUpdateExerciseIndex(index);
+  const handleUpdateExercise = (index: NullableNumber): void => {
+    if (index !== null) {
+      const completedSet = completedSets[index];
+      setExerciseName(completedSet.exerciseName);
+      setExerciseId(completedSet.exerciseId);
+      setSets(
+        completedSet.sets.map((set) => ({
+          exerciseId: completedSet.exerciseId,
+          reps: set.reps,
+          weight: set.weight,
+          partialReps: set.partialReps || 0, // Default to 0 if partial reps is empty
+        }))
+      );
+      setIsExerciseUpdating(true);
+      setUpdateExerciseIndex(index);
+    }
   };
 
-  const checkUnsavedChanges = () => {
-    if (reps || weight || partialReps > 0) {
+  const checkUnsavedChanges = (): boolean => {
+    if (reps || weight || (partialReps !== null && partialReps > 0)) {
       return true;
     } else {
       return false;
     }
   };
 
-  const handleAddExerciseToWorkout = () => {
+  const handleAddExerciseToWorkout = (): void => {
     if (!checkUnsavedChanges()) {
       handleConfirmAddExerciseToWorkout();
     } else {
-      setIsAddExerciseDialogOpen(true);
       return;
     }
   };
 
-  const handleConfirmAddExerciseToWorkout = async () => {
+  const handleConfirmAddExerciseToWorkout = async (): Promise<void> => {
     if (isExerciseUpdating && updateExerciseIndex !== null) {
       // Replaces the old completedSet with a new one with updates
       const updatedCompletedSets = [...completedSets];
+
       updatedCompletedSets[updateExerciseIndex] = {
         exerciseId,
         exerciseName,
-        sets,
+        sets: sets.map((set) => ({
+          exerciseId,
+          reps: set.reps,
+          weight: set.weight,
+          partialReps: set.partialReps || 0,
+        })),
       };
       setCompletedSets(updatedCompletedSets);
 
@@ -254,22 +298,21 @@ const AddWorkoutForm = ({ workoutId }) => {
     resetFormFields();
   };
 
-  const resetFormFields = () => {
+  const resetFormFields = (): void => {
     setExerciseName("");
-    setReps("");
-    setWeight("");
-    setPartialReps("");
+    setReps(null);
+    setWeight(null);
+    setPartialReps(null);
   };
 
-  const cancelUpdateSet = () => {
+  const cancelUpdateSet = (): void => {
     setIsSetUpdating(false);
-    setReps("");
-    setWeight("");
-    setPartialReps("");
+    setReps(null);
+    setWeight(null);
+    setPartialReps(null);
   };
 
-  // TODO: Remove workout from db if cancelled
-  const confirmCancelWorkout = async () => {
+  const confirmCancelWorkout = async (): Promise<void> => {
     const { error } = await supabase
       .from("workouts")
       .delete()
@@ -288,44 +331,34 @@ const AddWorkoutForm = ({ workoutId }) => {
     const savedProgress = localStorage.getItem("workoutProgress");
     if (savedProgress) {
       try {
-        const [
-          savedCompletedSets,
-          savedExerciseId,
-          savedExerciseName,
-          savedExercisesInWorkout,
-          savedReps,
-          savedWeight,
-          savedPartialReps,
-          savedSets,
-        ] = JSON.parse(savedProgress);
-        if (savedCompletedSets) {
-          setCompletedSets(savedCompletedSets);
-          const derivedExercises = savedCompletedSets.map((ex) => ({
-            id: ex.exerciseId,
-            name: ex.exerciseName,
-          }));
+        const progress = JSON.parse(savedProgress);
+        if (progress.completedSets) {
+          setCompletedSets(progress.completedSets);
+          const derivedExercises = progress.completedSets.map(
+            (ex: CompletedSet) => ({
+              id: ex.exerciseId,
+              name: ex.exerciseName,
+            })
+          );
           setExercisesInWorkout(derivedExercises);
         }
-        if (savedExerciseId) {
-          setExerciseId(savedExerciseId);
+        if (progress.exerciseId) {
+          setExerciseId(progress.exerciseId);
         }
-        if (savedExerciseName) {
-          setExerciseName(savedExerciseName);
+        if (progress.exerciseName) {
+          setExerciseName(progress.exerciseName);
         }
-        // if (savedExercisesInWorkout) {
-        //   setExercisesInWorkout(savedExercisesInWorkout);
-        // }
-        if (savedReps) {
-          setReps(savedReps);
+        if (progress.reps) {
+          setReps(progress.reps);
         }
-        if (savedWeight) {
-          setWeight(savedWeight);
+        if (progress.weight) {
+          setWeight(progress.weight);
         }
-        if (savedPartialReps) {
-          setPartialReps(savedPartialReps);
+        if (progress.partialReps) {
+          setPartialReps(progress.partialReps);
         }
-        if (savedSets) {
-          setSets(savedSets);
+        if (progress.sets) {
+          setSets(progress.sets);
         }
       } catch (error) {
         console.error("Error parsing saved progress:", error);
@@ -338,24 +371,22 @@ const AddWorkoutForm = ({ workoutId }) => {
       setLoading(false);
       setIsInitialized(true);
     }
-  }, [isIntialized]);
+  }, [isInitialized]);
 
   // Save the current workout progress to local storage so that it can be retrieved upon refresh or page change
   useEffect(() => {
-    if (isIntialized) {
-      localStorage.setItem(
-        "workoutProgress",
-        JSON.stringify([
-          completedSets,
-          exerciseId,
-          exerciseName,
-          exercisesInWorkout,
-          reps,
-          weight,
-          partialReps,
-          sets,
-        ])
-      );
+    if (isInitialized) {
+      const progress = {
+        completedSets,
+        exerciseId,
+        exerciseName,
+        exercisesInWorkout,
+        reps,
+        weight,
+        partialReps,
+        sets,
+      };
+      localStorage.setItem("workoutProgress", JSON.stringify(progress));
     }
   }, [
     completedSets,
@@ -366,15 +397,10 @@ const AddWorkoutForm = ({ workoutId }) => {
     weight,
     partialReps,
     sets,
+    isInitialized,
   ]);
 
-  // TODO: query supabase instead of relying on local storage
-  // useEffect(() => {
-  //   if (workoutId) {
-  //     fetchCompletedExercises();
-  //   }
-  // }, [workoutId]);
-
+  // TODO: Centralize the loading state and error handling
   if (loading) {
     return <div>Loading...</div>; // Or any other loading indicator
   }
@@ -386,7 +412,7 @@ const AddWorkoutForm = ({ workoutId }) => {
         className="overflow-y-auto max-h-[calc(100vh-4rem)] pb-24"
       >
         <div className="bg-base-300 rounded-lg py-3 mt-3">
-          <div className="mb-3">
+          <div className={`${exerciseName ? "mb-3" : ""}`}>
             <ExerciseSelector
               exerciseName={exerciseName}
               setExerciseName={setExerciseName}

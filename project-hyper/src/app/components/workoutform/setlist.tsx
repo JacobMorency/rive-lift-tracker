@@ -1,23 +1,27 @@
-// import { Button } from "@/components/ui/button";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogDescription,
-//   DialogFooter,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-// } from "@/components/ui/dialog";
 import { SquarePen, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { SetInputs } from "@/types/workout";
 
-const SetList = ({ sets, handleUpdateSet, handleDeleteSet, exerciseName }) => {
-  const [deleteSetIndex, setDeleteSetIndex] = useState(null);
-  const [isDeleteSetDialogOpen, setIsDeleteSetDialogOpen] = useState(false);
+type SetListProps = {
+  sets: SetInputs[];
+  handleUpdateSet: (index: number) => void;
+  handleDeleteSet: (index: number) => void;
+  exerciseName: string;
+};
 
-  const handleConfirmDeleteSet = () => {
-    handleDeleteSet(deleteSetIndex);
-    setIsDeleteSetDialogOpen(false);
+const SetList = ({
+  sets,
+  handleUpdateSet,
+  handleDeleteSet,
+  exerciseName,
+}: SetListProps) => {
+  const [deleteSetIndex, setDeleteSetIndex] = useState<number | null>(null);
+
+  const handleConfirmDeleteSet = (): void => {
+    if (deleteSetIndex !== null) {
+      handleDeleteSet(deleteSetIndex);
+      (document.getElementById("delete_modal") as HTMLDialogElement)?.close();
+    }
   };
   return (
     <div className="px-4">
@@ -31,7 +35,9 @@ const SetList = ({ sets, handleUpdateSet, handleDeleteSet, exerciseName }) => {
             <p>
               <span className="font-bold">Set {index + 1}:</span> {set.reps}{" "}
               reps at {set.weight} lbs
-              {set.partialReps > 0 && ` with ${set.partialReps} partial reps`}
+              {set.partialReps !== null &&
+                set.partialReps > 0 &&
+                ` with ${set.partialReps} partial reps`}
             </p>
             <span className="flex gap-2">
               <button
@@ -46,8 +52,9 @@ const SetList = ({ sets, handleUpdateSet, handleDeleteSet, exerciseName }) => {
                 type="button"
                 onClick={() => {
                   setDeleteSetIndex(index);
-                  setIsDeleteSetDialogOpen(true);
-                  document.getElementById("delete_modal").showModal();
+                  (
+                    document.getElementById("delete_modal") as HTMLDialogElement
+                  )?.showModal();
                 }}
               >
                 <Trash2 />
@@ -63,12 +70,13 @@ const SetList = ({ sets, handleUpdateSet, handleDeleteSet, exerciseName }) => {
             Delete Set {deleteSetIndex !== null ? deleteSetIndex + 1 : ""}
           </h3>
           <p className="py-2">Are you sure you want to delete this set?</p>
-          {deleteSetIndex !== null && (
+          {deleteSetIndex !== null && sets[deleteSetIndex] && (
             <div className="mb-2">
               <span className="font-bold">Set {deleteSetIndex + 1}:</span>{" "}
               {sets[deleteSetIndex].reps} reps at {sets[deleteSetIndex].weight}{" "}
               lbs
-              {sets[deleteSetIndex].partialReps > 0 &&
+              {sets[deleteSetIndex].partialReps !== null &&
+                sets[deleteSetIndex].partialReps > 0 &&
                 ` with ${sets[deleteSetIndex].partialReps} partial reps`}
             </div>
           )}
@@ -77,8 +85,9 @@ const SetList = ({ sets, handleUpdateSet, handleDeleteSet, exerciseName }) => {
               className="btn btn-primary"
               type="button"
               onClick={() => {
-                setIsDeleteSetDialogOpen(false);
-                document.getElementById("delete_modal").close();
+                (
+                  document.getElementById("delete_modal") as HTMLDialogElement
+                )?.close();
               }}
             >
               Cancel

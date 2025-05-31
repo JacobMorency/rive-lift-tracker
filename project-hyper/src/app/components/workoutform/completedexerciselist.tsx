@@ -1,19 +1,26 @@
-// import { Button } from "@/components/ui/button";
 import { SquarePen, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { ExercisesInWorkout } from "@/types/workout";
+
+type CompletedExerciseListProps = {
+  exercisesInWorkout: ExercisesInWorkout[];
+  handleDeleteExercise: (index: number) => void;
+  handleUpdateExercise: (index: number) => void;
+};
 
 const CompletedExerciseList = ({
   exercisesInWorkout,
   handleDeleteExercise,
   handleUpdateExercise,
-}) => {
-  const [isDeleteSetDialogOpen, setIsDeleteSetDialogOpen] = useState(false);
-  const [deleteExerciseIndex, setDeleteExerciseIndex] = useState(null);
-  const [updateExerciseIndex, setUpdateExerciseIndex] = useState(null);
+}: CompletedExerciseListProps) => {
+  const [deleteExerciseIndex, setDeleteExerciseIndex] = useState<number | null>(
+    null
+  );
 
-  const handleConfirmDeleteExercise = () => {
-    handleDeleteExercise(deleteExerciseIndex);
-    setIsDeleteSetDialogOpen(false);
+  const handleConfirmDeleteExercise = (): void => {
+    if (deleteExerciseIndex !== null) {
+      handleDeleteExercise(deleteExerciseIndex);
+    }
   };
   return (
     <div className="px-4">
@@ -39,8 +46,11 @@ const CompletedExerciseList = ({
                   type="button"
                   onClick={() => {
                     setDeleteExerciseIndex(index);
-                    setIsDeleteSetDialogOpen(true);
-                    document.getElementById("delete_modal")?.showModal();
+                    (
+                      document.getElementById(
+                        "delete_modal"
+                      ) as HTMLDialogElement
+                    )?.showModal();
                   }}
                 >
                   <Trash2 />
@@ -68,8 +78,9 @@ const CompletedExerciseList = ({
               className="btn btn-primary"
               type="button"
               onClick={() => {
-                setIsDeleteSetDialogOpen(false);
-                document.getElementById("delete_modal")?.close();
+                (
+                  document.getElementById("delete_modal") as HTMLDialogElement
+                )?.close();
               }}
             >
               Cancel
@@ -79,7 +90,9 @@ const CompletedExerciseList = ({
               type="button"
               onClick={() => {
                 handleConfirmDeleteExercise();
-                document.getElementById("delete_modal")?.close();
+                (
+                  document.getElementById("delete_modal") as HTMLDialogElement
+                )?.close();
               }}
             >
               Remove

@@ -8,14 +8,14 @@ import {
   ReactNode,
 } from "react";
 import supabase from "@/app/lib/supabaseClient";
-import { AuthContextType } from "@/app/types/AuthContext";
+import { AuthContextType } from "@/types/workout";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<AuthContextType["user"]>(null);
   const [userData, setUserData] = useState<AuthContextType["userData"]>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  const fetchUserData = async (userId: string) => {
+  const fetchUserData = async (userId: string): Promise<void> => {
     const { data, error } = await supabase
       .from("users")
       .select("first_name, last_name, email")

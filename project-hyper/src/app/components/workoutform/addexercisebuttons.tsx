@@ -1,9 +1,18 @@
+import type { SetInputs } from "@/types/workout";
+
+type AddExerciseButtonProps = {
+  handleAddExerciseToWorkout: () => void;
+  isSetUpdating: boolean;
+  sets: SetInputs[];
+  isExerciseUpdating: boolean;
+};
+
 const AddExerciseButton = ({
   handleAddExerciseToWorkout,
   isSetUpdating,
   sets,
   isExerciseUpdating,
-}) => {
+}: AddExerciseButtonProps) => {
   return (
     <div className="px-4">
       {isExerciseUpdating ? (

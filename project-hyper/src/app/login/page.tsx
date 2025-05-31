@@ -1,19 +1,33 @@
 "use client";
 
 import LoginForm from "@/app/components/loginform";
-
 import { useRouter } from "next/navigation";
+import { User, Session } from "@supabase/supabase-js";
 
 const LoginPage = () => {
   const router = useRouter();
 
-  const handleLoginSuccess = (data: any) => {
-    router.push("/dashboard");
+  const handleLoginSuccess = (
+    user: User | null,
+    session: Session | null
+  ): void => {
+    if (user && session) {
+      router.push("/dashboard");
+    }
+    // TODO: Handle case where login fails or user is null
+  };
+
+  // TODO: Implement forgot password functionality
+  const handleForgotPassword = (): void => {
+    router.push("/underconstruction");
   };
 
   return (
     <div>
-      <LoginForm onLoginSuccess={handleLoginSuccess} />
+      <LoginForm
+        onLoginSuccess={handleLoginSuccess}
+        handleForgotPassword={handleForgotPassword}
+      />
     </div>
   );
 };
