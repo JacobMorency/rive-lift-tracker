@@ -71,10 +71,10 @@ const ExerciseSelector = ({
       {!isSetUpdating && (
         <ul
           tabIndex={0}
-          className="dropdown-content menu px-4 shadow rounded-box overflow-y-auto w-full"
+          className="dropdown-content menu px-4 shadow-md rounded-box w-full bg-base-300"
         >
           {isSetsEmpty ? (
-            <>
+            <div>
               <input
                 type="text"
                 placeholder="Search exercises"
@@ -82,20 +82,22 @@ const ExerciseSelector = ({
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
               />
-              {filteredExercises.map((exercise) => (
-                <li key={exercise.id}>
-                  <button
-                    className="btn btn-primary my-1 w-full"
-                    disabled={exercisesInWorkout.some(
-                      (ex) => ex.name === exercise.name
-                    )}
-                    onClick={() => handleSelect(exercise)}
-                  >
-                    {exercise.name}
-                  </button>
-                </li>
-              ))}
-            </>
+              <div className="overflow-y-auto max-h-64">
+                {filteredExercises.map((exercise) => (
+                  <li key={exercise.id}>
+                    <button
+                      className="btn btn-primary my-1 w-full"
+                      disabled={exercisesInWorkout.some(
+                        (ex) => ex.name === exercise.name
+                      )}
+                      onClick={() => handleSelect(exercise)}
+                    >
+                      {exercise.name}
+                    </button>
+                  </li>
+                ))}
+              </div>
+            </div>
           ) : (
             <p className="text-sm text-center px-2">
               Please add this exercise to the workout or remove the sets to

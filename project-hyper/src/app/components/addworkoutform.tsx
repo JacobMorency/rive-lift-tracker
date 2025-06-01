@@ -407,10 +407,7 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
 
   return (
     <div>
-      <form
-        action=""
-        className="overflow-y-auto max-h-[calc(100vh-4rem)] pb-24"
-      >
+      <form action="" className=" max-h-[calc(100vh-4rem)] pb-24">
         <div className="bg-base-300 rounded-lg py-3 mt-3">
           <div className={`${exerciseName ? "mb-3" : ""}`}>
             <ExerciseSelector
