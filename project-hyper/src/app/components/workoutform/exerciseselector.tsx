@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import supabase from "@/app/lib/supabaseClient";
-import { ChevronsUpDown } from "lucide-react";
+import { Dumbbell } from "lucide-react";
 import { ExercisesInWorkout, Exercise } from "@/types/workout";
+import { toast } from "sonner";
 
 type ExerciseSelectorProps = {
   exerciseName: string;
@@ -15,6 +16,7 @@ type ExerciseSelectorProps = {
 type ExerciseOption = {
   id: number;
   name: string;
+  category: string;
 }[];
 
 const ExerciseSelector = ({
@@ -29,22 +31,36 @@ const ExerciseSelector = ({
     []
   );
   const [searchValue, setSearchValue] = useState<string>("");
-
-  // Get the list of exercises from the database
-  const fetchExercises = async (): Promise<void> => {
-    const { data, error } = await supabase.from("exercise_library").select("*");
-    if (error) {
-      console.error("Error fetching exercises:", error.message);
-      return;
-    }
-    setExerciseOptionsState(data);
-  };
+  const [selectedFilter, setSelectedFilter] = useState<string>("");
 
   // TODO: Potentially filter out exercisesInWorkout from the list instead of disabling
 
   useEffect(() => {
+    const fetchExercises = async (): Promise<void> => {
+      try {
+        let query = supabase.from("exercise_library").select("*");
+
+        if (selectedFilter === "Arms") {
+          query = query.in("category", ["Biceps", "Triceps", "Shoulders"]);
+        } else if (selectedFilter) {
+          query = query.eq("category", selectedFilter);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+          console.error("Error fetching exercises:", error.message);
+          return;
+        }
+
+        setExerciseOptionsState(data);
+      } catch (err) {
+        console.error("Unexpected error:", err);
+      }
+    };
+
     fetchExercises();
-  }, []);
+  }, [selectedFilter]);
 
   // Filter exercises based on search input
   const filteredExercises = exerciseOptions.filter((ex) =>
@@ -58,52 +74,119 @@ const ExerciseSelector = ({
   };
 
   return (
-    <div className="dropdown dropdown-center w-full px-4">
-      <label
+    <div className="w-full px-4">
+      <button
         tabIndex={0}
+        type="button"
+        onClick={() => {
+          if (!isSetsEmpty) {
+            toast.error(
+              "Finish or remove current sets before selecting a new exercise."
+            );
+            return;
+          }
+
+          (
+            document.getElementById("exercise_modal") as HTMLDialogElement
+          )?.showModal();
+        }}
         className={`bg-primary btn w-full ${
           isSetUpdating ? "btn-disabled" : ""
         }`}
+        disabled={isSetUpdating}
       >
         {exerciseName || "Select an Exercise"}
-        <ChevronsUpDown size={16} className="absolute right-6" />
-      </label>
-      {!isSetUpdating && (
-        <ul
-          tabIndex={0}
-          className="dropdown-content menu px-4 shadow rounded-box overflow-y-auto w-full"
-        >
-          {isSetsEmpty ? (
-            <>
+        <Dumbbell size={16} className="absolute right-10" />
+      </button>
+
+      <dialog id="exercise_modal" className="modal">
+        <div className="modal-box h-screen rounded-none w-full flex flex-col">
+          <h3 className="font-bold text-center mb-3">Select an Exercise</h3>
+          <div>
+            <div>
               <input
                 type="text"
                 placeholder="Search exercises"
-                className="input input-bordered w-full mb-2"
+                className="input input-bordered w-full"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
               />
-              {filteredExercises.map((exercise) => (
-                <li key={exercise.id}>
-                  <button
-                    className="btn btn-primary my-1 w-full"
-                    disabled={exercisesInWorkout.some(
-                      (ex) => ex.name === exercise.name
-                    )}
-                    onClick={() => handleSelect(exercise)}
-                  >
-                    {exercise.name}
-                  </button>
-                </li>
-              ))}
-            </>
-          ) : (
-            <p className="text-sm text-center px-2">
-              Please add this exercise to the workout or remove the sets to
-              switch exercises.
-            </p>
-          )}
-        </ul>
-      )}
+            </div>
+            <div className="divider">Filters</div>
+            <div className="flex justify-center my-3">
+              <div className="filter">
+                <input
+                  className="btn btn-square btn-primary"
+                  type="reset"
+                  value="×"
+                  onClick={() => setSelectedFilter("")}
+                />
+                <input
+                  className="btn btn-primary"
+                  type="radio"
+                  name="musclegroup"
+                  aria-label="Chest"
+                  onClick={() => setSelectedFilter("Chest")}
+                />
+                <input
+                  className="btn btn-primary"
+                  type="radio"
+                  name="musclegroup"
+                  aria-label="Back"
+                  onClick={() => setSelectedFilter("Back")}
+                />
+                <input
+                  className="btn btn-primary"
+                  type="radio"
+                  name="musclegroup"
+                  aria-label="Legs"
+                  onClick={() => setSelectedFilter("Legs")}
+                />
+                <input
+                  className="btn btn-primary"
+                  type="radio"
+                  name="musclegroup"
+                  aria-label="Arms"
+                  onClick={() => setSelectedFilter("Arms")}
+                />
+              </div>
+            </div>
+            <div className="divider"></div>
+            {!isSetUpdating && (
+              <div className="max-h-96 overflow-y-auto rounded">
+                <ul tabIndex={0} className="">
+                  {isSetsEmpty && (
+                    <div>
+                      <div>
+                        {filteredExercises.map((exercise) => (
+                          <li key={exercise.id}>
+                            <button
+                              className="btn btn-primary my-1 w-full"
+                              disabled={exercisesInWorkout.some(
+                                (ex) => ex.name === exercise.name
+                              )}
+                              onClick={() => {
+                                handleSelect(exercise);
+                                (
+                                  document.getElementById(
+                                    "exercise_modal"
+                                  ) as HTMLDialogElement
+                                )?.close();
+                              }}
+                            >
+                              {exercise.name}
+                            </button>
+                          </li>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      </dialog>
     </div>
   );
 };
