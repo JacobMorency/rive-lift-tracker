@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import supabase from "@/app/lib/supabaseClient";
 import { Dumbbell } from "lucide-react";
 import { ExercisesInWorkout, Exercise } from "@/types/workout";
+import { toast } from "sonner";
 
 type ExerciseSelectorProps = {
   exerciseName: string;
@@ -74,20 +75,29 @@ const ExerciseSelector = ({
 
   return (
     <div className="w-full px-4">
-      <label
+      <button
         tabIndex={0}
-        onClick={() =>
+        type="button"
+        onClick={() => {
+          if (!isSetsEmpty) {
+            toast.error(
+              "Finish or remove current sets before selecting a new exercise."
+            );
+            return;
+          }
+
           (
             document.getElementById("exercise_modal") as HTMLDialogElement
-          )?.showModal()
-        }
+          )?.showModal();
+        }}
         className={`bg-primary btn w-full ${
           isSetUpdating ? "btn-disabled" : ""
         }`}
+        disabled={isSetUpdating}
       >
         {exerciseName || "Select an Exercise"}
         <Dumbbell size={16} className="absolute right-10" />
-      </label>
+      </button>
 
       <dialog id="exercise_modal" className="modal">
         <div className="modal-box h-screen rounded-none w-full flex flex-col">
