@@ -17,6 +17,7 @@ const ClientLayout = ({ children, header }: ClientLayoutProps) => {
       {header && <div className="w-full">{header}</div>}
       <div className="flex flex-1 flex-col px-3">{children}</div>
       {user && <BottomNav />}
+      {user && <div className="h-[env(safe-area-inset-bottom)]" />}
     </div>
   );
 };
