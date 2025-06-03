@@ -53,3 +53,12 @@ html,
 body {
   font-family: "Inter", sans-serif;
 }
+
+body {
+  background-color: #1b1b1b; /* match your theme color */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  box-sizing: border-box;
+}
