@@ -6,6 +6,6 @@ const nextConfig: NextConfig = {
 };
 
 export default withSerwistInit({
-  swSrc: "./serwist.config.ts",
+  swSrc: "src/sw.ts",
   swDest: "public/sw.js",
 })(nextConfig);
