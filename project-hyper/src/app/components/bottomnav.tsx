@@ -9,7 +9,7 @@ const BottomNav = () => {
 
   return (
     <div>
-      <div className="dock bg-base-200 fixed py-2">
+      <div className="dock dock-lg bg-base-200 py-2">
         <button
           className={pathname === "/dashboard" ? "dock-active" : ""}
           onClick={() => router.push("/dashboard")}
