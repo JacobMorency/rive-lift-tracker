@@ -8,6 +8,8 @@ import { useState, useEffect } from "react";
 
 const DashboardContent = () => {
   const [totalWorkouts, setTotalWorkouts] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+
   const { user } = useAuth();
 
   useEffect(() => {
@@ -22,6 +24,7 @@ const DashboardContent = () => {
           console.error("Error fetching workouts:", error.message);
         } else {
           setTotalWorkouts(data.length);
+          setLoading(false);
         }
       }
     };
@@ -31,12 +34,16 @@ const DashboardContent = () => {
 
   return (
     <div>
-      <DashboardCard
-        title={"Total Workouts"}
-        description={"Your total amount of workouts."}
-        content={totalWorkouts.toString()}
-        icon={<Dumbbell />}
-      />
+      {!loading && (
+        <div className="animate-fade-in-up transition-opacity duration-500">
+          <DashboardCard
+            title={"Total Workouts"}
+            description={"Your total amount of workouts."}
+            content={totalWorkouts.toString()}
+            icon={<Dumbbell />}
+          />
+        </div>
+      )}
     </div>
   );
 };
