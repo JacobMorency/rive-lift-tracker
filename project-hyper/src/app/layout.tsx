@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Head from "next/head";
 import "./globals.css";
 import { AuthProvider } from "@/app/context/authcontext";
 import { Toaster } from "sonner";
@@ -51,6 +52,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="projecthyperpink">
+      <Head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
+      </Head>
       <body className="bg-base-200">
         <Toaster richColors position="top-center" />
         <AuthProvider>{children}</AuthProvider>
