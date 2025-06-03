@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@serwist/next": "^9.0.14",
     "@supabase/supabase-js": "^2.49.4",
     "daisyui": "^5.0.35",
     "lucide-react": "^0.510.0",
@@ -25,6 +26,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
+    "serwist": "^9.0.14",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
