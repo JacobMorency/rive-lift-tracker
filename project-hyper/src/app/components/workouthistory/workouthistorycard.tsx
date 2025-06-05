@@ -105,7 +105,7 @@ const WorkoutHistoryCard = ({ workout }: WorkoutHistoryCardProps) => {
   return (
     <div className="mb-3">
       {!loading && (
-        <div className="card bg-base-300 shadow-md w-full">
+        <div className="card bg-base-300 shadow-md w-full animate-fade-in-down transition-opacity duration-500">
           <div className="card-body px-6 py-4">
             <div className="flex items-center justify-between">
               <h2 className="card-title text-lg font-semibold">
