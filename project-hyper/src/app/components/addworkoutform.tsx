@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import supabase from "@/app/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { ExercisesInWorkout, NullableNumber, SetInputs } from "@/types/workout";
+import { toast } from "sonner";
 
 type AddWorkoutFormProps = {
   workoutId: number;
@@ -141,6 +142,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
       console.error("Error saving workout:", error.message);
       return;
     }
+    toast.success("Workout saved successfully!");
     handleCompleteWorkout();
   };
 
