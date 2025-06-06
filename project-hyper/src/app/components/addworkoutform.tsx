@@ -53,6 +53,45 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
   };
 
   const handleSaveWorkout = async (): Promise<void> => {
+    // If editing, delete all sets and workout_exercises first
+    if (isEditing) {
+      // 1. Fetch all workout_exercise ids for the current workout
+      const { data: workoutExercises, error: fetchError } = await supabase
+        .from("workout_exercises")
+        .select("id")
+        .eq("workout_id", workoutId);
+      if (fetchError) {
+        console.error("Error fetching workout exercises:", fetchError.message);
+        return;
+      }
+
+      const workoutExerciseIds = workoutExercises.map(
+        (exercise) => exercise.id
+      );
+
+      // 2. Delete all sets for the current workout_exercise ids
+      const { error: deleteSetsError } = await supabase
+        .from("sets")
+        .delete()
+        .in("workout_exercise_id", workoutExerciseIds);
+      if (deleteSetsError) {
+        console.error("Error deleting sets:", deleteSetsError.message);
+        return;
+      }
+      // 3. Delete all workout_exercises for the current workout
+      const { error: deleteExercisesError } = await supabase
+        .from("workout_exercises")
+        .delete()
+        .eq("workout_id", workoutId);
+      if (deleteExercisesError) {
+        console.error(
+          "Error deleting workout exercises:",
+          deleteExercisesError.message
+        );
+        return;
+      }
+    }
+
     for (const completedSet of completedSets) {
       const { data: workoutExercisesData, error: exerciseError } =
         await supabase
