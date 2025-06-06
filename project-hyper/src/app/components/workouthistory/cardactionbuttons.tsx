@@ -73,9 +73,23 @@ const CardActionButtons = ({ workoutId, onDelete }: CardActionButtonsProps) => {
     }, 150);
   };
 
+  const handleEditWorkout = (workoutId: NullableNumber): void => {
+    if (workoutId) {
+      router.push(`/addworkout/${workoutId}?edit=true`);
+    }
+  };
+
   return (
     <div className="flex gap-2">
-      <button className="btn btn-primary">Edit</button>
+      <button
+        className="btn btn-primary"
+        type="button"
+        onClick={() => {
+          handleEditWorkout(workoutId);
+        }}
+      >
+        Edit
+      </button>
       <button
         className="btn btn-error"
         type="button"
