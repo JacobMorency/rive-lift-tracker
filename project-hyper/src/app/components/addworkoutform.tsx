@@ -19,13 +19,6 @@ type CompletedSet = {
   sets: SetInputs[];
 };
 
-// type SetInputs = {
-//   exerciseId: NullableNumber;
-//   reps: NullableNumber;
-//   weight: NullableNumber;
-//   partialReps: NullableNumber;
-// };
-
 const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
   const [exerciseName, setExerciseName] = useState<string>("");
   const [exerciseId, setExerciseId] = useState<NullableNumber>(null);
