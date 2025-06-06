@@ -12,8 +12,15 @@ type WorkoutHistoryTabProps = {
 const WorkoutHistoryTab = ({ workouts }: WorkoutHistoryTabProps) => {
   const [selectedWorkouts, setSelectedWorkouts] = useState<Workout[]>([]);
   const [selectedTab, setSelectedTab] = useState<string>("week");
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    if (workouts.length === 0) {
+      return;
+    }
+
+    setLoading(true);
+
     const fetchWeeklyWorkouts = (): void => {
       const today = new Date();
       const currentYear = today.getFullYear();
@@ -39,6 +46,7 @@ const WorkoutHistoryTab = ({ workouts }: WorkoutHistoryTabProps) => {
       });
 
       setSelectedWorkouts(weeklyWorkouts);
+      setLoading(false);
     };
 
     const fetchMonthlyWorkouts = (): void => {
@@ -55,15 +63,13 @@ const WorkoutHistoryTab = ({ workouts }: WorkoutHistoryTabProps) => {
       });
 
       setSelectedWorkouts(monthlyWorkouts);
+      setLoading(false);
     };
 
     const fetchAllWorkouts = (): void => {
       setSelectedWorkouts(workouts);
+      setLoading(false);
     };
-
-    if (workouts.length > 0) {
-      fetchWeeklyWorkouts();
-    }
 
     if (selectedTab === "week") fetchWeeklyWorkouts();
     else if (selectedTab === "month") fetchMonthlyWorkouts();
@@ -104,19 +110,25 @@ const WorkoutHistoryTab = ({ workouts }: WorkoutHistoryTabProps) => {
         </div>
       </div>
 
-      <div className="max-w-md mx-auto mt-4 pb-24">
-        {selectedWorkouts.length > 0 ? (
-          selectedWorkouts.map((workout) => (
-            <WorkoutHistoryCard key={workout.id} workout={workout} />
-          ))
-        ) : (
-          <p className="text-center text-gray-500 mt-4">
-            {selectedTab === "week" && "No workouts this week."}
-            {selectedTab === "month" && "No workouts this month."}
-            {selectedTab === "all" && "No workouts yet."}
-          </p>
-        )}
-      </div>
+      {!loading && (
+        <div className="max-w-md mx-auto mt-4 pb-24">
+          {selectedWorkouts.length > 0 ? (
+            selectedWorkouts.map((workout) => (
+              <WorkoutHistoryCard key={workout.id} workout={workout} />
+            ))
+          ) : (
+            <div>
+              {!loading && (
+                <p className="text-center text-gray-500 mt-4">
+                  {selectedTab === "week" && "No workouts this week."}
+                  {selectedTab === "month" && "No workouts this month."}
+                  {selectedTab === "all" && "No workouts yet."}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

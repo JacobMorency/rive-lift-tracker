@@ -12,7 +12,7 @@ const AddWorkoutPage = () => {
   return (
     <div>
       <ClientLayout header={<PageHeader heading="Add Workout" />}>
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 overflow-y-auto">
           {workoutId && <AddWorkoutForm workoutId={workoutId} />}
         </div>
       </ClientLayout>
