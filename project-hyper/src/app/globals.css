@@ -35,7 +35,7 @@
   --color-warning: #facc15; /* Yellow for caution/fatigue */
   --color-warning-content: #002d40;
 
-  --color-error: #ef4444; /* Red for errors */
+  --color-error: oklch(57% 0.245 27.325); /* Red for errors */
   --color-error-content: #ffffff;
 
   /* Keep your existing radius and sizing values */
