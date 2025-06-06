@@ -162,6 +162,7 @@ const ExerciseSelector = ({
                           <li key={exercise.id}>
                             <button
                               className="btn btn-primary my-1 w-full"
+                              type="button"
                               disabled={exercisesInWorkout.some(
                                 (ex) => ex.name === exercise.name
                               )}

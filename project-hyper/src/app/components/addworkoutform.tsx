@@ -8,9 +8,11 @@ import { useState, useEffect } from "react";
 import supabase from "@/app/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { ExercisesInWorkout, NullableNumber, SetInputs } from "@/types/workout";
+import { toast } from "sonner";
 
 type AddWorkoutFormProps = {
   workoutId: number;
+  isEditing?: boolean;
 };
 
 type CompletedSet = {
@@ -19,14 +21,7 @@ type CompletedSet = {
   sets: SetInputs[];
 };
 
-// type SetInputs = {
-//   exerciseId: NullableNumber;
-//   reps: NullableNumber;
-//   weight: NullableNumber;
-//   partialReps: NullableNumber;
-// };
-
-const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
+const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
   const [exerciseName, setExerciseName] = useState<string>("");
   const [exerciseId, setExerciseId] = useState<NullableNumber>(null);
   const [reps, setReps] = useState<NullableNumber>(null);
@@ -59,6 +54,45 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
   };
 
   const handleSaveWorkout = async (): Promise<void> => {
+    // If editing, delete all sets and workout_exercises first
+    if (isEditing) {
+      // 1. Fetch all workout_exercise ids for the current workout
+      const { data: workoutExercises, error: fetchError } = await supabase
+        .from("workout_exercises")
+        .select("id")
+        .eq("workout_id", workoutId);
+      if (fetchError) {
+        console.error("Error fetching workout exercises:", fetchError.message);
+        return;
+      }
+
+      const workoutExerciseIds = workoutExercises.map(
+        (exercise) => exercise.id
+      );
+
+      // 2. Delete all sets for the current workout_exercise ids
+      const { error: deleteSetsError } = await supabase
+        .from("sets")
+        .delete()
+        .in("workout_exercise_id", workoutExerciseIds);
+      if (deleteSetsError) {
+        console.error("Error deleting sets:", deleteSetsError.message);
+        return;
+      }
+      // 3. Delete all workout_exercises for the current workout
+      const { error: deleteExercisesError } = await supabase
+        .from("workout_exercises")
+        .delete()
+        .eq("workout_id", workoutId);
+      if (deleteExercisesError) {
+        console.error(
+          "Error deleting workout exercises:",
+          deleteExercisesError.message
+        );
+        return;
+      }
+    }
+
     for (const completedSet of completedSets) {
       const { data: workoutExercisesData, error: exerciseError } =
         await supabase
@@ -77,6 +111,7 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
           "Error adding exercise to workout:",
           exerciseError.message
         );
+        toast.error("Error saving exercise to workout. Please try again.");
         return;
       }
 
@@ -93,9 +128,8 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
       const { error: setsError } = await supabase.from("sets").insert(setsData);
       if (setsError) {
         console.error("Error adding sets to workout:", setsError.message);
+        toast.error("Error saving sets to workout. Please try again.");
         return;
-      } else {
-        console.log("Sets added to workout successfully");
       }
     }
 
@@ -106,8 +140,10 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
       .select();
     if (error) {
       console.error("Error saving workout:", error.message);
+      toast.error("Error saving workout. Please try again.");
       return;
     }
+    toast.success("Workout saved successfully!");
     handleCompleteWorkout();
   };
 
@@ -328,6 +364,7 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
 
   // Get previous workout progress from local storage so its persisted upon refresh
   useEffect(() => {
+    if (isEditing) return;
     const savedProgress = localStorage.getItem("workoutProgress");
     if (savedProgress) {
       try {
@@ -371,7 +408,7 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
       setLoading(false);
       setIsInitialized(true);
     }
-  }, [isInitialized]);
+  }, [isInitialized, isEditing]);
 
   // Save the current workout progress to local storage so that it can be retrieved upon refresh or page change
   useEffect(() => {
@@ -400,9 +437,94 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
     isInitialized,
   ]);
 
+  // If the workout is being edited, fetch the existing workout data
+  useEffect(() => {
+    if (!isEditing || !workoutId) return;
+
+    const loadCompletedWorkout = async (): Promise<void> => {
+      setLoading(true);
+      const { data: workoutExercises, error: workoutExercisesError } =
+        await supabase
+          .from("workout_exercises")
+          .select("*")
+          .eq("workout_id", workoutId);
+
+      if (workoutExercisesError) {
+        console.error(
+          "Error fetching workout exercises:",
+          workoutExercisesError.message
+        );
+        setLoading(false);
+        return;
+      }
+
+      const exerciseIds = workoutExercises.map(
+        (exercise) => exercise.exercise_id
+      );
+      const { data: exerciseNames, error: exerciseNamesError } = await supabase
+        .from("exercise_library")
+        .select("id, name")
+        .in("id", exerciseIds);
+
+      if (exerciseNamesError) {
+        console.error(
+          "Error fetching exercise names:",
+          exerciseNamesError.message
+        );
+        setLoading(false);
+        return;
+      }
+
+      const workoutExerciseIds = workoutExercises.map(
+        (exercise) => exercise.id
+      );
+      const { data: sets, error: setsError } = await supabase
+        .from("sets")
+        .select("*")
+        .in("workout_exercise_id", workoutExerciseIds);
+
+      if (setsError) {
+        console.error("Error fetching sets:", setsError.message);
+        setLoading(false);
+        return;
+      }
+
+      const completedSetsData: CompletedSet[] = workoutExercises.map(
+        (exercise) => ({
+          exerciseId: exercise.exercise_id,
+          exerciseName:
+            exerciseNames.find((e) => e.id === exercise.exercise_id)?.name ||
+            "",
+          sets: sets
+            .filter((set) => set.workout_exercise_id === exercise.id)
+            .map((set) => ({
+              exerciseId: exercise.exercise_id,
+              reps: set.reps,
+              weight: set.weight,
+              partialReps: set.partial_reps || 0,
+            })),
+        })
+      );
+
+      setCompletedSets(completedSetsData);
+      setExercisesInWorkout(
+        completedSetsData.map((cs) => ({
+          id: cs.exerciseId,
+          name: cs.exerciseName,
+        }))
+      );
+      setLoading(false);
+    };
+    loadCompletedWorkout();
+  }, [isEditing, workoutId]);
+
   // TODO: Centralize the loading state and error handling
   if (loading) {
-    return <div>Loading...</div>; // Or any other loading indicator
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="loading loading-spinner"></div>
+      </div>
+    );
   }
 
   return (
@@ -470,6 +592,7 @@ const AddWorkoutForm = ({ workoutId }: AddWorkoutFormProps) => {
             handleSaveWorkout={handleSaveWorkout}
             exercisesInWorkout={exercisesInWorkout}
             confirmCancelWorkout={confirmCancelWorkout}
+            isEditing={isEditing}
           />
         </div>
       </form>
