@@ -32,6 +32,7 @@ const WorkoutHistoryCard = ({ workout }: WorkoutHistoryCardProps) => {
     []
   );
   const [loading, setLoading] = useState<boolean>(true);
+  const [deleted, setDeleted] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchWorkoutInfo = async (): Promise<void> => {
@@ -102,6 +103,8 @@ const WorkoutHistoryCard = ({ workout }: WorkoutHistoryCardProps) => {
     fetchWorkoutInfo();
   }, [workout.id]);
 
+  if (deleted) return null;
+
   return (
     <div className="mb-3">
       {!loading && (
@@ -132,7 +135,10 @@ const WorkoutHistoryCard = ({ workout }: WorkoutHistoryCardProps) => {
                   ))}
 
                 <div className="flex justify-end pt-2">
-                  <CardActionButtons />
+                  <CardActionButtons
+                    workoutId={workout.id}
+                    onDelete={() => setDeleted(true)}
+                  />
                 </div>
               </div>
             )}
