@@ -479,7 +479,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
   // TODO: Centralize the loading state and error handling
   if (loading) {
     return (
-      <div>
+      <div className="flex justify-center items-center h-screen">
         <div className="loading loading-spinner"></div>
       </div>
     );
@@ -550,6 +550,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
             handleSaveWorkout={handleSaveWorkout}
             exercisesInWorkout={exercisesInWorkout}
             confirmCancelWorkout={confirmCancelWorkout}
+            isEditing={isEditing}
           />
         </div>
       </form>
