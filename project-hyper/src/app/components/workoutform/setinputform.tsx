@@ -80,7 +80,7 @@ const SetInputForm = (props: SetInputFormProps) => {
         </div>
         {/* TODO: Add a help icon and potentially a toggle for partial reps */}
         <div className="flex-1">
-          <label htmlFor="partialReps">Partial Reps</label>
+          <label htmlFor="partialReps">Partials</label>
           <input
             type="number"
             id="partialReps"
