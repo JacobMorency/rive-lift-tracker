@@ -34,7 +34,7 @@ const SetInputForm = (props: SetInputFormProps) => {
   return (
     <div className="px-4">
       <div className="flex space-x-3">
-        <div>
+        <div className="flex-1">
           <label htmlFor="reps">Reps</label>
           <input
             type="number"
@@ -55,7 +55,7 @@ const SetInputForm = (props: SetInputFormProps) => {
             <p className="text-error italic text-sm">Invalid amount of reps</p>
           )}
         </div>
-        <div>
+        <div className="flex-1">
           <label htmlFor="weight">Weight</label>
           <input
             type="number"
@@ -79,7 +79,7 @@ const SetInputForm = (props: SetInputFormProps) => {
           )}
         </div>
         {/* TODO: Add a help icon and potentially a toggle for partial reps */}
-        <div>
+        <div className="flex-1">
           <label htmlFor="partialReps">Partial Reps</label>
           <input
             type="number"
