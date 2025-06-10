@@ -33,20 +33,22 @@ const SetInputForm = (props: SetInputFormProps) => {
   } = props;
   return (
     <div className="px-4">
-      <div className="flex space-x-3">
-        <div>
+      <div className="flex gap-1 w-full">
+        <div className="flex-1">
           <label htmlFor="reps">Reps</label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             id="reps"
             value={reps !== null ? reps : ""}
             onChange={(e) =>
               setReps(e.target.value !== "" ? parseInt(e.target.value) : null)
             }
             placeholder="0"
-            className={
+            className={`${
               repsEmpty || repsInvalid ? "border-error input" : "input"
-            }
+            } w-full`}
           />
           {repsEmpty && (
             <p className="text-error italic text-sm">Reps required</p>
@@ -55,19 +57,21 @@ const SetInputForm = (props: SetInputFormProps) => {
             <p className="text-error italic text-sm">Invalid amount of reps</p>
           )}
         </div>
-        <div>
+        <div className="flex-1">
           <label htmlFor="weight">Weight</label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             id="weight"
             value={weight !== null ? weight : ""}
             onChange={(e) =>
               setWeight(e.target.value ? parseFloat(e.target.value) : null)
             }
             placeholder="0 (lbs)"
-            className={
+            className={`${
               weightEmpty || weightInvalid ? "border-error input" : "input"
-            }
+            } w-full`}
           />
           {weightEmpty && (
             <p className="text-error italic text-sm">Weight required</p>
@@ -79,17 +83,21 @@ const SetInputForm = (props: SetInputFormProps) => {
           )}
         </div>
         {/* TODO: Add a help icon and potentially a toggle for partial reps */}
-        <div>
-          <label htmlFor="partialReps">Partial Reps</label>
+        <div className="flex-1">
+          <label htmlFor="partialReps">Partials</label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             id="partialReps"
             value={partialReps !== null ? partialReps : ""}
             onChange={(e) =>
               setPartialReps(e.target.value ? parseInt(e.target.value) : null)
             }
             placeholder="0 (optional)"
-            className={partialRepsInvalid ? "border-error input" : "input"}
+            className={`${
+              partialRepsInvalid ? "border-error input" : "input"
+            } w-full`}
           />
           {partialRepsInvalid && (
             <p className="text-error italic text-sm">

@@ -16,6 +16,7 @@ const WorkoutsPage = () => {
 
   const [workoutInProgress, setWorkoutInProgress] = useState<boolean>(false);
   const [workoutId, setWorkoutId] = useState<NullableNumber>(null);
+  const [isNavigating, setIsNavigating] = useState<boolean>(false);
 
   useEffect(() => {
     const savedWorkoutId = localStorage.getItem("workoutId");
@@ -26,12 +27,15 @@ const WorkoutsPage = () => {
   }, []);
 
   const handleStartNewWorkout = async (): Promise<void> => {
+    setIsNavigating(true);
     const newWorkoutId = await createNewWorkout();
     if (newWorkoutId) {
       setWorkoutId(newWorkoutId);
       localStorage.setItem("workoutId", newWorkoutId.toString());
-      setWorkoutInProgress(true);
+      // setWorkoutInProgress(true);
       router.push(`/addworkout/${newWorkoutId}`);
+    } else {
+      setIsNavigating(false);
     }
   };
 
@@ -61,25 +65,36 @@ const WorkoutsPage = () => {
   return (
     <ClientLayout header={<PageHeader heading="Workouts" />}>
       <div>
-        {workoutInProgress ? (
-          <div className="flex justify-center mt-3">
-            <div className="w-full max-w-md">
-              <button
-                className="btn btn-primary w-full"
-                onClick={handleContinueWorkout}
-              >
-                Continue Previous Workout
-              </button>
-            </div>
+        {isNavigating ? (
+          <div className="flex justify-center items-center h-screen">
+            <div className="loading loading-spinner"></div>
           </div>
         ) : (
-          <div className="flex justify-center mt-3">
-            <button className="btn btn-primary" onClick={handleStartNewWorkout}>
-              Start New Workout
-            </button>
+          <div>
+            {workoutInProgress ? (
+              <div className="flex justify-center mt-3">
+                <div className="w-full max-w-md">
+                  <button
+                    className="btn btn-primary w-full"
+                    onClick={handleContinueWorkout}
+                  >
+                    Continue Previous Workout
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex justify-center mt-3">
+                <button
+                  className="btn btn-primary"
+                  onClick={handleStartNewWorkout}
+                >
+                  Start New Workout
+                </button>
+              </div>
+            )}
+            <WorkoutHistory />
           </div>
         )}
-        <WorkoutHistory />
       </div>
     </ClientLayout>
   );

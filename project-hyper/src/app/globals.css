@@ -35,7 +35,7 @@
   --color-warning: #facc15; /* Yellow for caution/fatigue */
   --color-warning-content: #002d40;
 
-  --color-error: #ef4444; /* Red for errors */
+  --color-error: oklch(57% 0.245 27.325); /* Red for errors */
   --color-error-content: #ffffff;
 
   /* Keep your existing radius and sizing values */
@@ -52,4 +52,47 @@
 html,
 body {
   font-family: "Inter", sans-serif;
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+input,
+select,
+textarea,
+button {
+  font-size: 16px;
+}
+
+@layer utilities {
+  .animate-fade-in-up {
+    animation: fade-in-up 0.5s ease-out forwards;
+  }
+
+  .animate-fade-in-down {
+    animation: fade-in-down 0.5s ease-out forwards;
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-down {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
