@@ -12,7 +12,7 @@ const DashboardCard = ({
   icon,
 }: DashboardCardProps) => {
   return (
-    <div className="p-4">
+    <div className="px-4">
       <div className="card card-border bg-primary">
         <div className="card-body">
           <div className="flex items-center justify-between w-full">
