@@ -33,7 +33,7 @@ const SetInputForm = (props: SetInputFormProps) => {
   } = props;
   return (
     <div className="px-4">
-      <div className="flex space-x-3">
+      <div className="flex gap-3 w-full">
         <div className="flex-1">
           <label htmlFor="reps">Reps</label>
           <input
@@ -44,9 +44,9 @@ const SetInputForm = (props: SetInputFormProps) => {
               setReps(e.target.value !== "" ? parseInt(e.target.value) : null)
             }
             placeholder="0"
-            className={
+            className={`${
               repsEmpty || repsInvalid ? "border-error input" : "input"
-            }
+            } w-full`}
           />
           {repsEmpty && (
             <p className="text-error italic text-sm">Reps required</p>
@@ -65,9 +65,9 @@ const SetInputForm = (props: SetInputFormProps) => {
               setWeight(e.target.value ? parseFloat(e.target.value) : null)
             }
             placeholder="0 (lbs)"
-            className={
+            className={`${
               weightEmpty || weightInvalid ? "border-error input" : "input"
-            }
+            } w-full`}
           />
           {weightEmpty && (
             <p className="text-error italic text-sm">Weight required</p>
@@ -89,7 +89,9 @@ const SetInputForm = (props: SetInputFormProps) => {
               setPartialReps(e.target.value ? parseInt(e.target.value) : null)
             }
             placeholder="0 (optional)"
-            className={partialRepsInvalid ? "border-error input" : "input"}
+            className={`${
+              partialRepsInvalid ? "border-error input" : "input"
+            } w-full`}
           />
           {partialRepsInvalid && (
             <p className="text-error italic text-sm">
