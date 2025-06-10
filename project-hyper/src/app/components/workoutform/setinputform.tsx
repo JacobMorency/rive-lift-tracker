@@ -33,7 +33,7 @@ const SetInputForm = (props: SetInputFormProps) => {
   } = props;
   return (
     <div className="px-4">
-      <div className="flex gap- w-full">
+      <div className="flex gap-1 w-full">
         <div className="flex-1">
           <label htmlFor="reps">Reps</label>
           <input
