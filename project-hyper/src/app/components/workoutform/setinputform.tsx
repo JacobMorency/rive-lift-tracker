@@ -33,11 +33,13 @@ const SetInputForm = (props: SetInputFormProps) => {
   } = props;
   return (
     <div className="px-4">
-      <div className="flex gap-3 w-full">
+      <div className="flex gap- w-full">
         <div className="flex-1">
           <label htmlFor="reps">Reps</label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             id="reps"
             value={reps !== null ? reps : ""}
             onChange={(e) =>
@@ -58,7 +60,9 @@ const SetInputForm = (props: SetInputFormProps) => {
         <div className="flex-1">
           <label htmlFor="weight">Weight</label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             id="weight"
             value={weight !== null ? weight : ""}
             onChange={(e) =>
@@ -82,7 +86,9 @@ const SetInputForm = (props: SetInputFormProps) => {
         <div className="flex-1">
           <label htmlFor="partialReps">Partials</label>
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             id="partialReps"
             value={partialReps !== null ? partialReps : ""}
             onChange={(e) =>
