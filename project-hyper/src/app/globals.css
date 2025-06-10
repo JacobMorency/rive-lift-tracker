@@ -58,6 +58,13 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+input,
+select,
+textarea,
+button {
+  font-size: 16px;
+}
+
 @layer utilities {
   .animate-fade-in-up {
     animation: fade-in-up 0.5s ease-out forwards;
