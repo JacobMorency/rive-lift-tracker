@@ -3,6 +3,7 @@ import supabase from "@/app/lib/supabaseClient";
 import { Dumbbell } from "lucide-react";
 import { ExercisesInWorkout, Exercise } from "@/types/workout";
 import { toast } from "sonner";
+import debounce from "lodash/debounce";
 
 type ExerciseSelectorProps = {
   exerciseName: string;
@@ -35,32 +36,45 @@ const ExerciseSelector = ({
 
   // TODO: Potentially filter out exercisesInWorkout from the list instead of disabling
 
-  useEffect(() => {
-    const fetchExercises = async (): Promise<void> => {
-      try {
-        let query = supabase.from("exercise_library").select("*");
+  const fetchExercises = async (searchTerm: string): Promise<void> => {
+    try {
+      let query = supabase.from("exercise_library").select("*");
 
-        if (selectedFilter === "Arms") {
-          query = query.in("category", ["Biceps", "Triceps", "Shoulders"]);
-        } else if (selectedFilter) {
-          query = query.eq("category", selectedFilter);
-        }
-
-        const { data, error } = await query;
-
-        if (error) {
-          console.error("Error fetching exercises:", error.message);
-          return;
-        }
-
-        setExerciseOptionsState(data);
-      } catch (err) {
-        console.error("Unexpected error:", err);
+      if (selectedFilter === "Arms") {
+        query = query.in("category", ["Biceps", "Triceps", "Shoulders"]);
+      } else if (selectedFilter) {
+        query = query.eq("category", selectedFilter);
       }
-    };
 
-    fetchExercises();
-  }, [selectedFilter]);
+      const { data, error } = await query
+        .ilike("name", `%${searchTerm}%`)
+        .range(0, 30); // Limit to 30 results
+
+      if (error) {
+        console.error("Error fetching exercises:", error.message);
+        return;
+      }
+
+      setExerciseOptionsState(data);
+    } catch (err) {
+      console.error("Unexpected error:", err);
+    }
+  };
+
+  // Debounce the search input to avoid too many requests
+  const debouncedFetch = debounce((term: string) => {
+    fetchExercises(term);
+  }, 300);
+
+  useEffect(() => {
+    debouncedFetch(searchValue, selectedFilter);
+  }, [searchValue, selectedFilter, debouncedFetch]);
+
+  useEffect(() => {
+    return () => {
+      debouncedFetch.cancel();
+    };
+  }, [debouncedFetch]);
 
   // Filter exercises based on search input
   const filteredExercises = exerciseOptions.filter((ex) =>
