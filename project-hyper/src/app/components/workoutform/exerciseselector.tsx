@@ -41,7 +41,10 @@ const ExerciseSelector = ({
     filter: string
   ): Promise<void> => {
     try {
-      let query = supabase.from("exercise_library").select("*");
+      let query = supabase
+        .from("exercise_library")
+        .select("*")
+        .order("name", { ascending: true });
 
       if (filter === "Arms") {
         query = query.in("category", ["Biceps", "Triceps", "Shoulders"]);
@@ -88,6 +91,51 @@ const ExerciseSelector = ({
   const handleSelect = (exercise: Exercise): void => {
     setExerciseName(exercise.name);
     setExerciseId(exercise.id);
+  };
+
+  // Get recent exercises from local storage
+  const getRecentExercises = (): Exercise[] => {
+    const recentExercises = localStorage.getItem("recentExercises");
+    if (recentExercises) {
+      try {
+        return JSON.parse(recentExercises) as Exercise[];
+      } catch (error) {
+        console.error(
+          "Error parsing recent exercises from local storage:",
+          error
+        );
+        return [];
+      }
+    }
+    return [];
+  };
+
+  // Add to recent exercises in local storage
+  const addToRecent = async (exercise: Exercise): Promise<void> => {
+    const recentExercises = getRecentExercises();
+    // Check if the exercise is already in recent exercises
+    const isAlreadyRecent = recentExercises.some((ex) => ex.id === exercise.id);
+    if (isAlreadyRecent) {
+      const updatedRecentExercises = recentExercises.filter(
+        (ex) => ex.id !== exercise.id
+      );
+      updatedRecentExercises.unshift(exercise);
+      // Limit to 5 recent exercises
+      if (updatedRecentExercises.length > 5) {
+        updatedRecentExercises.pop();
+      }
+      localStorage.setItem(
+        "recentExercises",
+        JSON.stringify(updatedRecentExercises)
+      );
+    } else {
+      recentExercises.unshift(exercise);
+      // Limit to 10 recent exercises
+      if (recentExercises.length > 5) {
+        recentExercises.pop();
+      }
+      localStorage.setItem("recentExercises", JSON.stringify(recentExercises));
+    }
   };
 
   return (
@@ -171,14 +219,47 @@ const ExerciseSelector = ({
             <div className="divider"></div>
             {!isSetUpdating && (
               <div className="max-h-96 overflow-y-auto rounded">
-                <ul tabIndex={0} className="">
+                <ul tabIndex={0}>
                   {isSetsEmpty && (
                     <div>
+                      {getRecentExercises().length > 0 && (
+                        <div className="mb-3">
+                          <h4>
+                            <span className="text-lg font-semibold">
+                              Recent
+                            </span>
+                            {getRecentExercises().map((exercise) => (
+                              <li key={exercise.id}>
+                                <button
+                                  className="btn btn-primary my-1 w-full relative"
+                                  type="button"
+                                  onClick={() => {
+                                    handleSelect(exercise);
+                                    (
+                                      document.getElementById(
+                                        "exercise_modal"
+                                      ) as HTMLDialogElement
+                                    )?.close();
+                                    addToRecent(exercise);
+                                  }}
+                                >
+                                  {exercise.name}
+                                </button>
+                              </li>
+                            ))}
+                          </h4>
+                        </div>
+                      )}
                       <div>
+                        <h4>
+                          <span className="text-lg font-semibold">
+                            {selectedFilter} Exercises
+                          </span>
+                        </h4>
                         {filteredExercises.map((exercise) => (
                           <li key={exercise.id}>
                             <button
-                              className="btn btn-primary my-1 w-full"
+                              className="btn btn-primary my-1 w-full relative"
                               type="button"
                               disabled={exercisesInWorkout.some(
                                 (ex) => ex.name === exercise.name
@@ -190,6 +271,7 @@ const ExerciseSelector = ({
                                     "exercise_modal"
                                   ) as HTMLDialogElement
                                 )?.close();
+                                addToRecent(exercise);
                               }}
                             >
                               {exercise.name}
