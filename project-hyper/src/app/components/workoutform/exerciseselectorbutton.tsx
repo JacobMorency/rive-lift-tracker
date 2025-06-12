@@ -32,17 +32,20 @@ const ExerciseSelectorButton = ({
       <div className="absolute right-2">
         {isFavorite ? (
           <Star
+            size={20}
+            fill="currentColor"
             className="text-yellow-500"
             onClick={(e) => {
-              e.stopPropagation();
+              e.stopPropagation(); // Prevents modal from closing
               onToggleFavorite(exercise);
             }}
           />
         ) : (
           <StarOff
+            size={20}
             className="text-gray-400"
             onClick={(e) => {
-              e.stopPropagation();
+              e.stopPropagation(); // Prevents modal from closing
               onToggleFavorite(exercise);
             }}
           />
