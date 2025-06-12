@@ -28,7 +28,6 @@ const ExerciseSelector = ({
   setExerciseId,
   isSetUpdating,
   isSetsEmpty,
-  exercisesInWorkout,
 }: ExerciseSelectorProps) => {
   const [exerciseOptions, setExerciseOptionsState] = useState<ExerciseOption>(
     []
