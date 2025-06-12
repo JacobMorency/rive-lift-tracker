@@ -36,14 +36,17 @@ const ExerciseSelector = ({
 
   // TODO: Potentially filter out exercisesInWorkout from the list instead of disabling
 
-  const fetchExercises = async (searchTerm: string): Promise<void> => {
+  const fetchExercises = async (
+    searchTerm: string,
+    filter: string
+  ): Promise<void> => {
     try {
       let query = supabase.from("exercise_library").select("*");
 
-      if (selectedFilter === "Arms") {
+      if (filter === "Arms") {
         query = query.in("category", ["Biceps", "Triceps", "Shoulders"]);
-      } else if (selectedFilter) {
-        query = query.eq("category", selectedFilter);
+      } else if (filter) {
+        query = query.eq("category", filter);
       }
 
       const { data, error } = await query
@@ -62,8 +65,8 @@ const ExerciseSelector = ({
   };
 
   // Debounce the search input to avoid too many requests
-  const debouncedFetch = debounce((term: string) => {
-    fetchExercises(term);
+  const debouncedFetch = debounce((term: string, filter: string) => {
+    fetchExercises(term, filter);
   }, 300);
 
   useEffect(() => {
