@@ -62,6 +62,7 @@ const SetInputForm = (props: SetInputFormProps) => {
           <input
             type="text"
             inputMode="decimal"
+            pattern="[0-9]*[.,]?[0-9]*"
             id="weight"
             value={weight !== null ? weight : ""}
             onChange={(e) => {
