@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { Text, View, Image, TextInput } from "react-native";
 
 export default function Login() {
   return (
@@ -14,8 +14,18 @@ export default function Login() {
           color: "#FFF",
         }}
       >
-        This is the login screen.
+        Sign In
       </Text>
+      <Image
+        source={require("../../assets/images/logo.png")}
+        style={{
+          width: 75,
+          height: 75,
+          marginTop: 20,
+          borderRadius: 100,
+        }}
+      />
+      <TextInput placeholder="email" />
     </View>
   );
 }
