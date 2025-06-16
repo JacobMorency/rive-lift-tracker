@@ -61,8 +61,8 @@ const SetInputForm = (props: SetInputFormProps) => {
           <label htmlFor="weight">Weight</label>
           <input
             type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
+            inputMode="decimal"
+            pattern="[0-9]*[.,]?[0-9]*"
             id="weight"
             value={weight !== null ? weight : ""}
             onChange={(e) =>
