@@ -60,7 +60,7 @@ const SetInputForm = (props: SetInputFormProps) => {
         <div className="flex-1">
           <label htmlFor="weight">Weight</label>
           <input
-            type="text"
+            type="number"
             inputMode="decimal"
             pattern="[0-9]*[.,]?[0-9]*"
             id="weight"
@@ -68,7 +68,12 @@ const SetInputForm = (props: SetInputFormProps) => {
             onChange={(e) => {
               const val = e.target.value;
               const parsed = parseFloat(val);
-              setWeight(val === "" || isNaN(parsed) ? null : parsed);
+              if (val === "" || isNaN(parsed)) {
+                setWeight(null);
+              } else {
+                const rounded = Math.floor(parsed * 10) / 10;
+                setWeight(rounded);
+              }
             }}
             placeholder="0 (lbs)"
             className={`${
