@@ -1,4 +1,5 @@
 import { Text, View } from "react-native";
+import { Button } from "tamagui";
 
 export default function Index() {
   return (
@@ -9,7 +10,13 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+      <Text
+        style={{
+          color: "#FFF",
+        }}
+      >
+        Edit app/index.tsx to edit this screen.
+      </Text>
     </View>
   );
 }
