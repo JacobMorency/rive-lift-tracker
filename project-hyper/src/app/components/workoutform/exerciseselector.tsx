@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import supabase from "@/app/lib/supabaseClient";
-import { Dumbbell } from "lucide-react";
+import { Dumbbell, ArrowLeft } from "lucide-react";
 import { ExercisesInWorkout, Exercise } from "@/types/workout";
 import { toast } from "sonner";
 import debounce from "lodash/debounce";
@@ -266,7 +266,19 @@ const ExerciseSelector = ({
 
       <dialog id="exercise_modal" className="modal">
         <div className="modal-box h-screen rounded-none w-full flex flex-col">
-          <h3 className="font-bold text-center mb-3">Select an Exercise</h3>
+          <div className="flex justify-center">
+            <h3 className="font-bold text-center mb-3">Select an Exercise</h3>
+            <button
+              className="btn btn-square btn-ghost absolute left-3 top-4"
+              onClick={() => {
+                (
+                  document.getElementById("exercise_modal") as HTMLDialogElement
+                )?.close();
+              }}
+            >
+              <ArrowLeft size={24} />
+            </button>
+          </div>
           <div>
             <div>
               <input
