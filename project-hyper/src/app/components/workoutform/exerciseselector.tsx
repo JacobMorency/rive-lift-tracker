@@ -328,7 +328,10 @@ const ExerciseSelector = ({
             </div>
             <div className="divider"></div>
             {!isSetUpdating && (
-              <div className="max-h-96 overflow-y-auto rounded">
+              <div
+                className="overflow-y-auto rounded"
+                style={{ maxHeight: "calc(100vh - 300px)" }}
+              >
                 <ul tabIndex={0}>
                   {isSetsEmpty && (
                     <div>
