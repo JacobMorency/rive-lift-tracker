@@ -64,9 +64,11 @@ const SetInputForm = (props: SetInputFormProps) => {
             inputMode="decimal"
             id="weight"
             value={weight !== null ? weight : ""}
-            onChange={(e) =>
-              setWeight(e.target.value ? parseFloat(e.target.value) : null)
-            }
+            onChange={(e) => {
+              const val = e.target.value;
+              const parsed = parseFloat(val);
+              setWeight(val === "" || isNaN(parsed) ? null : parsed);
+            }}
             placeholder="0 (lbs)"
             className={`${
               weightEmpty || weightInvalid ? "border-error input" : "input"
