@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import supabase from "../../lib/supabaseClient";
 import { User, Session } from "@supabase/supabase-js";
+import { useRouter } from "expo-router";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -19,15 +20,14 @@ export default function Login() {
   const [passwordEmpty, setPasswordEmpty] = useState<boolean>(false);
   const [isPasswordActive, setIsPasswordActive] = useState<boolean>(false);
 
+  const router = useRouter();
+
   const handleLoginSuccess = (
     user: User | null,
     session: Session | null
   ): void => {
     if (user && session) {
-      // Navigate to the home screen or perform any other action on successful login
-      console.log("Login successful:", user, session);
-      // For example, you might want to navigate to a different screen:
-      // navigation.navigate("Home");
+      router.push("/home");
     }
     // TODO: Handle case where login fails or user is null
   };
