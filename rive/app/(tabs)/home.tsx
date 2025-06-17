@@ -7,6 +7,12 @@ export default function HomeScreen() {
     <SafeAreaView className="bg-base-100 flex-1 px-8">
       <View>
         <Text className="text-primary-content text-3xl font-bold my-4">
+          Dashboard
+        </Text>
+      </View>
+
+      <View>
+        <Text className="text-primary-content text-3xl font-bold my-4">
           Hiya, User
         </Text>
       </View>
