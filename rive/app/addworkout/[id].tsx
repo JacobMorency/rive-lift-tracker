@@ -1,16 +1,20 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import AddWorkoutForm from "../../components/addworkoutform";
 import { View, Text } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 
 const AddWorkoutPage = () => {
+  const { id } = useLocalSearchParams();
+  const workoutId = Array.isArray(id) ? id[0] : id;
+
   return (
-    <SafeAreaView>
+    <SafeAreaView className="bg-base-100 flex-1 px-8">
       <View>
         <Text className="text-primary-content text-3xl font-bold my-4">
           Add Workout
         </Text>
       </View>
-      <AddWorkoutForm workoutId={"1234"} />
+      <AddWorkoutForm workoutId={workoutId} />
     </SafeAreaView>
   );
 };

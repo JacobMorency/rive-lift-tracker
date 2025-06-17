@@ -519,11 +519,24 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
     loadCompletedWorkout();
   }, [isEditing, workoutId]);
 
-  if (loading) {
-    return <Text className="text-primary-content">Loading...</Text>;
-  }
+  //   if (loading) {
+  //     return <Text className="text-primary-content">Loading...</Text>;
+  //   }
 
-  return <View></View>;
+  return (
+    <View>
+      <View className="bg-base-300 rounded-lg p-4">
+        <ExerciseSelector
+          exerciseName={exerciseName}
+          setExerciseName={setExerciseName}
+          setExerciseId={setExerciseId}
+          isSetUpdating={isSetUpdating}
+          isSetsEmpty={sets.length === 0}
+          exercisesInWorkout={exercisesInWorkout}
+        />
+      </View>
+    </View>
+  );
 };
 
 export default AddWorkoutForm;

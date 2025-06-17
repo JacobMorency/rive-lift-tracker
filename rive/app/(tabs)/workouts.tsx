@@ -21,7 +21,7 @@ export default function WorkoutsScreen() {
     const newWorkoutId = await createNewWorkout();
     if (newWorkoutId) {
       setWorkoutId(newWorkoutId);
-      localStorage.setItem("workoutId", newWorkoutId.toString());
+      // localStorage.setItem("workoutId", newWorkoutId.toString());
       router.push(`/addworkout/${newWorkoutId}`);
     } else {
       setIsNavigating(false);

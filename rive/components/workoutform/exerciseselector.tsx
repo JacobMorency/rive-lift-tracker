@@ -1,11 +1,19 @@
 import { useState, useEffect } from "react";
-import supabase from "@/app/lib/supabaseClient";
-import { Dumbbell, ArrowLeft } from "lucide-react";
+import supabase from "../../lib/supabaseClient";
+import { Dumbbell, ArrowLeft } from "lucide-react-native";
 import { ExercisesInWorkout, Exercise } from "@/types/workout";
-import { toast } from "sonner";
-import debounce from "lodash/debounce";
-import { useAuth } from "@/app/context/authcontext";
-import ExerciseSelectorButton from "@/app/components/workoutform/exerciseselectorbutton";
+import { debounce } from "lodash";
+import { useAuth } from "../../hooks/useAuth";
+import ExerciseSelectorButton from "./exerciseselectorbutton";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+  Switch,
+} from "react-native";
 
 type ExerciseSelectorProps = {
   exerciseName: string;
@@ -28,6 +36,7 @@ const ExerciseSelector = ({
   setExerciseId,
   isSetUpdating,
   isSetsEmpty,
+  exercisesInWorkout,
 }: ExerciseSelectorProps) => {
   const [exerciseOptions, setExerciseOptionsState] = useState<ExerciseOption>(
     []
@@ -41,10 +50,9 @@ const ExerciseSelector = ({
   const [favoriteExerciseIds, setFavoriteExerciseIds] = useState<Set<number>>(
     new Set()
   );
+  const [modalVisible, setModalVisible] = useState(false);
 
   const { user } = useAuth();
-
-  // TODO: Potentially filter out exercisesInWorkout from the list instead of disabling
 
   const fetchExercises = async (
     searchTerm: string,
@@ -64,7 +72,7 @@ const ExerciseSelector = ({
 
       const { data, error } = await query
         .ilike("name", `%${searchTerm}%`)
-        .range(0, 30); // Limit to 30 results
+        .range(0, 30);
 
       if (error) {
         console.error("Error fetching exercises:", error.message);
@@ -77,75 +85,25 @@ const ExerciseSelector = ({
     }
   };
 
-  // Debounce the search input to avoid too many requests
   const debouncedFetch = debounce((term: string, filter: string) => {
     fetchExercises(term, filter);
   }, 300);
 
   useEffect(() => {
     debouncedFetch(searchValue, selectedFilter);
-  }, [searchValue, selectedFilter, debouncedFetch]);
-
-  useEffect(() => {
     return () => {
       debouncedFetch.cancel();
     };
-  }, [debouncedFetch]);
+  }, [searchValue, selectedFilter]);
 
-  // Filter exercises based on search input
   const filteredExercises = exerciseOptions.filter((ex) =>
     ex.name.toLowerCase().includes(searchValue.toLowerCase())
   );
 
-  // Handle the select
   const handleSelect = (exercise: Exercise): void => {
     setExerciseName(exercise.name);
     setExerciseId(exercise.id);
-  };
-
-  // Get recent exercises from local storage
-  const getRecentExercises = (): Exercise[] => {
-    const recentExercises = localStorage.getItem("recentExercises");
-    if (recentExercises) {
-      try {
-        return JSON.parse(recentExercises) as Exercise[];
-      } catch (error) {
-        console.error(
-          "Error parsing recent exercises from local storage:",
-          error
-        );
-        return [];
-      }
-    }
-    return [];
-  };
-
-  // Add to recent exercises in local storage
-  const addToRecent = async (exercise: Exercise): Promise<void> => {
-    const recentExercises = getRecentExercises();
-    // Check if the exercise is already in recent exercises
-    const isAlreadyRecent = recentExercises.some((ex) => ex.id === exercise.id);
-    if (isAlreadyRecent) {
-      const updatedRecentExercises = recentExercises.filter(
-        (ex) => ex.id !== exercise.id
-      );
-      updatedRecentExercises.unshift(exercise);
-      // Limit to 5 recent exercises
-      if (updatedRecentExercises.length > 5) {
-        updatedRecentExercises.pop();
-      }
-      localStorage.setItem(
-        "recentExercises",
-        JSON.stringify(updatedRecentExercises)
-      );
-    } else {
-      recentExercises.unshift(exercise);
-      // Limit to 10 recent exercises
-      if (recentExercises.length > 5) {
-        recentExercises.pop();
-      }
-      localStorage.setItem("recentExercises", JSON.stringify(recentExercises));
-    }
+    setModalVisible(false);
   };
 
   useEffect(() => {
@@ -192,264 +150,64 @@ const ExerciseSelector = ({
     getFavoriteExercises();
   }, [user]);
 
-  // Toggle favorite exercise
-  const toggleFavorite = async (exercise: Exercise): Promise<void> => {
-    if (!user) return;
-
-    try {
-      const isAlreadyFavorite = favoriteExerciseIds.has(exercise.id);
-
-      if (isAlreadyFavorite) {
-        const { error } = await supabase
-          .from("favorite_exercises")
-          .delete()
-          .match({ user_id: user.id, exercise_id: exercise.id });
-
-        if (!error) {
-          const updated = new Set(favoriteExerciseIds);
-          updated.delete(exercise.id);
-          setFavoriteExerciseIds(updated);
-          setFavoriteExercises((prev) =>
-            prev.filter((ex) => ex.id !== exercise.id)
-          );
-        }
-      } else {
-        const { error } = await supabase
-          .from("favorite_exercises")
-          .insert({ user_id: user.id, exercise_id: exercise.id });
-
-        if (!error) {
-          const updated = new Set(favoriteExerciseIds);
-          updated.add(exercise.id);
-          setFavoriteExerciseIds(updated);
-
-          // Ensure the full exercise details are added
-          const fullExercise =
-            exerciseOptions.find((ex) => ex.id === exercise.id) ||
-            favoriteExercises.find((ex) => ex.id === exercise.id);
-
-          if (fullExercise) {
-            setFavoriteExercises((prev) => [...prev, fullExercise]);
-          }
-        }
-      }
-    } catch (err) {
-      console.error("Error toggling favorite:", err);
-    }
-  };
-
   return (
-    <div className="w-full px-4">
-      <button
-        tabIndex={0}
-        type="button"
-        onClick={() => {
+    <View className="w-full">
+      <TouchableOpacity
+        disabled={isSetUpdating}
+        onPress={() => {
           if (!isSetsEmpty) {
-            toast.error(
-              "Finish or remove current sets before selecting a new exercise."
-            );
             return;
           }
-
-          (
-            document.getElementById("exercise_modal") as HTMLDialogElement
-          )?.showModal();
+          setModalVisible(true);
         }}
-        className={`bg-primary btn w-full ${
-          isSetUpdating ? "btn-disabled" : ""
-        }`}
-        disabled={isSetUpdating}
+        className="bg-primary w-full h-12 rounded items-center justify-center flex-row"
       >
-        {exerciseName || "Select an Exercise"}
-        <Dumbbell size={16} className="absolute right-10" />
-      </button>
+        <Text className="text-white">
+          {exerciseName || "Select an Exercise"}
+        </Text>
+        <Dumbbell size={16} stroke={"white"} style={{ marginLeft: 10 }} />
+      </TouchableOpacity>
 
-      <dialog id="exercise_modal" className="modal">
-        <div className="modal-box h-screen rounded-none w-full flex flex-col">
-          <div className="flex justify-center">
-            <h3 className="font-bold text-center mb-3">Select an Exercise</h3>
-            <button
-              className="btn btn-square btn-ghost absolute left-3 top-4"
-              onClick={() => {
-                (
-                  document.getElementById("exercise_modal") as HTMLDialogElement
-                )?.close();
-              }}
-            >
-              <ArrowLeft size={24} />
-            </button>
-          </div>
-          <div>
-            <div>
-              <input
-                type="text"
-                placeholder="Search exercises"
-                className="input input-bordered w-full"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-              />
-            </div>
-            <div className="divider">Filters</div>
-            <label className="label">
-              <input
-                type="checkbox"
-                className="toggle toggle-primary"
-                checked={showFavoritesOnly}
-                onChange={(e) => setShowFavoritesOnly(e.target.checked)}
-                form="none"
-              />
-              <span className="label-text">Show Favorites Only</span>
-            </label>
-            <div className="flex justify-center my-3">
-              <div className="filter">
-                <input
-                  className="btn btn-square btn-primary"
-                  type="reset"
-                  value="×"
-                  onClick={() => setSelectedFilter("")}
-                />
-                <input
-                  className="btn btn-primary"
-                  type="radio"
-                  name="musclegroup"
-                  aria-label="Chest"
-                  onClick={() => setSelectedFilter("Chest")}
-                />
-                <input
-                  className="btn btn-primary"
-                  type="radio"
-                  name="musclegroup"
-                  aria-label="Back"
-                  onClick={() => setSelectedFilter("Back")}
-                />
-                <input
-                  className="btn btn-primary"
-                  type="radio"
-                  name="musclegroup"
-                  aria-label="Legs"
-                  onClick={() => setSelectedFilter("Legs")}
-                />
-                <input
-                  className="btn btn-primary"
-                  type="radio"
-                  name="musclegroup"
-                  aria-label="Arms"
-                  onClick={() => setSelectedFilter("Arms")}
-                />
-              </div>
-            </div>
-            <div className="divider"></div>
-            {!isSetUpdating && (
-              <div
-                className="overflow-y-auto rounded"
-                style={{ maxHeight: "calc(100vh - 300px)" }}
-              >
-                <ul tabIndex={0}>
-                  {isSetsEmpty && (
-                    <div>
-                      {!showFavoritesOnly ? (
-                        <div>
-                          {getRecentExercises().length > 0 && (
-                            <div className="mb-3">
-                              <h4>
-                                <span className="text-lg font-semibold">
-                                  Recent
-                                </span>
-                                {getRecentExercises().map((exercise) => (
-                                  <li key={exercise.id}>
-                                    <ExerciseSelectorButton
-                                      exercise={exercise}
-                                      handleSelect={handleSelect}
-                                      addToRecent={addToRecent}
-                                      isFavorite={favoriteExerciseIds.has(
-                                        exercise.id
-                                      )}
-                                      onToggleFavorite={toggleFavorite}
-                                    />
-                                  </li>
-                                ))}
-                              </h4>
-                            </div>
-                          )}
-                          <div>
-                            <h4>
-                              <span className="text-lg font-semibold">
-                                {selectedFilter} Exercises
-                              </span>
-                            </h4>
-                            {filteredExercises.map((exercise) => (
-                              <li key={exercise.id}>
-                                <ExerciseSelectorButton
-                                  exercise={exercise}
-                                  handleSelect={handleSelect}
-                                  addToRecent={addToRecent}
-                                  isFavorite={favoriteExerciseIds.has(
-                                    exercise.id
-                                  )}
-                                  onToggleFavorite={toggleFavorite}
-                                />
-                              </li>
-                            ))}
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          <h4>
-                            <span className="text-lg font-semibold">
-                              Favorite Exercises
-                            </span>
-                          </h4>
-                          <>
-                            {favoriteExercises.length > 0 ? (
-                              <>
-                                {favoriteExercises
-                                  .filter((ex) => {
-                                    const matchesSearch = ex.name
-                                      .toLowerCase()
-                                      .includes(searchValue.toLowerCase());
-                                    const matchesFilter =
-                                      selectedFilter === ""
-                                        ? true
-                                        : selectedFilter === "Arms"
-                                        ? [
-                                            "Biceps",
-                                            "Triceps",
-                                            "Shoulders",
-                                          ].includes(ex.category)
-                                        : ex.category === selectedFilter;
-                                    return matchesSearch && matchesFilter;
-                                  })
-                                  .map((exercise) => (
-                                    <li key={exercise.id}>
-                                      <ExerciseSelectorButton
-                                        exercise={exercise}
-                                        handleSelect={handleSelect}
-                                        addToRecent={addToRecent}
-                                        isFavorite={favoriteExerciseIds.has(
-                                          exercise.id
-                                        )}
-                                        onToggleFavorite={toggleFavorite}
-                                      />
-                                    </li>
-                                  ))}
-                              </>
-                            ) : (
-                              <p className="text-center text-gray-500 mt-2">
-                                No favorite exercises found.
-                              </p>
-                            )}
-                          </>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </ul>
-              </div>
+      <Modal animationType="slide" visible={modalVisible}>
+        <View className="flex-1 p-4 bg-base-100">
+          <TouchableOpacity
+            onPress={() => setModalVisible(false)}
+            className="absolute top-4 left-4"
+          >
+            <ArrowLeft size={24} />
+          </TouchableOpacity>
+          <Text className="text-center text-lg font-bold mb-4">
+            Select an Exercise
+          </Text>
+          <TextInput
+            placeholder="Search exercises"
+            value={searchValue}
+            onChangeText={setSearchValue}
+            className="border border-primary-content text-primary-content rounded-md p-3 w-full"
+          />
+          <View className="flex-row items-center justify-between mb-4">
+            <Text className="text-base-content">Show Favorites Only</Text>
+            <Switch
+              value={showFavoritesOnly}
+              onValueChange={setShowFavoritesOnly}
+            />
+          </View>
+          <ScrollView className="flex-1">
+            {(showFavoritesOnly ? favoriteExercises : filteredExercises).map(
+              (exercise) => (
+                <TouchableOpacity
+                  key={exercise.id}
+                  onPress={() => handleSelect(exercise)}
+                  className="p-3 border-b border-gray-200"
+                >
+                  <Text className="text-base-content">{exercise.name}</Text>
+                </TouchableOpacity>
+              )
             )}
-          </div>
-        </div>
-      </dialog>
-    </div>
+          </ScrollView>
+        </View>
+      </Modal>
+    </View>
   );
 };
 
