@@ -62,7 +62,7 @@ const CardActionButtons = ({ workoutId, onDelete }: CardActionButtonsProps) => {
   };
 
   return (
-    <View className="flex-row space-x-2 mt-2">
+    <View className="flex-row gap-x-2 mt-2">
       <Button
         className=""
         variant="primary"
@@ -96,7 +96,7 @@ const CardActionButtons = ({ workoutId, onDelete }: CardActionButtonsProps) => {
               Are you sure you want to delete this workout? This action cannot
               be undone.
             </Text>
-            <View className="flex-row justify-end space-x-2">
+            <View className="flex-row justify-end gap-x-2">
               <Button variant="primary" onPress={() => setModalVisible(false)}>
                 Back
               </Button>
