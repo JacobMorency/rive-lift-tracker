@@ -1,6 +1,7 @@
 // app/_layout.tsx
-import "../globals.css";
+
 import { Slot } from "expo-router";
+import "../app/globals.css";
 
 import { AuthProvider } from "../hooks/useAuth";
 
