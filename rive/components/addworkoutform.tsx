@@ -11,7 +11,8 @@ import {
   NullableNumber,
   SetInputs,
 } from "../types/workout";
-import { View, Text } from "react-native";
+import { View, Keyboard } from "react-native";
+import { useRouter } from "expo-router";
 
 type AddWorkoutFormProps = {
   workoutId: string;
@@ -48,10 +49,12 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
+  const router = useRouter();
+
   const handleCompleteWorkout = (): void => {
     // localStorage.removeItem("workoutId");
     // localStorage.removeItem("workoutProgress");
-    // router.push("/workouts");
+    router.push("/workouts");
   };
 
   const handleSaveWorkout = async (): Promise<void> => {
@@ -112,7 +115,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
           "Error adding exercise to workout:",
           exerciseError.message
         );
-        toast.error("Error saving exercise to workout. Please try again.");
+        // toast.error("Error saving exercise to workout. Please try again.");
         return;
       }
 
@@ -129,7 +132,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
       const { error: setsError } = await supabase.from("sets").insert(setsData);
       if (setsError) {
         console.error("Error adding sets to workout:", setsError.message);
-        toast.error("Error saving sets to workout. Please try again.");
+        // toast.error("Error saving sets to workout. Please try again.");
         return;
       }
     }
@@ -141,10 +144,10 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
       .select();
     if (error) {
       console.error("Error saving workout:", error.message);
-      toast.error("Error saving workout. Please try again.");
+      //   toast.error("Error saving workout. Please try again.");
       return;
     }
-    toast.success("Workout saved successfully!");
+    // toast.success("Workout saved successfully!");
     handleCompleteWorkout();
   };
 
@@ -198,6 +201,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
       setReps(null);
       setWeight(null);
       setPartialReps(null);
+      Keyboard.dismiss();
     }
   };
 
@@ -537,7 +541,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
       </View>
 
       {exerciseName && (
-        <View>
+        <View className="bg-base-300 rounded-lg p-4">
           <SetInputForm
             reps={reps}
             weight={weight}
@@ -559,7 +563,29 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
         </View>
       )}
 
-      <View className="bg-base-300 rounded-lg p-4">
+      {sets.length > 0 && (
+        <View className="bg-base-300 rounded-lg p-4 gap-2">
+          <SetList
+            sets={sets}
+            handleUpdateSet={handleUpdateSet}
+            handleDeleteSet={handleDeleteSet}
+            exerciseName={exerciseName}
+          />
+          <AddExerciseButton
+            handleAddExerciseToWorkout={handleAddExerciseToWorkout}
+            isSetUpdating={isSetUpdating}
+            sets={sets}
+            isExerciseUpdating={isExerciseUpdating}
+          />
+        </View>
+      )}
+
+      <View className="bg-base-300 rounded-lg p-4 gap-2">
+        <CompletedExerciseList
+          exercisesInWorkout={exercisesInWorkout}
+          handleDeleteExercise={handleDeleteExercise}
+          handleUpdateExercise={handleUpdateExercise}
+        />
         <WorkoutActionButtons
           handleSaveWorkout={handleSaveWorkout}
           exercisesInWorkout={exercisesInWorkout}

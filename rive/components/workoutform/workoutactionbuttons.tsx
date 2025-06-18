@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Modal, TouchableOpacity } from "react-native";
+import { View, Text, Modal } from "react-native";
 import { ExercisesInWorkout } from "@/types/workout";
 import { useRouter } from "expo-router";
 import Button from "../button";
@@ -30,22 +30,23 @@ const WorkoutActionButtons = ({
 
   return (
     <View>
-      <TouchableOpacity
-        className="w-full my-2 bg-pink-600 rounded p-4 items-center"
-        onPress={handleSaveWorkout}
-        disabled={exercisesInWorkout.length <= 0}
-      >
-        <Text className="text-white font-bold">Save Workout</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        className="w-full bg-red-600 rounded p-4 items-center"
-        onPress={() => setModalVisible(true)}
-      >
-        <Text className="text-white font-bold">
+      <View className="flex gap-2">
+        <Button
+          className="w-full"
+          variant="primary"
+          onPress={handleSaveWorkout}
+          disabled={exercisesInWorkout.length <= 0}
+        >
+          Save Workout
+        </Button>
+        <Button
+          className="w-full"
+          variant="error"
+          onPress={() => setModalVisible(true)}
+        >
           {isEditing ? "Cancel Editing" : "Cancel Workout"}
-        </Text>
-      </TouchableOpacity>
+        </Button>
+      </View>
 
       <Modal
         visible={modalVisible}

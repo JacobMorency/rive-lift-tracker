@@ -2,7 +2,7 @@ import { View, Text, TextInput } from "react-native";
 import AddSetButtons from "../workoutform/addsetbuttons";
 import { AddSetButtonProps } from "../workoutform/addsetbuttons";
 import { NullableNumber } from "../../types/workout";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type SetInputFormProps = AddSetButtonProps & {
   reps: NullableNumber;
@@ -35,8 +35,16 @@ const SetInputForm = (props: SetInputFormProps) => {
 
   const [weightText, setWeightText] = useState<string>("");
 
+  useEffect(() => {
+    if (weight === null) {
+      setWeightText("");
+    } else {
+      setWeightText(weight.toString());
+    }
+  }, [weight]);
+
   return (
-    <View className="bg-base-300 p-4 rounded-lg">
+    <View>
       <View className="flex-row gap-3 w-full">
         <View className="flex-1">
           <Text className="text-white mb-1">Reps</Text>
@@ -53,6 +61,7 @@ const SetInputForm = (props: SetInputFormProps) => {
                 : "border border-gray-300"
             } rounded px-2 py-1 text-white`}
             placeholderTextColor="#9CA3AF"
+            returnKeyType="done"
           />
           {repsEmpty && (
             <Text className="text-red-500 italic text-sm">Reps required</Text>
@@ -85,6 +94,7 @@ const SetInputForm = (props: SetInputFormProps) => {
                 : "border border-gray-300"
             } rounded px-2 py-1 text-white`}
             placeholderTextColor="#9CA3AF"
+            returnKeyType="done"
           />
           {weightEmpty && (
             <Text className="text-red-500 italic text-sm">Weight required</Text>
@@ -110,6 +120,7 @@ const SetInputForm = (props: SetInputFormProps) => {
                 : "border border-gray-300"
             } rounded px-2 py-1 text-white`}
             placeholderTextColor="#9CA3AF"
+            returnKeyType="done"
           />
           {partialRepsInvalid && (
             <Text className="text-red-500 italic text-sm">

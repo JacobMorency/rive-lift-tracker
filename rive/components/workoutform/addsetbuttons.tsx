@@ -1,5 +1,6 @@
 import { NullableNumber } from "../../types/workout";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View } from "react-native";
+import Button from "../button";
 
 export type AddSetButtonProps = {
   isSetUpdating: boolean;
@@ -19,31 +20,28 @@ const AddSetButtons = ({
   return (
     <View className="w-full">
       {!isSetUpdating && (
-        <TouchableOpacity
-          className="w-full bg-primary py-3 rounded items-center"
+        <Button
           onPress={handleAddSet}
+          disabled={isSetUpdating}
+          variant="primary"
         >
-          <Text className="text-white font-semibold">Add Set</Text>
-        </TouchableOpacity>
+          Add Set
+        </Button>
       )}
       {isSetUpdating && (
         <View className="flex flex-col space-y-2">
-          <TouchableOpacity
+          <Button
             className="w-full bg-primary py-3 rounded items-center"
             onPress={handleSaveUpdatedSet}
+            variant="primary"
           >
-            <Text className="text-white font-semibold">
-              {updateSetIndex !== null
-                ? `Update Set ${updateSetIndex + 1}`
-                : "Update Set"}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="w-full bg-red-500 py-3 rounded items-center"
-            onPress={cancelUpdateSet}
-          >
-            <Text className="text-white font-semibold">Cancel</Text>
-          </TouchableOpacity>
+            {updateSetIndex !== null
+              ? `Update Set ${updateSetIndex + 1}`
+              : "Update Set"}
+          </Button>
+          <Button onPress={cancelUpdateSet} variant="error">
+            Cancel
+          </Button>
         </View>
       )}
     </View>

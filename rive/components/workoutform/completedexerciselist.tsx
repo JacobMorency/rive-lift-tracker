@@ -1,6 +1,8 @@
-import { SquarePen, Trash2 } from "lucide-react";
+import { SquarePen, Trash2 } from "lucide-react-native";
 import { useState } from "react";
+import { View, Text, FlatList, TouchableOpacity, Modal } from "react-native";
 import { ExercisesInWorkout } from "@/types/workout";
+import Button from "../button";
 
 type CompletedExerciseListProps = {
   exercisesInWorkout: ExercisesInWorkout[];
@@ -16,91 +18,93 @@ const CompletedExerciseList = ({
   const [deleteExerciseIndex, setDeleteExerciseIndex] = useState<number | null>(
     null
   );
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const handleConfirmDeleteExercise = (): void => {
     if (deleteExerciseIndex !== null) {
       handleDeleteExercise(deleteExerciseIndex);
+      setModalVisible(false);
+      setDeleteExerciseIndex(null);
     }
   };
-  return (
-    <div className="px-4">
-      <h3 className="font-bold text-lg">Exercises Completed This Workout:</h3>
-      <ul>
-        {exercisesInWorkout.length > 0 ? (
-          exercisesInWorkout.map((exercise, index) => (
-            <li
-              key={exercise.id}
-              className="rounded py-3 px-2 my-3 flex items-center justify-between bg-base-100"
-            >
-              <p>{exercise.name}</p>
-              <span className="flex gap-2">
-                <button
-                  className="btn btn-primary px-2 rounded"
-                  type="button"
-                  onClick={() => handleUpdateExercise(index)}
-                >
-                  <SquarePen />
-                </button>
-                <button
-                  className="btn btn-error px-2 rounded"
-                  type="button"
-                  onClick={() => {
-                    setDeleteExerciseIndex(index);
-                    (
-                      document.getElementById(
-                        "delete_modal"
-                      ) as HTMLDialogElement
-                    )?.showModal();
-                  }}
-                >
-                  <Trash2 />
-                </button>
-              </span>
-            </li>
-          ))
-        ) : (
-          <li>No exercises completed yet.</li>
-        )}
-      </ul>
 
-      <dialog id="delete_modal" className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">Remove Exercise</h3>
-          <p className="py-2">Are you sure you want to remove this exercise?</p>
-          {deleteExerciseIndex !== null && (
-            <div className="mb-2">
-              <span className="font-bold">Exercise:</span>{" "}
-              {exercisesInWorkout[deleteExerciseIndex].name}
-            </div>
-          )}
-          <div className="modal-action">
-            <button
-              className="btn btn-primary"
-              type="button"
-              onClick={() => {
-                (
-                  document.getElementById("delete_modal") as HTMLDialogElement
-                )?.close();
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              className="btn btn-error"
-              type="button"
-              onClick={() => {
-                handleConfirmDeleteExercise();
-                (
-                  document.getElementById("delete_modal") as HTMLDialogElement
-                )?.close();
-              }}
-            >
-              Remove
-            </button>
-          </div>
-        </div>
-      </dialog>
-    </div>
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: ExercisesInWorkout;
+    index: number;
+  }) => (
+    <View className="rounded bg-base-100 py-3 px-2 my-1 flex-row items-center justify-between">
+      <Text className="flex-1 mr-2 text-white">{item.name}</Text>
+      <View className="flex-row gap-2">
+        <TouchableOpacity
+          className="bg-primary rounded p-2"
+          onPress={() => handleUpdateExercise(index)}
+        >
+          <SquarePen color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="bg-error rounded p-2"
+          onPress={() => {
+            setDeleteExerciseIndex(index);
+            setModalVisible(true);
+          }}
+        >
+          <Trash2 color="white" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  return (
+    <View>
+      <Text className="font-bold text-lg text-white mb-2">
+        Exercises Completed This Workout:
+      </Text>
+      {exercisesInWorkout.length > 0 ? (
+        <FlatList
+          data={exercisesInWorkout}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+        />
+      ) : (
+        <Text className="text-base-content">No exercises completed yet.</Text>
+      )}
+
+      <Modal
+        animationType="fade"
+        transparent
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <View className="bg-base-100 rounded p-4 w-11/12">
+            <Text className="font-bold text-lg mb-2 text-base-content">
+              Remove Exercise
+            </Text>
+            <Text className="py-2 text-base-content">
+              Are you sure you want to remove this exercise?
+            </Text>
+            {deleteExerciseIndex !== null &&
+              exercisesInWorkout[deleteExerciseIndex] && (
+                <Text className="mb-2 text-base-content">
+                  <Text className="font-bold">Exercise:</Text>{" "}
+                  {exercisesInWorkout[deleteExerciseIndex].name}
+                </Text>
+              )}
+            <View className="flex-row justify-end gap-2 mt-4">
+              <Button variant="primary" onPress={() => setModalVisible(false)}>
+                Cancel
+              </Button>
+              <Button variant="error" onPress={handleConfirmDeleteExercise}>
+                Remove
+              </Button>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 };
 

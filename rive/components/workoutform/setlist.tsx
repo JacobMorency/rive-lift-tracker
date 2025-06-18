@@ -1,6 +1,15 @@
-import { SquarePen, Trash2 } from "lucide-react";
+import { SquarePen, Trash2 } from "lucide-react-native";
 import { useState } from "react";
-import { SetInputs } from "@/types/workout";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+} from "react-native";
+import { SetInputs } from "../../types/workout";
+import Button from "../button";
 
 type SetListProps = {
   sets: SetInputs[];
@@ -16,93 +25,92 @@ const SetList = ({
   exerciseName,
 }: SetListProps) => {
   const [deleteSetIndex, setDeleteSetIndex] = useState<number | null>(null);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const handleConfirmDeleteSet = (): void => {
     if (deleteSetIndex !== null) {
       handleDeleteSet(deleteSetIndex);
-      (document.getElementById("delete_modal") as HTMLDialogElement)?.close();
+      setModalVisible(false);
+      setDeleteSetIndex(null);
     }
   };
-  return (
-    <div className="px-4">
-      <h3 className="font-bold text-lg">Sets for {exerciseName}:</h3>
-      <ul>
-        {sets.map((set, index) => (
-          <li
-            key={index}
-            className="rounded bg-base-100 py-3 px-2 my-3 flex items-center justify-between"
-          >
-            <p>
-              <span className="font-bold">Set {index + 1}:</span> {set.reps}{" "}
-              reps at {set.weight} lbs
-              {set.partialReps !== null &&
-                set.partialReps > 0 &&
-                ` with ${set.partialReps} partial reps`}
-            </p>
-            <span className="flex gap-2">
-              <button
-                className="bg-primary rounded p-2"
-                type="button"
-                onClick={() => handleUpdateSet(index)}
-              >
-                <SquarePen />
-              </button>
-              <button
-                className="bg-error rounded p-2"
-                type="button"
-                onClick={() => {
-                  setDeleteSetIndex(index);
-                  (
-                    document.getElementById("delete_modal") as HTMLDialogElement
-                  )?.showModal();
-                }}
-              >
-                <Trash2 />
-              </button>
-            </span>
-          </li>
-        ))}
-      </ul>
 
-      <dialog id="delete_modal" className="modal">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">
-            Delete Set {deleteSetIndex !== null ? deleteSetIndex + 1 : ""}
-          </h3>
-          <p className="py-2">Are you sure you want to delete this set?</p>
-          {deleteSetIndex !== null && sets[deleteSetIndex] && (
-            <div className="mb-2">
-              <span className="font-bold">Set {deleteSetIndex + 1}:</span>{" "}
-              {sets[deleteSetIndex].reps} reps at {sets[deleteSetIndex].weight}{" "}
-              lbs
-              {sets[deleteSetIndex].partialReps !== null &&
-                sets[deleteSetIndex].partialReps > 0 &&
-                ` with ${sets[deleteSetIndex].partialReps} partial reps`}
-            </div>
-          )}
-          <div className="modal-action">
-            <button
-              className="btn btn-primary"
-              type="button"
-              onClick={() => {
-                (
-                  document.getElementById("delete_modal") as HTMLDialogElement
-                )?.close();
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              className="btn btn-error"
-              type="button"
-              onClick={handleConfirmDeleteSet}
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      </dialog>
-    </div>
+  const renderItem = ({ item, index }: { item: SetInputs; index: number }) => (
+    <View className="rounded bg-base-100 py-3 px-2 my-1 flex-row items-center justify-between">
+      <Text className="flex-1 mr-2 text-white">
+        <Text className="font-bold">Set {index + 1}:</Text> {item.reps} reps at{" "}
+        {item.weight} lbs
+        {item.partialReps !== null &&
+          item.partialReps > 0 &&
+          ` with ${item.partialReps} partial reps`}
+      </Text>
+      <View className="flex-row gap-2">
+        <TouchableOpacity
+          className="bg-primary rounded p-2"
+          onPress={() => handleUpdateSet(index)}
+        >
+          <SquarePen color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="bg-error rounded p-2"
+          onPress={() => {
+            setDeleteSetIndex(index);
+            setModalVisible(true);
+          }}
+        >
+          <Trash2 color="white" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  return (
+    <View>
+      <Text className="font-bold text-lg text-white">
+        Sets for {exerciseName}:
+      </Text>
+      <FlatList
+        data={sets}
+        renderItem={renderItem}
+        keyExtractor={(_, index) => index.toString()}
+      />
+
+      <Modal
+        animationType="fade"
+        transparent
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <View className="bg-base-100 rounded p-4 w-11/12">
+            <Text className="font-bold text-lg mb-2 text-base-content">
+              Delete Set {deleteSetIndex !== null ? deleteSetIndex + 1 : ""}
+            </Text>
+            <Text className="py-2 text-base-content">
+              Are you sure you want to delete this set?
+            </Text>
+            {deleteSetIndex !== null && sets[deleteSetIndex] && (
+              <Text className="mb-2 text-base-content">
+                <Text className="font-bold">Set {deleteSetIndex + 1}:</Text>{" "}
+                {sets[deleteSetIndex].reps} reps at{" "}
+                {sets[deleteSetIndex].weight} lbs
+                {sets[deleteSetIndex].partialReps !== null &&
+                  sets[deleteSetIndex].partialReps > 0 &&
+                  ` with ${sets[deleteSetIndex].partialReps} partial reps`}
+              </Text>
+            )}
+            <View className="flex-row justify-end gap-2 mt-4">
+              <Button variant="primary" onPress={() => setModalVisible(false)}>
+                Back
+              </Button>
+              <Button variant="error" onPress={handleConfirmDeleteSet}>
+                Delete Set
+              </Button>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 };
 
