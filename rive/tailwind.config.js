@@ -31,7 +31,7 @@ module.exports = {
         "success-content": "#002d40",
         warning: "#facc15",
         "warning-content": "#002d40",
-        error: "#e02424", // Changed from oklch to valid hex
+        error: "#e50006",
         "error-content": "#ffffff",
       },
       borderRadius: {

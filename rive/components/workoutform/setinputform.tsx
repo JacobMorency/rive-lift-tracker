@@ -1,8 +1,9 @@
-import AddSetButtons from "@/app/components/workoutform/addsetbuttons";
-import { AddSetButtonProps } from "@/app/components/workoutform/addsetbuttons";
-import { NullableNumber } from "@/types/workout";
+import { View, Text, TextInput } from "react-native";
+import AddSetButtons from "../workoutform/addsetbuttons";
+import { AddSetButtonProps } from "../workoutform/addsetbuttons";
+import { NullableNumber } from "../../types/workout";
+import { useState } from "react";
 
-// Imports types for the AddSetButtonProps and new ones for the spread at the bottom
 type SetInputFormProps = AddSetButtonProps & {
   reps: NullableNumber;
   weight: NullableNumber;
@@ -31,92 +32,96 @@ const SetInputForm = (props: SetInputFormProps) => {
     weightInvalid,
     repsInvalid,
   } = props;
+
+  const [weightText, setWeightText] = useState<string>("");
+
   return (
-    <div className="px-4">
-      <div className="flex gap-1 w-full">
-        <div className="flex-1">
-          <label htmlFor="reps">Reps</label>
-          <input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            id="reps"
-            value={reps !== null ? reps : ""}
-            onChange={(e) =>
-              setReps(e.target.value !== "" ? parseInt(e.target.value) : null)
+    <View className="bg-base-300 p-4 rounded-lg">
+      <View className="flex-row gap-3 w-full">
+        <View className="flex-1">
+          <Text className="text-white mb-1">Reps</Text>
+          <TextInput
+            keyboardType="number-pad"
+            value={reps !== null ? reps.toString() : ""}
+            onChangeText={(val) =>
+              setReps(val !== "" ? parseInt(val, 10) : null)
             }
             placeholder="0"
             className={`${
-              repsEmpty || repsInvalid ? "border-error input" : "input"
-            } w-full`}
+              repsEmpty || repsInvalid
+                ? "border border-red-500"
+                : "border border-gray-300"
+            } rounded px-2 py-1 text-white`}
+            placeholderTextColor="#9CA3AF"
           />
           {repsEmpty && (
-            <p className="text-error italic text-sm">Reps required</p>
+            <Text className="text-red-500 italic text-sm">Reps required</Text>
           )}
           {repsInvalid && (
-            <p className="text-error italic text-sm">Invalid amount of reps</p>
+            <Text className="text-red-500 italic text-sm">
+              Invalid amount of reps
+            </Text>
           )}
-        </div>
-        <div className="flex-1">
-          <label htmlFor="weight">Weight</label>
-          <input
-            type="number"
-            inputMode="decimal"
-            pattern="[0-9]*[.,]?[0-9]*"
-            id="weight"
-            value={weight !== null ? weight : ""}
-            onChange={(e) => {
-              const val = e.target.value;
+        </View>
+        <View className="flex-1">
+          <Text className="text-white mb-1">Weight</Text>
+          <TextInput
+            keyboardType="decimal-pad"
+            value={weightText}
+            onChangeText={(val) => {
+              setWeightText(val);
               const parsed = parseFloat(val);
-              if (val === "" || isNaN(parsed)) {
-                setWeight(null);
-              } else {
+              if (!isNaN(parsed)) {
                 const rounded = Math.floor(parsed * 10) / 10;
                 setWeight(rounded);
+              } else {
+                setWeight(null);
               }
             }}
             placeholder="0 (lbs)"
             className={`${
-              weightEmpty || weightInvalid ? "border-error input" : "input"
-            } w-full`}
+              weightEmpty || weightInvalid
+                ? "border border-red-500"
+                : "border border-gray-300"
+            } rounded px-2 py-1 text-white`}
+            placeholderTextColor="#9CA3AF"
           />
           {weightEmpty && (
-            <p className="text-error italic text-sm">Weight required</p>
+            <Text className="text-red-500 italic text-sm">Weight required</Text>
           )}
           {weightInvalid && (
-            <p className="text-error italic text-sm">
+            <Text className="text-red-500 italic text-sm">
               Invalid amount of weight
-            </p>
+            </Text>
           )}
-        </div>
-        {/* TODO: Add a help icon and potentially a toggle for partial reps */}
-        <div className="flex-1">
-          <label htmlFor="partialReps">Partials</label>
-          <input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            id="partialReps"
-            value={partialReps !== null ? partialReps : ""}
-            onChange={(e) =>
-              setPartialReps(e.target.value ? parseInt(e.target.value) : null)
+        </View>
+        <View className="flex-1">
+          <Text className="text-white mb-1">Partials</Text>
+          <TextInput
+            keyboardType="number-pad"
+            value={partialReps !== null ? partialReps.toString() : ""}
+            onChangeText={(val) =>
+              setPartialReps(val !== "" ? parseInt(val, 10) : null)
             }
             placeholder="0 (optional)"
             className={`${
-              partialRepsInvalid ? "border-error input" : "input"
-            } w-full`}
+              partialRepsInvalid
+                ? "border border-red-500"
+                : "border border-gray-300"
+            } rounded px-2 py-1 text-white`}
+            placeholderTextColor="#9CA3AF"
           />
           {partialRepsInvalid && (
-            <p className="text-error italic text-sm">
+            <Text className="text-red-500 italic text-sm">
               Invalid amount of partial reps
-            </p>
+            </Text>
           )}
-        </div>
-      </div>
-      <div className="mt-3">
+        </View>
+      </View>
+      <View className="mt-3">
         <AddSetButtons {...props} />
-      </div>
-    </div>
+      </View>
+    </View>
   );
 };
 

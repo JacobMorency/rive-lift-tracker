@@ -1,4 +1,5 @@
-import { NullableNumber } from "@/types/workout";
+import { NullableNumber } from "../../types/workout";
+import { View, Text, TouchableOpacity } from "react-native";
 
 export type AddSetButtonProps = {
   isSetUpdating: boolean;
@@ -16,35 +17,36 @@ const AddSetButtons = ({
   updateSetIndex,
 }: AddSetButtonProps) => {
   return (
-    <div>
+    <View className="w-full">
       {!isSetUpdating && (
-        <button
-          className="w-full btn btn-primary"
-          onClick={handleAddSet}
-          type="button"
+        <TouchableOpacity
+          className="w-full bg-primary py-3 rounded items-center"
+          onPress={handleAddSet}
         >
-          Add Set
-        </button>
+          <Text className="text-white font-semibold">Add Set</Text>
+        </TouchableOpacity>
       )}
       {isSetUpdating && (
-        <div className="flex flex-col space-y-1">
-          <button
-            className="w-full btn btn-primary"
-            onClick={handleSaveUpdatedSet}
-            type="button"
+        <View className="flex flex-col space-y-2">
+          <TouchableOpacity
+            className="w-full bg-primary py-3 rounded items-center"
+            onPress={handleSaveUpdatedSet}
           >
-            {updateSetIndex !== null && `Update Set ${updateSetIndex + 1}`}
-          </button>
-          <button
-            className="w-full btn btn-error"
-            type="button"
-            onClick={cancelUpdateSet}
+            <Text className="text-white font-semibold">
+              {updateSetIndex !== null
+                ? `Update Set ${updateSetIndex + 1}`
+                : "Update Set"}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            className="w-full bg-red-500 py-3 rounded items-center"
+            onPress={cancelUpdateSet}
           >
-            Cancel
-          </button>
-        </div>
+            <Text className="text-white font-semibold">Cancel</Text>
+          </TouchableOpacity>
+        </View>
       )}
-    </div>
+    </View>
   );
 };
 

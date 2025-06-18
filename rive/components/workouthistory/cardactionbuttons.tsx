@@ -84,10 +84,7 @@ const CardActionButtons = ({ workoutId, onDelete }: CardActionButtonsProps) => {
         transparent={true}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View
-          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-          className="flex-1 justify-center items-center"
-        >
+        <View className="flex-1 justify-center items-center bg-black/50">
           <View className="bg-base-300 p-6 rounded-lg shadow-lg mx-8">
             <Text className="font-bold text-lg mb-2 text-base-content">
               Delete Workout?

@@ -1,5 +1,8 @@
+import React, { useState } from "react";
+import { View, Text, Modal, TouchableOpacity } from "react-native";
 import { ExercisesInWorkout } from "@/types/workout";
-import { useRouter } from "next/navigation";
+import { useRouter } from "expo-router";
+import Button from "../button";
 
 type WorkoutActionButtonsProps = {
   handleSaveWorkout: () => void;
@@ -15,107 +18,68 @@ const WorkoutActionButtons = ({
   isEditing,
 }: WorkoutActionButtonsProps) => {
   const router = useRouter();
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleCancel = () => {
+    if (isEditing) {
+      router.push("/workouts");
+    }
+    confirmCancelWorkout();
+    setModalVisible(false);
+  };
+
   return (
-    <div className="px-4">
-      <button
-        className="w-full my-2 btn btn-primary"
-        type="button"
-        onClick={handleSaveWorkout}
+    <View>
+      <TouchableOpacity
+        className="w-full my-2 bg-pink-600 rounded p-4 items-center"
+        onPress={handleSaveWorkout}
         disabled={exercisesInWorkout.length <= 0}
       >
-        Save Workout
-      </button>
-      {!isEditing ? (
-        <button
-          className="w-full btn btn-error"
-          type="button"
-          onClick={() =>
-            (
-              document.getElementById("cancel_modal") as HTMLDialogElement
-            )?.showModal()
-          }
-        >
-          Cancel Workout
-        </button>
-      ) : (
-        <button
-          className="w-full btn btn-error"
-          type="button"
-          onClick={() =>
-            (
-              document.getElementById("cancel_modal") as HTMLDialogElement
-            )?.showModal()
-          }
-        >
-          Cancel Editing
-        </button>
-      )}
+        <Text className="text-white font-bold">Save Workout</Text>
+      </TouchableOpacity>
 
-      <dialog id="cancel_modal" className="modal">
-        {!isEditing ? (
-          <div className="modal-box">
-            <h3 className="font-bold text-lg">Cancel Workout?</h3>
-            <p className="py-2">
-              Are you sure you want to cancel this workout? Any unsaved progress
+      <TouchableOpacity
+        className="w-full bg-red-600 rounded p-4 items-center"
+        onPress={() => setModalVisible(true)}
+      >
+        <Text className="text-white font-bold">
+          {isEditing ? "Cancel Editing" : "Cancel Workout"}
+        </Text>
+      </TouchableOpacity>
+
+      <Modal
+        visible={modalVisible}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black/50 px-6">
+          <View className="bg-base-300 rounded-lg p-6 w-full max-w-md">
+            <Text className="font-bold text-lg mb-2 text-base-content">
+              {isEditing ? "Cancel Editing?" : "Cancel Workout?"}
+            </Text>
+            <Text className="mb-4 text-base-content">
+              Are you sure you want to cancel{" "}
+              {isEditing ? "editing" : "this workout"}? Any unsaved progress
               will be lost.
-            </p>
-            <div className="modal-action">
-              <button
-                className="btn btn-primary"
-                type="button"
-                onClick={() =>
-                  (
-                    document.getElementById("cancel_modal") as HTMLDialogElement
-                  )?.close()
-                }
-              >
-                Back
-              </button>
-              <button
-                className="btn btn-error"
-                type="button"
-                onClick={confirmCancelWorkout}
-              >
-                Cancel Workout
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="modal-box">
-            <h3 className="font-bold text-lg">Cancel Editing?</h3>
-            <p className="py-2">
-              Are you sure you want to cancel editing this workout? Any unsaved
-              progress will be lost.
-            </p>
-            <div className="modal-action">
-              <button
-                className="btn btn-primary"
-                type="button"
-                onClick={() =>
-                  (
-                    document.getElementById("cancel_modal") as HTMLDialogElement
-                  )?.close()
-                }
-              >
-                Back
-              </button>
-              <button
-                className="btn btn-error"
-                type="button"
-                onClick={() => {
-                  router.push("/workouts");
-                  (
-                    document.getElementById("cancel_modal") as HTMLDialogElement
-                  )?.close();
-                }}
-              >
-                Cancel Editing
-              </button>
-            </div>
-          </div>
-        )}
-      </dialog>
-    </div>
+            </Text>
+            <View className="flex-row justify-between">
+              <View className="flex-row justify-end gap-x-2 ">
+                <Button
+                  variant="primary"
+                  onPress={() => setModalVisible(false)}
+                >
+                  Back
+                </Button>
+                <Button variant="error" onPress={handleCancel}>
+                  {isEditing ? "Cancel Editing" : "Cancel Workout"}
+                </Button>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 };
 

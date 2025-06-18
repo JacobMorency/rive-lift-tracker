@@ -524,7 +524,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
   //   }
 
   return (
-    <View>
+    <View className="flex-1 bg-base-100 gap-4">
       <View className="bg-base-300 rounded-lg p-4">
         <ExerciseSelector
           exerciseName={exerciseName}
@@ -533,6 +533,38 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
           isSetUpdating={isSetUpdating}
           isSetsEmpty={sets.length === 0}
           exercisesInWorkout={exercisesInWorkout}
+        />
+      </View>
+
+      {exerciseName && (
+        <View>
+          <SetInputForm
+            reps={reps}
+            weight={weight}
+            partialReps={partialReps}
+            setReps={setReps}
+            setWeight={setWeight}
+            setPartialReps={setPartialReps}
+            repsEmpty={repsEmpty}
+            weightEmpty={weightEmpty}
+            partialRepsInvalid={partialRepsInvalid}
+            weightInvalid={weightInvalid}
+            repsInvalid={repsInvalid}
+            isSetUpdating={isSetUpdating}
+            handleAddSet={handleAddSet}
+            handleSaveUpdatedSet={handleSaveUpdatedSet}
+            cancelUpdateSet={cancelUpdateSet}
+            updateSetIndex={updateSetIndex}
+          />
+        </View>
+      )}
+
+      <View className="bg-base-300 rounded-lg p-4">
+        <WorkoutActionButtons
+          handleSaveWorkout={handleSaveWorkout}
+          exercisesInWorkout={exercisesInWorkout}
+          confirmCancelWorkout={confirmCancelWorkout}
+          isEditing={isEditing}
         />
       </View>
     </View>
