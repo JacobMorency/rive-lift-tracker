@@ -23,6 +23,7 @@ const WorkoutActionButtons = ({
   const handleCancel = () => {
     if (isEditing) {
       router.push("/workouts");
+      return;
     }
     confirmCancelWorkout();
     setModalVisible(false);

@@ -29,12 +29,8 @@ const AddSetButtons = ({
         </Button>
       )}
       {isSetUpdating && (
-        <View className="flex flex-col space-y-2">
-          <Button
-            className="w-full bg-primary py-3 rounded items-center"
-            onPress={handleSaveUpdatedSet}
-            variant="primary"
-          >
+        <View className="flex flex-col gap-2">
+          <Button onPress={handleSaveUpdatedSet} variant="primary">
             {updateSetIndex !== null
               ? `Update Set ${updateSetIndex + 1}`
               : "Update Set"}
