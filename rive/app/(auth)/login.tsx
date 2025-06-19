@@ -11,6 +11,7 @@ import { useState } from "react";
 import supabase from "../../lib/supabaseClient";
 import { User, Session } from "@supabase/supabase-js";
 import { useRouter } from "expo-router";
+import { AntDesign } from "@expo/vector-icons";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -125,13 +126,15 @@ export default function Login() {
           <View className="flex-1 border-t border-gray-700" />
         </View>
 
-        <Pressable className="border border-white rounded-md py-3 mb-4">
+        <Pressable className="border border-white rounded-md py-3 mb-4 flex-row items-center justify-center gap-2">
+          <AntDesign name="google" size={24} color="white" />
           <Text className="text-center text-primary-content font-bold">
             Sign in with Google
           </Text>
         </Pressable>
 
-        <Pressable className="border border-white rounded-md py-3 mb-4">
+        <Pressable className="border border-white rounded-md py-3 mb-4 flex-row items-center justify-center gap-2">
+          <AntDesign name="apple1" size={24} color="white" />
           <Text className="text-center text-primary-content font-bold">
             Sign in with Apple
           </Text>
