@@ -14,9 +14,14 @@ import {
   ScrollView,
   Switch,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import Divider from "../ui/divider";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const RECENT_KEY = "recentExercises";
 
 type ExerciseSelectorProps = {
   exerciseName: string;
@@ -39,7 +44,6 @@ const ExerciseSelector = ({
   setExerciseId,
   isSetUpdating,
   isSetsEmpty,
-  exercisesInWorkout,
 }: ExerciseSelectorProps) => {
   const [exerciseOptions, setExerciseOptionsState] = useState<ExerciseOption>(
     []
@@ -53,6 +57,7 @@ const ExerciseSelector = ({
   const [favoriteExerciseIds, setFavoriteExerciseIds] = useState<Set<number>>(
     new Set()
   );
+  const [recentExercises, setRecentExercises] = useState<ExerciseOption>([]);
   const [modalVisible, setModalVisible] = useState(false);
 
   const { user } = useAuth();
@@ -108,7 +113,39 @@ const ExerciseSelector = ({
     setExerciseName(exercise.name);
     setExerciseId(exercise.id);
     setModalVisible(false);
+    addToRecentExercises(exercise);
   };
+
+  const getRecentExercises = async (): Promise<Exercise[]> => {
+    try {
+      const value = await AsyncStorage.getItem(RECENT_KEY);
+      return value ? JSON.parse(value) : [];
+    } catch (error) {
+      console.error("Failed to load recent exercises:", error);
+      return [];
+    }
+  };
+
+  const addToRecentExercises = async (exercise: Exercise): Promise<void> => {
+    try {
+      const recent = await getRecentExercises();
+
+      const updated = [exercise, ...recent.filter((e) => e.id !== exercise.id)];
+
+      if (updated.length > 5) updated.pop();
+
+      await AsyncStorage.setItem(RECENT_KEY, JSON.stringify(updated));
+    } catch (error) {
+      console.error("Failed to update recent exercises:", error);
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      const recent = await getRecentExercises();
+      setRecentExercises(recent); // You'll need this state
+    })();
+  }, []);
 
   // Toggle favorite exercise
   const toggleFavorite = async (exercise: Exercise): Promise<void> => {
@@ -223,7 +260,7 @@ const ExerciseSelector = ({
           <View className="flex items-center p-4">
             <TouchableOpacity
               onPress={() => setModalVisible(false)}
-              className="absolute left-4"
+              className="absolute top-4 left-4"
             >
               <ArrowLeft size={24} stroke={"white"} />
             </TouchableOpacity>
@@ -261,20 +298,39 @@ const ExerciseSelector = ({
                 paddingBottom: insets.bottom + 150,
               }}
             >
+              {recentExercises.length > 0 && (
+                <View className="mb-4">
+                  <View>
+                    <Text className="text-base-content font-bold text-2xl">
+                      Recent Exercises
+                    </Text>
+                  </View>
+                  {recentExercises.map((exercise) => (
+                    <ExerciseSelectorButton
+                      key={exercise.id}
+                      exercise={exercise}
+                      handleSelect={handleSelect}
+                      addToRecent={addToRecentExercises}
+                      isFavorite={favoriteExerciseIds.has(exercise.id)}
+                      onToggleFavorite={() => toggleFavorite(exercise)}
+                    />
+                  ))}
+                </View>
+              )}
+
               <View>
                 <Text className="text-base-content font-bold text-2xl">
                   {showFavoritesOnly ? "Favorites" : "Exercises"}
                 </Text>
               </View>
+
               {(showFavoritesOnly ? favoriteExercises : filteredExercises).map(
                 (exercise) => (
                   <ExerciseSelectorButton
                     key={exercise.id}
                     exercise={exercise}
                     handleSelect={handleSelect}
-                    addToRecent={(ex) => {
-                      // Add to recent logic here if needed
-                    }}
+                    addToRecent={addToRecentExercises}
                     isFavorite={favoriteExerciseIds.has(exercise.id)}
                     onToggleFavorite={() => toggleFavorite(exercise)}
                   />
