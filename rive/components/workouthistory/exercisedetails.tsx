@@ -20,10 +20,7 @@ const ExerciseDetails = ({ exerciseName, sets }: ExerciseDetailsProps) => {
         <Text className="font-medium text-base-content">
           {exerciseName} – {sets.length} {sets.length === 1 ? "Set" : "Sets"}
         </Text>
-        <Pressable
-          className="btn btn-ghost btn-sm"
-          onPress={() => setIsOpen(!isOpen)}
-        >
+        <Pressable className="p-2" onPress={() => setIsOpen(!isOpen)}>
           {isOpen ? (
             <ChevronUp stroke={"white"} />
           ) : (
