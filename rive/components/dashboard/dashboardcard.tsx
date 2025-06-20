@@ -15,9 +15,9 @@ const DashboardCard = ({
 }: DashboardCardProps) => {
   return (
     <View>
-      <View className="bg-primary rounded-lg p-4">
+      <View className="bg-primary rounded-lg p-6 shadow-lg">
         <View className="flex-row items-center justify-between mb-2">
-          <Text className="text-primary-content text-lg font-semibold">
+          <Text className="text-primary-content text-xl font-bold">
             {title}
           </Text>
           {icon && (
