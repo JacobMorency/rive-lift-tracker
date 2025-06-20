@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text } from "react-native";
+import Button from "../button";
 import supabase from "../../lib/supabaseClient";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -22,7 +23,7 @@ const ProfileCard = () => {
 
   return (
     <View>
-      <View className="bg-base-300 rounded-lg p-4 shadow-md space-y-3">
+      <View className="bg-base-300 rounded-lg p-4 shadow-lg space-y-3">
         <Text className="text-xl font-bold text-primary-content text-left">
           {userData?.first_name} {userData?.last_name}
         </Text>
@@ -36,12 +37,14 @@ const ProfileCard = () => {
           </View>
         ) : (
           <View className="items-end">
-            <Pressable
+            <Button
+              variant="primary"
+              className="mt-4"
               onPress={handleLogout}
-              className="bg-primary px-4 py-2 rounded mt-4"
+              disabled={isLoggingOut}
             >
-              <Text className="text-primary-content font-bold">Logout</Text>
-            </Pressable>
+              {isLoggingOut ? "Logging out..." : "Logout"}
+            </Button>
           </View>
         )}
       </View>
