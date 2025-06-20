@@ -15,7 +15,7 @@ const ExerciseDetails = ({ exerciseName, sets }: ExerciseDetailsProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
-    <View className="border-t border-base-300 py-2">
+    <View className="border-t border-base-300">
       <View className="flex-row items-center justify-between">
         <Text className="font-medium text-base-content">
           {exerciseName} – {sets.length} {sets.length === 1 ? "Set" : "Sets"}
@@ -30,9 +30,9 @@ const ExerciseDetails = ({ exerciseName, sets }: ExerciseDetailsProps) => {
       </View>
 
       {isOpen && (
-        <View className="px-4 py-2 space-y-1">
+        <View className="px-4">
           {sets.map((set) => (
-            <Text key={set.id} className="text-sm text-primary-content">
+            <Text key={set.id} className="text-md text-primary-content my-1">
               Set {set.set_number}: {set.reps} {set.reps === 1 ? "rep" : "reps"}{" "}
               at {set.weight}lbs
               {set.partialReps != null && set.partialReps > 0 && (

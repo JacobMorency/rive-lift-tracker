@@ -109,7 +109,7 @@ const WorkoutHistoryCard = ({ workout }: WorkoutHistoryCardProps) => {
       {!loading && (
         <View className="bg-base-300 rounded-md shadow-md w-full p-4">
           <View className="flex-row items-center justify-between">
-            <Text className="text-lg font-semibold text-base-content">
+            <Text className="text-lg font-bold text-base-content">
               {workout.date} - {workoutData.length}{" "}
               {workoutData.length > 1 ? "Exercises" : "Exercise"}
             </Text>
@@ -122,7 +122,7 @@ const WorkoutHistoryCard = ({ workout }: WorkoutHistoryCardProps) => {
             </Pressable>
           </View>
           {isOpen && (
-            <View className="mt-2 gap-2">
+            <View>
               {workoutData?.length > 0 &&
                 workoutData.map((exercise) => (
                   <ExerciseDetails
