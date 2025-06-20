@@ -1,6 +1,6 @@
 import { NullableNumber } from "../../types/workout";
 import { View } from "react-native";
-import Button from "../button";
+import Button from "../ui/button";
 
 export type AddSetButtonProps = {
   isSetUpdating: boolean;

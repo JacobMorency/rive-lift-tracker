@@ -9,7 +9,7 @@ import {
   Pressable,
 } from "react-native";
 import { SetInputs } from "../../types/workout";
-import Button from "../button";
+import Button from "../ui/button";
 
 type SetListProps = {
   sets: SetInputs[];

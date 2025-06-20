@@ -1,5 +1,7 @@
 import { Exercise } from "@/types/workout";
-import { Star, StarOff } from "lucide-react";
+import { Star, StarOff } from "lucide-react-native";
+import { TouchableOpacity, Text, View } from "react-native";
+import Button from "../ui/button";
 
 type ExerciseSelectorButtonProps = {
   exercise: Exercise;
@@ -16,42 +18,33 @@ const ExerciseSelectorButton = ({
   isFavorite,
   onToggleFavorite,
 }: ExerciseSelectorButtonProps) => {
+  const handlePress = () => {
+    handleSelect(exercise);
+    addToRecent(exercise);
+    // Modal closing should be handled by parent
+  };
+
   return (
-    <button
-      className="btn btn-primary my-1 w-full relative"
-      type="button"
-      onClick={() => {
-        handleSelect(exercise);
-        (
-          document.getElementById("exercise_modal") as HTMLDialogElement
-        )?.close();
-        addToRecent(exercise);
-      }}
+    <TouchableOpacity
+      className="bg-primary py-4 my-1 px-4 rounded-md w-full flex-row justify-between items-center"
+      onPress={handlePress}
     >
-      {exercise.name}
-      <div className="absolute right-2">
+      <Text className="text-primary-content font-bold text-xl">
+        {exercise.name}
+      </Text>
+      <TouchableOpacity
+        onPress={(e) => {
+          e.stopPropagation?.(); // Prevent bubbling to outer TouchableOpacity
+          onToggleFavorite(exercise);
+        }}
+      >
         {isFavorite ? (
-          <Star
-            size={20}
-            fill="currentColor"
-            className="text-yellow-500"
-            onClick={(e) => {
-              e.stopPropagation(); // Prevents modal from closing
-              onToggleFavorite(exercise);
-            }}
-          />
+          <Star size={20} color="#facc15" fill="#facc15" />
         ) : (
-          <StarOff
-            size={20}
-            className="text-gray-400"
-            onClick={(e) => {
-              e.stopPropagation(); // Prevents modal from closing
-              onToggleFavorite(exercise);
-            }}
-          />
+          <StarOff size={20} color="#9ca3af" />
         )}
-      </div>
-    </button>
+      </TouchableOpacity>
+    </TouchableOpacity>
   );
 };
 

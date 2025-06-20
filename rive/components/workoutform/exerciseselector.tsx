@@ -14,6 +14,9 @@ import {
   ScrollView,
   Switch,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Divider from "../ui/divider";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type ExerciseSelectorProps = {
   exerciseName: string;
@@ -53,6 +56,7 @@ const ExerciseSelector = ({
   const [modalVisible, setModalVisible] = useState(false);
 
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const fetchExercises = async (
     searchTerm: string,
@@ -104,6 +108,52 @@ const ExerciseSelector = ({
     setExerciseName(exercise.name);
     setExerciseId(exercise.id);
     setModalVisible(false);
+  };
+
+  // Toggle favorite exercise
+  const toggleFavorite = async (exercise: Exercise): Promise<void> => {
+    if (!user) return;
+
+    try {
+      const isAlreadyFavorite = favoriteExerciseIds.has(exercise.id);
+
+      if (isAlreadyFavorite) {
+        const { error } = await supabase
+          .from("favorite_exercises")
+          .delete()
+          .match({ user_id: user.id, exercise_id: exercise.id });
+
+        if (!error) {
+          const updated = new Set(favoriteExerciseIds);
+          updated.delete(exercise.id);
+          setFavoriteExerciseIds(updated);
+          setFavoriteExercises((prev) =>
+            prev.filter((ex) => ex.id !== exercise.id)
+          );
+        }
+      } else {
+        const { error } = await supabase
+          .from("favorite_exercises")
+          .insert({ user_id: user.id, exercise_id: exercise.id });
+
+        if (!error) {
+          const updated = new Set(favoriteExerciseIds);
+          updated.add(exercise.id);
+          setFavoriteExerciseIds(updated);
+
+          // Ensure the full exercise details are added
+          const fullExercise =
+            exerciseOptions.find((ex) => ex.id === exercise.id) ||
+            favoriteExercises.find((ex) => ex.id === exercise.id);
+
+          if (fullExercise) {
+            setFavoriteExercises((prev) => [...prev, fullExercise]);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
+    }
   };
 
   useEffect(() => {
@@ -169,43 +219,70 @@ const ExerciseSelector = ({
       </TouchableOpacity>
 
       <Modal animationType="slide" visible={modalVisible}>
-        <View className="flex-1 p-4 bg-base-100">
-          <TouchableOpacity
-            onPress={() => setModalVisible(false)}
-            className="absolute top-4 left-4"
-          >
-            <ArrowLeft size={24} />
-          </TouchableOpacity>
-          <Text className="text-center text-lg font-bold mb-4">
-            Select an Exercise
-          </Text>
-          <TextInput
-            placeholder="Search exercises"
-            value={searchValue}
-            onChangeText={setSearchValue}
-            className="border border-primary-content text-primary-content rounded-md p-3 w-full"
-          />
-          <View className="flex-row items-center justify-between mb-4">
-            <Text className="text-base-content">Show Favorites Only</Text>
-            <Switch
-              value={showFavoritesOnly}
-              onValueChange={setShowFavoritesOnly}
+        <SafeAreaView className="flex-1 bg-base-100">
+          <View className="flex items-center p-4">
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              className="absolute left-4"
+            >
+              <ArrowLeft size={24} stroke={"white"} />
+            </TouchableOpacity>
+            <Text className="text-center text-base-content text-lg font-bold mb-4">
+              Select an Exercise
+            </Text>
+            <TextInput
+              placeholder="Search exercises"
+              value={searchValue}
+              onChangeText={setSearchValue}
+              className="border border-gray text-primary-content rounded-md p-3 w-full"
             />
+            <Divider>Filters</Divider>
+
+            <View className="flex-row items-center justify-between gap-2">
+              <Switch
+                value={showFavoritesOnly}
+                onValueChange={setShowFavoritesOnly}
+                trackColor={{ false: "#767577", true: "#ff4b8c" }}
+              />
+              <Text
+                className={
+                  showFavoritesOnly ? "text-base-content" : "text-gray"
+                }
+              >
+                Show Favorites Only
+              </Text>
+            </View>
+
+            <Divider />
+
+            <ScrollView
+              className="w-full"
+              contentContainerStyle={{
+                paddingBottom: insets.bottom + 150,
+              }}
+            >
+              <View>
+                <Text className="text-base-content font-bold text-2xl">
+                  {showFavoritesOnly ? "Favorites" : "Exercises"}
+                </Text>
+              </View>
+              {(showFavoritesOnly ? favoriteExercises : filteredExercises).map(
+                (exercise) => (
+                  <ExerciseSelectorButton
+                    key={exercise.id}
+                    exercise={exercise}
+                    handleSelect={handleSelect}
+                    addToRecent={(ex) => {
+                      // Add to recent logic here if needed
+                    }}
+                    isFavorite={favoriteExerciseIds.has(exercise.id)}
+                    onToggleFavorite={() => toggleFavorite(exercise)}
+                  />
+                )
+              )}
+            </ScrollView>
           </View>
-          <ScrollView className="flex-1">
-            {(showFavoritesOnly ? favoriteExercises : filteredExercises).map(
-              (exercise) => (
-                <TouchableOpacity
-                  key={exercise.id}
-                  onPress={() => handleSelect(exercise)}
-                  className="p-3 border-b border-gray-200"
-                >
-                  <Text className="text-base-content">{exercise.name}</Text>
-                </TouchableOpacity>
-              )
-            )}
-          </ScrollView>
-        </View>
+        </SafeAreaView>
       </Modal>
     </View>
   );

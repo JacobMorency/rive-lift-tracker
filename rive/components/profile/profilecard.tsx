@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { View, Text } from "react-native";
-import Button from "../button";
+import Button from "../ui/button";
 import supabase from "../../lib/supabaseClient";
 import { useAuth } from "../../hooks/useAuth";
 

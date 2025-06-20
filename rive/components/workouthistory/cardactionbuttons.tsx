@@ -5,7 +5,7 @@ import { View, Text, Modal, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import supabase from "../../lib/supabaseClient";
 import { NullableNumber } from "@/types/workout";
-import Button from "../button";
+import Button from "../ui/button";
 
 type CardActionButtonsProps = {
   workoutId: NullableNumber;

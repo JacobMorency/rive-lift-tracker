@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import supabase from "../../lib/supabaseClient";
 import { useAuth } from "../../hooks/useAuth";
 import { NullableNumber } from "../../types/workout";
-import Button from "../../components/button";
+import Button from "../../components/ui/button";
 import WorkoutHistory from "../../components/workouthistory";
 
 export default function WorkoutsScreen() {
