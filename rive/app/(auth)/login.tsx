@@ -87,9 +87,9 @@ export default function Login() {
         </View>
 
         <View className="mb-4">
-          <Text className="text-primary-content mb-1">Email</Text>
+          <Text className="text-gray mb-1">Email</Text>
           <TextInput
-            className="border border-primary-content text-primary-content rounded-md p-3 w-full"
+            className="border border-gray text-primary-content rounded-md p-3 w-full"
             placeholder="Email"
             onChangeText={setEmail}
             value={email}
@@ -98,9 +98,9 @@ export default function Login() {
         </View>
 
         <View>
-          <Text className="text-primary-content mb-1">Password</Text>
+          <Text className="text-gray mb-1">Password</Text>
           <TextInput
-            className="border border-primary-content text-primary-content rounded-md p-3 w-full mb-4"
+            className="border border-gray text-primary-content rounded-md p-3 w-full mb-4"
             placeholder="Password"
             secureTextEntry
             onChangeText={(text) => {
@@ -121,9 +121,9 @@ export default function Login() {
         </Pressable>
 
         <View className="flex-row items-center justify-center mb-4">
-          <View className="flex-1 border-t border-gray-700" />
+          <View className="flex-1 border-t border-gray" />
           <Text className="text-center text-primary-content px-3">OR</Text>
-          <View className="flex-1 border-t border-gray-700" />
+          <View className="flex-1 border-t border-gray" />
         </View>
 
         <Pressable className="border border-white rounded-md py-3 mb-4 flex-row items-center justify-center gap-2">
