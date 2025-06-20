@@ -122,7 +122,7 @@ const WorkoutHistoryCard = ({ workout }: WorkoutHistoryCardProps) => {
             </Pressable>
           </View>
           {isOpen && (
-            <View className="mt-2 space-y-2">
+            <View className="mt-2 gap-2">
               {workoutData?.length > 0 &&
                 workoutData.map((exercise) => (
                   <ExerciseDetails

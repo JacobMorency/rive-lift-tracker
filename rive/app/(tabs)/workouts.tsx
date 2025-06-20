@@ -59,20 +59,30 @@ export default function WorkoutsScreen() {
         </Text>
       </View>
 
-      <View>
-        {!workoutInProgress ? (
-          <Button onPress={handleStartNewWorkout} className="w-full mb-4">
-            Start New Workout
-          </Button>
-        ) : (
-          <Button onPress={handleContinueWorkout} className="w-full mb-4">
-            Continue Previous Workout
-          </Button>
-        )}
-      </View>
-
-      <View>
-        <WorkoutHistory />
+      <View className="px-2">
+        <View>
+          {!workoutInProgress ? (
+            <Button
+              onPress={handleStartNewWorkout}
+              className="w-full"
+              variant="primary"
+            >
+              Start New Workout
+            </Button>
+          ) : (
+            <Button
+              onPress={handleContinueWorkout}
+              className="w-full"
+              variant="primary"
+              disabled={isNavigating}
+            >
+              Continue Previous Workout
+            </Button>
+          )}
+        </View>
+        <View>
+          <WorkoutHistory />
+        </View>
       </View>
     </SafeAreaView>
   );
