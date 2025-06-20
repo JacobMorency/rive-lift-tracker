@@ -12,6 +12,7 @@ import supabase from "../../lib/supabaseClient";
 import { User, Session } from "@supabase/supabase-js";
 import { useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
+import Divider from "../../components/ui/divider";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -113,18 +114,11 @@ export default function Login() {
           <Text className="text-right mb-4 text-primary">Forgot Password?</Text>
         </View>
 
-        <Pressable
-          className="bg-primary rounded-md py-3 mb-4"
-          onPress={handleLogin}
-        >
+        <Pressable className="bg-primary rounded-md py-3" onPress={handleLogin}>
           <Text className="text-center text-white font-medium">Login</Text>
         </Pressable>
 
-        <View className="flex-row items-center justify-center mb-4">
-          <View className="flex-1 border-t border-gray" />
-          <Text className="text-center text-primary-content px-3">OR</Text>
-          <View className="flex-1 border-t border-gray" />
-        </View>
+        <Divider>OR</Divider>
 
         <Pressable className="border border-white rounded-md py-3 mb-4 flex-row items-center justify-center gap-2">
           <AntDesign name="google" size={24} color="white" />
