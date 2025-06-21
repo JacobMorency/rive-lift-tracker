@@ -21,7 +21,7 @@ A progressive web app that allows users to track their workouts and their reps, 
 ## 📸 Demo Screenshots
 
 ### Exercise Selector
-<img src="screenshots/exerciseselector1.png" width="600">
+<img src="screenshots/exerciseselector1.png" width="300">
 
 ### Exercise Selector With Filter
 <img src="screenshots/exerciseselector2.png" width="600">
