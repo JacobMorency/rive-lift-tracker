@@ -18,9 +18,11 @@ A progressive web app that allows users to track their workouts and their reps, 
 [DaisyUI](https://daisyui.com)
 [TypeScript](https://www.typescriptlang.org/)
 
-## 📸 Demo Screenshots
 
-### Login Screen
+
+<details>
+  <summary>## 📸 Demo Screenshots</summary>
+  ### Login Screen
 <img src="screenshots/login.png" width="300">
 
 ### Exercise Selector
@@ -37,6 +39,7 @@ A progressive web app that allows users to track their workouts and their reps, 
 
 ### Add Workout Screen
 <img src="screenshots/addworkout.png" width="300">
+</details>
 
 ## 🧠 What I learned
 - Using Supabase and Row-Level Security (RLS)
