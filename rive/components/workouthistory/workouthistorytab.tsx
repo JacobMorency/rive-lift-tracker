@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import WorkoutHistoryCard from "../../components/workouthistory/workouthistorycard";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Workout } from "@/types/workout";
 
@@ -14,6 +15,8 @@ const WorkoutHistoryTab = ({ workouts }: WorkoutHistoryTabProps) => {
   const [selectedWorkouts, setSelectedWorkouts] = useState<Workout[]>([]);
   const [selectedTab, setSelectedTab] = useState<string>("week");
   const [loading, setLoading] = useState<boolean>(true);
+
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (workouts.length === 0) {
@@ -78,39 +81,56 @@ const WorkoutHistoryTab = ({ workouts }: WorkoutHistoryTabProps) => {
   }, [workouts, selectedTab]);
 
   return (
-    <View className="mt-3">
+    <View className="my-4">
       <View className="flex justify-center items-center">
-        <View className="flex-row bg-base-300 shadow-md rounded-lg overflow-hidden">
+        <View className="flex-row bg-base-300 shadow-md rounded-lg overflow-hidden p-1">
           <TouchableOpacity
-            className={`px-4 py-2 ${selectedTab === "week" ? "bg-primary" : ""}`}
+            className={`px-4 py-3 rounded ${selectedTab === "week" ? "bg-primary text-white" : ""}`}
             onPress={() => setSelectedTab("week")}
           >
-            <Text className="text-white">This Week</Text>
+            <Text
+              className={selectedTab === "week" ? "text-white" : "text-gray"}
+            >
+              This Week
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className={`px-4 py-2 ${selectedTab === "month" ? "bg-primary" : ""}`}
+            className={`px-4 py-3 rounded ${selectedTab === "month" ? "bg-primary" : ""}`}
             onPress={() => setSelectedTab("month")}
           >
-            <Text className="text-white">This Month</Text>
+            <Text
+              className={selectedTab === "month" ? "text-white" : "text-gray"}
+            >
+              This Month
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className={`px-4 py-2 ${selectedTab === "all" ? "bg-primary" : ""}`}
+            className={`px-4 py-3 rounded ${selectedTab === "all" ? "bg-primary" : ""}`}
             onPress={() => setSelectedTab("all")}
           >
-            <Text className="text-white">All Time</Text>
+            <Text
+              className={selectedTab === "all" ? "text-white" : "text-gray"}
+            >
+              All Time
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
 
       {!loading && (
-        <ScrollView className="mt-4 pb-24">
+        <ScrollView
+          className="mt-4"
+          contentContainerStyle={{
+            paddingBottom: insets.bottom + 200,
+          }}
+        >
           {selectedWorkouts.length > 0 ? (
             selectedWorkouts.map((workout) => (
               <WorkoutHistoryCard key={workout.id} workout={workout} />
             ))
           ) : (
             <View className="mt-4">
-              <Text className="text-center text-gray-500">
+              <Text className="text-center text-base-content text-lg">
                 {selectedTab === "week" && "No workouts this week."}
                 {selectedTab === "month" && "No workouts this month."}
                 {selectedTab === "all" && "No workouts yet."}

@@ -1,5 +1,5 @@
-import { View, Text } from "react-native";
-import Button from "../button";
+import { View } from "react-native";
+import Button from "../ui/button";
 import type { SetInputs } from "@/types/workout";
 
 type AddExerciseButtonProps = {

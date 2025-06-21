@@ -11,7 +11,7 @@ export default function ProfileScreen() {
         </Text>
       </View>
 
-      <View>
+      <View className="px-2">
         <ProfileCard />
       </View>
     </SafeAreaView>

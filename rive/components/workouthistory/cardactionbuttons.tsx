@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { View, Text, Modal, Pressable } from "react-native";
+import { View, Text, Modal } from "react-native";
 import { useRouter } from "expo-router";
 import supabase from "../../lib/supabaseClient";
 import { NullableNumber } from "@/types/workout";
-import Button from "../button";
+import Button from "../ui/button";
+import Toast from "react-native-toast-message";
 
 type CardActionButtonsProps = {
   workoutId: NullableNumber;
@@ -24,7 +25,13 @@ const CardActionButtons = ({ workoutId, onDelete }: CardActionButtonsProps) => {
       .select("id")
       .eq("workout_id", workoutId);
 
-    if (fetchError) return;
+    if (fetchError) {
+      Toast.show({
+        type: "error",
+        text1: "Error loading workout data.",
+      });
+      return;
+    }
 
     const workoutExerciseIds = workoutExercises.map((exercise) => exercise.id);
 
@@ -34,7 +41,13 @@ const CardActionButtons = ({ workoutId, onDelete }: CardActionButtonsProps) => {
         .delete()
         .in("workout_exercise_id", workoutExerciseIds);
 
-      if (setsError) return;
+      if (setsError) {
+        Toast.show({
+          type: "error",
+          text1: "Error deleting sets.",
+        });
+        return;
+      }
     }
 
     const { error: exercisesError } = await supabase
@@ -42,16 +55,32 @@ const CardActionButtons = ({ workoutId, onDelete }: CardActionButtonsProps) => {
       .delete()
       .eq("workout_id", workoutId);
 
-    if (exercisesError) return;
+    if (exercisesError) {
+      Toast.show({
+        type: "error",
+        text1: "Error deleting exercises.",
+      });
+      return;
+    }
 
     const { error: workoutsError } = await supabase
       .from("workouts")
       .delete()
       .eq("id", workoutId);
 
-    if (workoutsError) return;
+    if (workoutsError) {
+      Toast.show({
+        type: "error",
+        text1: "Error deleting workout.",
+      });
+      return;
+    }
 
     setModalVisible(false);
+    Toast.show({
+      type: "success",
+      text1: "Workout deleted successfully.",
+    });
     onDelete();
   };
 

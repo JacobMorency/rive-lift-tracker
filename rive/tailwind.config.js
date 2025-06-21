@@ -25,6 +25,8 @@ module.exports = {
         "accent-content": "#ffffff",
         neutral: "#3b3b3b",
         "neutral-content": "#fefbee",
+        gray: "#57534e",
+        "gray-content": "#fefbee",
         info: "#38bdf8",
         "info-content": "#002d40",
         success: "#22c55e",

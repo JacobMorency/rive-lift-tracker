@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Modal } from "react-native";
 import { ExercisesInWorkout } from "@/types/workout";
 import { useRouter } from "expo-router";
-import Button from "../button";
+import Button from "../ui/button";
 
 type WorkoutActionButtonsProps = {
   handleSaveWorkout: () => void;

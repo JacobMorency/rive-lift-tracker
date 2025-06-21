@@ -2,7 +2,7 @@ import { SquarePen, Trash2 } from "lucide-react-native";
 import { useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, Modal } from "react-native";
 import { ExercisesInWorkout } from "@/types/workout";
-import Button from "../button";
+import Button from "../ui/button";
 
 type CompletedExerciseListProps = {
   exercisesInWorkout: ExercisesInWorkout[];
@@ -66,7 +66,9 @@ const CompletedExerciseList = ({
         <FlatList
           data={exercisesInWorkout}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item, index) =>
+            item.id ? item.id.toString() : `exercise-${index}`
+          }
         />
       ) : (
         <Text className="text-base-content">No exercises completed yet.</Text>

@@ -1,12 +1,13 @@
-import { Text, View, Pressable } from "react-native";
+import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "expo-router";
 import supabase from "../../lib/supabaseClient";
 import { useAuth } from "../../hooks/useAuth";
 import { NullableNumber } from "../../types/workout";
-import Button from "../../components/button";
+import Button from "../../components/ui/button";
 import WorkoutHistory from "../../components/workouthistory";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function WorkoutsScreen() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function WorkoutsScreen() {
     const newWorkoutId = await createNewWorkout();
     if (newWorkoutId) {
       setWorkoutId(newWorkoutId);
-      // localStorage.setItem("workoutId", newWorkoutId.toString());
+      await AsyncStorage.setItem("workoutId", newWorkoutId.toString());
       router.push(`/addworkout/${newWorkoutId}`);
     } else {
       setIsNavigating(false);
@@ -51,6 +52,17 @@ export default function WorkoutsScreen() {
     }
   };
 
+  useEffect(() => {
+    const fetchWorkoutId = async () => {
+      const savedWorkoutId = await AsyncStorage.getItem("workoutId");
+      if (savedWorkoutId) {
+        setWorkoutId(parseInt(savedWorkoutId));
+        setWorkoutInProgress(true);
+      }
+    };
+    fetchWorkoutId();
+  }, []);
+
   return (
     <SafeAreaView className="bg-base-100 flex-1 px-4">
       <View>
@@ -59,20 +71,30 @@ export default function WorkoutsScreen() {
         </Text>
       </View>
 
-      <View>
-        {!workoutInProgress ? (
-          <Button onPress={handleStartNewWorkout} className="w-full mb-4">
-            Start New Workout
-          </Button>
-        ) : (
-          <Button onPress={handleContinueWorkout} className="w-full mb-4">
-            Continue Previous Workout
-          </Button>
-        )}
-      </View>
-
-      <View>
-        <WorkoutHistory />
+      <View className="px-2">
+        <View>
+          {!workoutInProgress ? (
+            <Button
+              onPress={handleStartNewWorkout}
+              className="w-full"
+              variant="primary"
+            >
+              Start New Workout
+            </Button>
+          ) : (
+            <Button
+              onPress={handleContinueWorkout}
+              className="w-full"
+              variant="primary"
+              disabled={isNavigating}
+            >
+              Continue Previous Workout
+            </Button>
+          )}
+        </View>
+        <View>
+          <WorkoutHistory />
+        </View>
       </View>
     </SafeAreaView>
   );

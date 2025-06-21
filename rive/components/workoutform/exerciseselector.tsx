@@ -5,6 +5,7 @@ import { ExercisesInWorkout, Exercise } from "@/types/workout";
 import { debounce } from "lodash";
 import { useAuth } from "../../hooks/useAuth";
 import ExerciseSelectorButton from "./exerciseselectorbutton";
+import Button from "../ui/button";
 import {
   View,
   Text,
@@ -14,6 +15,12 @@ import {
   ScrollView,
   Switch,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Divider from "../ui/divider";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
+
+const RECENT_KEY = "recentExercises";
 
 type ExerciseSelectorProps = {
   exerciseName: string;
@@ -36,7 +43,6 @@ const ExerciseSelector = ({
   setExerciseId,
   isSetUpdating,
   isSetsEmpty,
-  exercisesInWorkout,
 }: ExerciseSelectorProps) => {
   const [exerciseOptions, setExerciseOptionsState] = useState<ExerciseOption>(
     []
@@ -50,9 +56,18 @@ const ExerciseSelector = ({
   const [favoriteExerciseIds, setFavoriteExerciseIds] = useState<Set<number>>(
     new Set()
   );
+  const [recentExercises, setRecentExercises] = useState<ExerciseOption>([]);
   const [modalVisible, setModalVisible] = useState(false);
 
   const { user } = useAuth();
+  const insets = useSafeAreaInsets();
+
+  const filterOptions = [
+    { label: "Arms", value: "Arms" },
+    { label: "Chest", value: "Chest" },
+    { label: "Back", value: "Back" },
+    { label: "Legs", value: "Legs" },
+  ];
 
   const fetchExercises = async (
     searchTerm: string,
@@ -94,16 +109,109 @@ const ExerciseSelector = ({
     return () => {
       debouncedFetch.cancel();
     };
-  }, [searchValue, selectedFilter]);
+  }, [searchValue, selectedFilter, debouncedFetch]);
 
   const filteredExercises = exerciseOptions.filter((ex) =>
     ex.name.toLowerCase().includes(searchValue.toLowerCase())
   );
 
+  const filteredFavorites = favoriteExercises.filter((ex) => {
+    const matchesSearch = ex.name
+      .toLowerCase()
+      .includes(searchValue.toLowerCase());
+
+    const matchesFilter =
+      selectedFilter === ""
+        ? true
+        : selectedFilter === "Arms"
+          ? ["Biceps", "Triceps", "Shoulders"].includes(ex.category)
+          : ex.category === selectedFilter;
+
+    return matchesSearch && matchesFilter;
+  });
+
   const handleSelect = (exercise: Exercise): void => {
     setExerciseName(exercise.name);
     setExerciseId(exercise.id);
     setModalVisible(false);
+    addToRecentExercises(exercise);
+  };
+
+  const getRecentExercises = async (): Promise<Exercise[]> => {
+    try {
+      const value = await AsyncStorage.getItem(RECENT_KEY);
+      return value ? JSON.parse(value) : [];
+    } catch (error) {
+      console.error("Failed to load recent exercises:", error);
+      return [];
+    }
+  };
+
+  const addToRecentExercises = async (exercise: Exercise): Promise<void> => {
+    try {
+      const recent = await getRecentExercises();
+
+      const updated = [exercise, ...recent.filter((e) => e.id !== exercise.id)];
+
+      if (updated.length > 5) updated.pop();
+
+      await AsyncStorage.setItem(RECENT_KEY, JSON.stringify(updated));
+    } catch (error) {
+      console.error("Failed to update recent exercises:", error);
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      const recent = await getRecentExercises();
+      setRecentExercises(recent as ExerciseOption);
+    })();
+  }, []);
+
+  // Toggle favorite exercise
+  const toggleFavorite = async (exercise: Exercise): Promise<void> => {
+    if (!user) return;
+
+    try {
+      const isAlreadyFavorite = favoriteExerciseIds.has(exercise.id);
+
+      if (isAlreadyFavorite) {
+        const { error } = await supabase
+          .from("favorite_exercises")
+          .delete()
+          .match({ user_id: user.id, exercise_id: exercise.id });
+
+        if (!error) {
+          const updated = new Set(favoriteExerciseIds);
+          updated.delete(exercise.id);
+          setFavoriteExerciseIds(updated);
+          setFavoriteExercises((prev) =>
+            prev.filter((ex) => ex.id !== exercise.id)
+          );
+        }
+      } else {
+        const { error } = await supabase
+          .from("favorite_exercises")
+          .insert({ user_id: user.id, exercise_id: exercise.id });
+
+        if (!error) {
+          const updated = new Set(favoriteExerciseIds);
+          updated.add(exercise.id);
+          setFavoriteExerciseIds(updated);
+
+          // Ensure the full exercise details are added
+          const fullExercise =
+            exerciseOptions.find((ex) => ex.id === exercise.id) ||
+            favoriteExercises.find((ex) => ex.id === exercise.id);
+
+          if (fullExercise) {
+            setFavoriteExercises((prev) => [...prev, fullExercise]);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
+    }
   };
 
   useEffect(() => {
@@ -156,52 +264,134 @@ const ExerciseSelector = ({
         disabled={isSetUpdating}
         onPress={() => {
           if (!isSetsEmpty) {
+            Toast.show({
+              type: "error",
+              text1: "Cannot change exercise",
+              text2: "Please clear all sets before changing the exercise.",
+            });
             return;
           }
           setModalVisible(true);
         }}
-        className="bg-primary w-full h-12 rounded items-center justify-center flex-row"
+        className={`${isSetUpdating ? "bg-gray" : "bg-primary"} w-full h-12 rounded items-center justify-center flex-row`}
       >
-        <Text className="text-white">
+        <Text className="text-primary-content text-lg font-bold">
           {exerciseName || "Select an Exercise"}
         </Text>
         <Dumbbell size={16} stroke={"white"} style={{ marginLeft: 10 }} />
       </TouchableOpacity>
 
-      <Modal animationType="slide" visible={modalVisible}>
-        <View className="flex-1 p-4 bg-base-100">
-          <TouchableOpacity
-            onPress={() => setModalVisible(false)}
-            className="absolute top-4 left-4"
-          >
-            <ArrowLeft size={24} />
-          </TouchableOpacity>
-          <Text className="text-center text-lg font-bold mb-4">
-            Select an Exercise
-          </Text>
+      <Modal
+        animationType="slide"
+        visible={modalVisible}
+        presentationStyle="fullScreen"
+      >
+        <View
+          className="flex-1 bg-base-100 p-4"
+          style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+        >
+          <View className="flex-row items-center justify-between mb-4">
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              className="px-2"
+            >
+              <ArrowLeft size={24} stroke={"white"} />
+            </TouchableOpacity>
+            <Text className="flex-1 text-center text-base-content text-lg font-bold">
+              Select an Exercise
+            </Text>
+            <View style={{ width: 32 }} />
+          </View>
           <TextInput
             placeholder="Search exercises"
             value={searchValue}
             onChangeText={setSearchValue}
-            className="border border-primary-content text-primary-content rounded-md p-3 w-full"
+            className="border border-gray text-primary-content rounded-md p-3 w-full"
           />
-          <View className="flex-row items-center justify-between mb-4">
-            <Text className="text-base-content">Show Favorites Only</Text>
+          <Divider>Filters</Divider>
+
+          <View className="flex-row items-center justify-center gap-2 mb-2">
             <Switch
               value={showFavoritesOnly}
               onValueChange={setShowFavoritesOnly}
+              trackColor={{ false: "#767577", true: "#ff4b8c" }}
             />
+            <Text
+              className={showFavoritesOnly ? "text-base-content" : "text-gray"}
+            >
+              Show Favorites Only
+            </Text>
           </View>
-          <ScrollView className="flex-1">
-            {(showFavoritesOnly ? favoriteExercises : filteredExercises).map(
-              (exercise) => (
-                <TouchableOpacity
-                  key={exercise.id}
-                  onPress={() => handleSelect(exercise)}
-                  className="p-3 border-b border-gray-200"
+
+          <View className="flex-row justify-center my-3 flex-wrap gap-1">
+            {selectedFilter ? (
+              <>
+                <Button onPress={() => setSelectedFilter("")} variant="primary">
+                  x
+                </Button>
+                <View className="rounded-md px-4 py-2 bg-primary">
+                  <Text className="text-center text-lg font-bold text-primary-content">
+                    {filterOptions.find((f) => f.value === selectedFilter)
+                      ?.label || selectedFilter}
+                  </Text>
+                </View>
+              </>
+            ) : (
+              filterOptions.map((filter) => (
+                <Button
+                  key={filter.value}
+                  onPress={() => {
+                    setSelectedFilter(filter.value);
+                    setSearchValue("");
+                  }}
                 >
-                  <Text className="text-base-content">{exercise.name}</Text>
-                </TouchableOpacity>
+                  {filter.label}
+                </Button>
+              ))
+            )}
+          </View>
+
+          <Divider />
+
+          <ScrollView className="w-full">
+            {recentExercises.length > 0 && showFavoritesOnly === false && (
+              <View className="mb-4">
+                <View>
+                  <Text className="text-base-content font-bold text-2xl">
+                    Recent Exercises
+                  </Text>
+                </View>
+                {recentExercises.map((exercise) => (
+                  <ExerciseSelectorButton
+                    key={exercise.id}
+                    exercise={exercise}
+                    handleSelect={handleSelect}
+                    addToRecent={addToRecentExercises}
+                    isFavorite={favoriteExerciseIds.has(exercise.id)}
+                    onToggleFavorite={() => toggleFavorite(exercise)}
+                  />
+                ))}
+              </View>
+            )}
+
+            <View>
+              <Text className="text-base-content font-bold text-2xl">
+                {showFavoritesOnly
+                  ? "Favorites"
+                  : `${selectedFilter || ""} Exercises`}
+              </Text>
+            </View>
+
+            {(showFavoritesOnly ? filteredFavorites : filteredExercises).map(
+              (exercise) => (
+                <ExerciseSelectorButton
+                  key={exercise.id}
+                  exercise={exercise}
+                  handleSelect={handleSelect}
+                  addToRecent={addToRecentExercises}
+                  isFavorite={favoriteExerciseIds.has(exercise.id)}
+                  onToggleFavorite={() => toggleFavorite(exercise)}
+                />
               )
             )}
           </ScrollView>

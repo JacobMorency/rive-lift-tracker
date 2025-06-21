@@ -16,6 +16,7 @@ const WorkoutHistory = () => {
           .from("workouts")
           .select("*")
           .eq("user_id", user.id)
+          .eq("is_complete", true)
           .order("date", { ascending: false });
 
         if (error) {
