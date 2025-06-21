@@ -19,9 +19,10 @@ A progressive web app that allows users to track their workouts and their reps, 
 [TypeScript](https://www.typescriptlang.org/)
 
 
+## 📸 Demo Screenshots
 
 <details>
-  <summary>## 📸 Demo Screenshots</summary>
+  <summary>📸 Click to View Screenshots</summary>
   ### Login Screen
 <img src="screenshots/login.png" width="300">
 
