@@ -1,18 +1,11 @@
-import {
-  Text,
-  View,
-  Image,
-  TextInput,
-  SafeAreaView,
-  TextInputProps,
-  Pressable,
-} from "react-native";
+import { Text, View, TextInput, SafeAreaView, Pressable } from "react-native";
 import { useState } from "react";
 import supabase from "../../lib/supabaseClient";
 import { User, Session } from "@supabase/supabase-js";
 import { useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
 import Divider from "../../components/ui/divider";
+import Toast from "react-native-toast-message";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -67,7 +60,11 @@ export default function Login() {
       }
       handleLoginSuccess(data.user, data.session);
     } catch (error) {
-      setErrorMessage("Login failed. Invalid email or password.");
+      Toast.show({
+        type: "error",
+        text1: "Login failed",
+        text2: "Invalid email or password.",
+      });
       if (process.env.NODE_ENV === "development") {
         console.error("Login error:", error);
       }
@@ -96,12 +93,20 @@ export default function Login() {
             value={email}
             keyboardType="email-address"
           />
+          {emailEmpty && (
+            <Text className="text-error text-sm mt-1">
+              Email cannot be empty.
+            </Text>
+          )}
+          {errorMessage && (
+            <Text className="text-error text-sm mt-1">{errorMessage}</Text>
+          )}
         </View>
 
         <View>
           <Text className="text-gray mb-1">Password</Text>
           <TextInput
-            className="border border-gray text-primary-content rounded-md p-3 w-full mb-4"
+            className="border border-gray text-primary-content rounded-md p-3 w-full"
             placeholder="Password"
             secureTextEntry
             onChangeText={(text) => {
@@ -111,7 +116,17 @@ export default function Login() {
             value={password}
             onBlur={() => setIsPasswordActive(false)}
           />
-          <Text className="text-right mb-4 text-primary">Forgot Password?</Text>
+          {passwordEmpty && (
+            <Text className="text-error text-sm mt-1">
+              Password cannot be empty.
+            </Text>
+          )}
+          {errorMessage && (
+            <Text className="text-error text-sm mt-1">{errorMessage}</Text>
+          )}
+          <Text className="text-right mb-4 mt-4 text-primary">
+            Forgot Password?
+          </Text>
         </View>
 
         <Pressable className="bg-primary rounded-md py-3" onPress={handleLogin}>

@@ -14,6 +14,7 @@ import {
 import { View, Keyboard } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
 
 type AddWorkoutFormProps = {
   workoutId: string;
@@ -116,7 +117,11 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
           "Error adding exercise to workout:",
           exerciseError.message
         );
-        // toast.error("Error saving exercise to workout. Please try again.");
+        Toast.show({
+          type: "error",
+          text1: "Error saving exercise to workout",
+          text2: "Please try again.",
+        });
         return;
       }
 
@@ -133,7 +138,11 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
       const { error: setsError } = await supabase.from("sets").insert(setsData);
       if (setsError) {
         console.error("Error adding sets to workout:", setsError.message);
-        // toast.error("Error saving sets to workout. Please try again.");
+        Toast.show({
+          type: "error",
+          text1: "Error saving sets to workout",
+          text2: "Please try again.",
+        });
         return;
       }
     }
@@ -145,10 +154,17 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
       .select();
     if (error) {
       console.error("Error saving workout:", error.message);
-      //   toast.error("Error saving workout. Please try again.");
+      Toast.show({
+        type: "error",
+        text1: "Error saving workout",
+        text2: "Please try again.",
+      });
       return;
     }
-    // toast.success("Workout saved successfully!");
+    Toast.show({
+      type: "success",
+      text1: "Workout saved successfully!",
+    });
     handleCompleteWorkout();
   };
 

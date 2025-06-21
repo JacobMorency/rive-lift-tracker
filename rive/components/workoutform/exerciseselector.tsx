@@ -18,6 +18,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Divider from "../ui/divider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from "react-native-toast-message";
 
 const RECENT_KEY = "recentExercises";
 
@@ -263,6 +264,11 @@ const ExerciseSelector = ({
         disabled={isSetUpdating}
         onPress={() => {
           if (!isSetsEmpty) {
+            Toast.show({
+              type: "error",
+              text1: "Cannot change exercise",
+              text2: "Please clear all sets before changing the exercise.",
+            });
             return;
           }
           setModalVisible(true);
