@@ -47,7 +47,7 @@ const SetInputForm = (props: SetInputFormProps) => {
     <View>
       <View className="flex-row gap-3 w-full">
         <View className="flex-1">
-          <Text className="text-white mb-1">Reps</Text>
+          <Text className="text-base-content mb-1">Reps</Text>
           <TextInput
             keyboardType="number-pad"
             value={reps !== null ? reps.toString() : ""}
@@ -57,23 +57,23 @@ const SetInputForm = (props: SetInputFormProps) => {
             placeholder="0"
             className={`${
               repsEmpty || repsInvalid
-                ? "border border-red-500"
-                : "border border-gray-300"
-            } rounded px-2 py-1 text-white`}
-            placeholderTextColor="#9CA3AF"
+                ? "border border-error"
+                : "border border-gray"
+            } rounded px-2 py-1 text-base-content bg-base-100`}
+            placeholderTextColor="#57534e"
             returnKeyType="done"
           />
           {repsEmpty && (
-            <Text className="text-red-500 italic text-sm">Reps required</Text>
+            <Text className="text-error italic text-sm">Reps required</Text>
           )}
           {repsInvalid && (
-            <Text className="text-red-500 italic text-sm">
+            <Text className="text-error italic text-sm">
               Invalid amount of reps
             </Text>
           )}
         </View>
         <View className="flex-1">
-          <Text className="text-white mb-1">Weight</Text>
+          <Text className="text-base-content mb-1">Weight</Text>
           <TextInput
             keyboardType="decimal-pad"
             value={weightText}
@@ -90,23 +90,23 @@ const SetInputForm = (props: SetInputFormProps) => {
             placeholder="0 (lbs)"
             className={`${
               weightEmpty || weightInvalid
-                ? "border border-red-500"
-                : "border border-gray-300"
-            } rounded px-2 py-1 text-white`}
-            placeholderTextColor="#9CA3AF"
+                ? "border border-error"
+                : "border border-gray"
+            } rounded px-2 py-1 text-base-content bg-base-100`}
+            placeholderTextColor="#57534e"
             returnKeyType="done"
           />
           {weightEmpty && (
-            <Text className="text-red-500 italic text-sm">Weight required</Text>
+            <Text className="text-error italic text-sm">Weight required</Text>
           )}
           {weightInvalid && (
-            <Text className="text-red-500 italic text-sm">
+            <Text className="text-error italic text-sm">
               Invalid amount of weight
             </Text>
           )}
         </View>
         <View className="flex-1">
-          <Text className="text-white mb-1">Partials</Text>
+          <Text className="text-base-content mb-1">Partials</Text>
           <TextInput
             keyboardType="number-pad"
             value={partialReps !== null ? partialReps.toString() : ""}
@@ -115,15 +115,13 @@ const SetInputForm = (props: SetInputFormProps) => {
             }
             placeholder="0 (optional)"
             className={`${
-              partialRepsInvalid
-                ? "border border-red-500"
-                : "border border-gray-300"
-            } rounded px-2 py-1 text-white`}
-            placeholderTextColor="#9CA3AF"
+              partialRepsInvalid ? "border border-error" : "border border-gray"
+            } rounded px-2 py-1 text-base-content bg-base-100`}
+            placeholderTextColor="#57534e"
             returnKeyType="done"
           />
           {partialRepsInvalid && (
-            <Text className="text-red-500 italic text-sm">
+            <Text className="text-error italic text-sm">
               Invalid amount of partial reps
             </Text>
           )}

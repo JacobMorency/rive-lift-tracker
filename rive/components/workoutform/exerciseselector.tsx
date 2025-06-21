@@ -267,9 +267,9 @@ const ExerciseSelector = ({
           }
           setModalVisible(true);
         }}
-        className="bg-primary w-full h-12 rounded items-center justify-center flex-row"
+        className={`${isSetUpdating ? "bg-gray" : "bg-primary"} w-full h-12 rounded items-center justify-center flex-row`}
       >
-        <Text className="text-white">
+        <Text className="text-primary-content text-lg font-bold">
           {exerciseName || "Select an Exercise"}
         </Text>
         <Dumbbell size={16} stroke={"white"} style={{ marginLeft: 10 }} />
