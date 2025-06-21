@@ -20,6 +20,21 @@ A progressive web app that allows users to track their workouts and their reps, 
 
 ## 📸 Demo Screenshots
 
+### Exercise Selector
+<img src="screenshots/exerciseselector1.png" width="600">
+
+### Exercise Selector With Filter
+<img src="screenshots/exerciseselector2.png" width="600">
+
+### Exercise Selector With Favorites Only
+<img src="screenshots/exerciseselector3.png" width="600">
+
+### Workout History Screen
+<img src="screenshots/workouthistory.png" width="600">
+
+### Add Workout Screen
+<img src="screenshots/addworkout.png" width="600">
+
 ## 🧠 What I learned
 - Using Supabase and Row-Level Security (RLS)
 - How to build reusable components in React
@@ -30,4 +45,5 @@ A progressive web app that allows users to track their workouts and their reps, 
 - Personal records and analytics tracking
 - Bigger exercise selection list
 - Ability to specify unilateral movements
+- Sign In/ Sign Up with Google and Apple
 
