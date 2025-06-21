@@ -41,7 +41,7 @@ const DashboardContent = () => {
             title={"Total Workouts"}
             description={"Your total amount of workouts."}
             content={totalWorkouts.toString()}
-            icon={<Dumbbell stroke={"#fff"} />}
+            icon={<Dumbbell stroke={"white"} />}
           />
         </View>
       )}

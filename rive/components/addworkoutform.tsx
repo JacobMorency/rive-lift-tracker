@@ -13,6 +13,7 @@ import {
 } from "../types/workout";
 import { View, Keyboard } from "react-native";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type AddWorkoutFormProps = {
   workoutId: string;
@@ -51,9 +52,9 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
 
   const router = useRouter();
 
-  const handleCompleteWorkout = (): void => {
-    // localStorage.removeItem("workoutId");
-    // localStorage.removeItem("workoutProgress");
+  const handleCompleteWorkout = async (): Promise<void> => {
+    await AsyncStorage.removeItem("workoutId");
+    await AsyncStorage.removeItem("workoutProgress");
     router.push("/workouts");
   };
 
@@ -368,52 +369,55 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
   };
 
   // Get previous workout progress from local storage so its persisted upon refresh
-  //   useEffect(() => {
-  //     if (isEditing) return;
-  //     const savedProgress = localStorage.getItem("workoutProgress");
-  //     if (savedProgress) {
-  //       try {
-  //         const progress = JSON.parse(savedProgress);
-  //         if (progress.completedSets) {
-  //           setCompletedSets(progress.completedSets);
-  //           const derivedExercises = progress.completedSets.map(
-  //             (ex: CompletedSet) => ({
-  //               id: ex.exerciseId,
-  //               name: ex.exerciseName,
-  //             })
-  //           );
-  //           setExercisesInWorkout(derivedExercises);
-  //         }
-  //         if (progress.exerciseId) {
-  //           setExerciseId(progress.exerciseId);
-  //         }
-  //         if (progress.exerciseName) {
-  //           setExerciseName(progress.exerciseName);
-  //         }
-  //         if (progress.reps) {
-  //           setReps(progress.reps);
-  //         }
-  //         if (progress.weight) {
-  //           setWeight(progress.weight);
-  //         }
-  //         if (progress.partialReps) {
-  //           setPartialReps(progress.partialReps);
-  //         }
-  //         if (progress.sets) {
-  //           setSets(progress.sets);
-  //         }
-  //       } catch (error) {
-  //         console.error("Error parsing saved progress:", error);
-  //         return;
-  //       } finally {
-  //         setLoading(false);
-  //         setIsInitialized(true);
-  //       }
-  //     } else {
-  //       setLoading(false);
-  //       setIsInitialized(true);
-  //     }
-  //   }, [isInitialized, isEditing]);
+  useEffect(() => {
+    if (isEditing) return;
+    const loadProgress = async () => {
+      const savedProgress = await AsyncStorage.getItem("workoutProgress");
+      if (savedProgress) {
+        try {
+          const progress = JSON.parse(savedProgress);
+          if (progress.completedSets) {
+            setCompletedSets(progress.completedSets);
+            const derivedExercises = progress.completedSets.map(
+              (ex: CompletedSet) => ({
+                id: ex.exerciseId,
+                name: ex.exerciseName,
+              })
+            );
+            setExercisesInWorkout(derivedExercises);
+          }
+          if (progress.exerciseId) {
+            setExerciseId(progress.exerciseId);
+          }
+          if (progress.exerciseName) {
+            setExerciseName(progress.exerciseName);
+          }
+          if (progress.reps) {
+            setReps(progress.reps);
+          }
+          if (progress.weight) {
+            setWeight(progress.weight);
+          }
+          if (progress.partialReps) {
+            setPartialReps(progress.partialReps);
+          }
+          if (progress.sets) {
+            setSets(progress.sets);
+          }
+        } catch (error) {
+          console.error("Error parsing saved progress:", error);
+          return;
+        } finally {
+          setLoading(false);
+          setIsInitialized(true);
+        }
+      } else {
+        setLoading(false);
+        setIsInitialized(true);
+      }
+    };
+    loadProgress();
+  }, [isInitialized, isEditing]);
 
   // Save the current workout progress to local storage so that it can be retrieved upon refresh or page change
   useEffect(() => {
@@ -428,7 +432,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
         partialReps,
         sets,
       };
-      //   localStorage.setItem("workoutProgress", JSON.stringify(progress));
+      AsyncStorage.setItem("workoutProgress", JSON.stringify(progress));
     }
   }, [
     completedSets,

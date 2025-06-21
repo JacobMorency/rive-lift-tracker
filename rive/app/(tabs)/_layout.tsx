@@ -1,7 +1,5 @@
-import { Redirect } from "expo-router";
-import { View } from "react-native";
+import { Redirect, Tabs } from "expo-router";
 import { useAuth } from "../../hooks/useAuth";
-import { Tabs } from "expo-router";
 import { House, Dumbbell, User } from "lucide-react-native";
 export default function TabsLayout() {
   const { user, loading } = useAuth();

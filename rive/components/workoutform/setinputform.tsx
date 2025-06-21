@@ -1,6 +1,5 @@
 import { View, Text, TextInput } from "react-native";
-import AddSetButtons from "../workoutform/addsetbuttons";
-import { AddSetButtonProps } from "../workoutform/addsetbuttons";
+import AddSetButtons, { AddSetButtonProps } from "../workoutform/addsetbuttons";
 import { NullableNumber } from "../../types/workout";
 import { useState, useEffect } from "react";
 

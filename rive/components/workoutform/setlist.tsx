@@ -1,13 +1,6 @@
 import { SquarePen, Trash2 } from "lucide-react-native";
 import { useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  Modal,
-  Pressable,
-} from "react-native";
+import { View, Text, FlatList, TouchableOpacity, Modal } from "react-native";
 import { SetInputs } from "../../types/workout";
 import Button from "../ui/button";
 

@@ -66,7 +66,9 @@ const CompletedExerciseList = ({
         <FlatList
           data={exercisesInWorkout}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item, index) =>
+            item.id ? item.id.toString() : `exercise-${index}`
+          }
         />
       ) : (
         <Text className="text-base-content">No exercises completed yet.</Text>

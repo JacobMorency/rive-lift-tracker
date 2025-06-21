@@ -108,7 +108,7 @@ const ExerciseSelector = ({
     return () => {
       debouncedFetch.cancel();
     };
-  }, [searchValue, selectedFilter]);
+  }, [searchValue, selectedFilter, debouncedFetch]);
 
   const filteredExercises = exerciseOptions.filter((ex) =>
     ex.name.toLowerCase().includes(searchValue.toLowerCase())
@@ -163,7 +163,7 @@ const ExerciseSelector = ({
   useEffect(() => {
     (async () => {
       const recent = await getRecentExercises();
-      setRecentExercises(recent); // You'll need this state
+      setRecentExercises(recent as ExerciseOption);
     })();
   }, []);
 

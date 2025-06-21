@@ -130,7 +130,7 @@ const WorkoutHistoryTab = ({ workouts }: WorkoutHistoryTabProps) => {
             ))
           ) : (
             <View className="mt-4">
-              <Text className="text-center text-gray-500">
+              <Text className="text-center text-base-content text-lg">
                 {selectedTab === "week" && "No workouts this week."}
                 {selectedTab === "month" && "No workouts this month."}
                 {selectedTab === "all" && "No workouts yet."}

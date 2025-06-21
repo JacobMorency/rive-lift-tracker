@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { View, Text, Modal, Pressable } from "react-native";
+import { View, Text, Modal } from "react-native";
 import { useRouter } from "expo-router";
 import supabase from "../../lib/supabaseClient";
 import { NullableNumber } from "@/types/workout";

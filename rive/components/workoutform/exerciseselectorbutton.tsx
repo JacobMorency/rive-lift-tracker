@@ -1,7 +1,6 @@
 import { Exercise } from "@/types/workout";
 import { Star, StarOff } from "lucide-react-native";
-import { TouchableOpacity, Text, View } from "react-native";
-import Button from "../ui/button";
+import { TouchableOpacity, Text } from "react-native";
 
 type ExerciseSelectorButtonProps = {
   exercise: Exercise;

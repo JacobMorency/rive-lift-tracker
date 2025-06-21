@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react-native";
 import { View, Text, Pressable } from "react-native";
 import { Set } from "@/types/workout";
-import Button from "../ui/button";
 
 type ExerciseDetailsProps = {
   exerciseName: string;
