@@ -14,10 +14,7 @@ import {
   ScrollView,
   Switch,
 } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Divider from "../ui/divider";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -255,77 +252,59 @@ const ExerciseSelector = ({
         <Dumbbell size={16} stroke={"white"} style={{ marginLeft: 10 }} />
       </TouchableOpacity>
 
-      <Modal animationType="slide" visible={modalVisible}>
-        <SafeAreaView className="flex-1 bg-base-100">
-          <View className="flex items-center p-4">
+      <Modal
+        animationType="slide"
+        visible={modalVisible}
+        presentationStyle="fullScreen"
+      >
+        <View
+          className="flex-1 bg-base-100 p-4"
+          style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+        >
+          <View className="flex-row items-center justify-between mb-4">
             <TouchableOpacity
               onPress={() => setModalVisible(false)}
-              className="absolute top-4 left-4"
+              className="px-2"
             >
               <ArrowLeft size={24} stroke={"white"} />
             </TouchableOpacity>
-            <Text className="text-center text-base-content text-lg font-bold mb-4">
+            <Text className="flex-1 text-center text-base-content text-lg font-bold">
               Select an Exercise
             </Text>
-            <TextInput
-              placeholder="Search exercises"
-              value={searchValue}
-              onChangeText={setSearchValue}
-              className="border border-gray text-primary-content rounded-md p-3 w-full"
+            <View style={{ width: 32 }} />
+          </View>
+          <TextInput
+            placeholder="Search exercises"
+            value={searchValue}
+            onChangeText={setSearchValue}
+            className="border border-gray text-primary-content rounded-md p-3 w-full"
+          />
+          <Divider>Filters</Divider>
+
+          <View className="flex-row items-center gap-2">
+            <Switch
+              value={showFavoritesOnly}
+              onValueChange={setShowFavoritesOnly}
+              trackColor={{ false: "#767577", true: "#ff4b8c" }}
             />
-            <Divider>Filters</Divider>
-
-            <View className="flex-row items-center justify-between gap-2">
-              <Switch
-                value={showFavoritesOnly}
-                onValueChange={setShowFavoritesOnly}
-                trackColor={{ false: "#767577", true: "#ff4b8c" }}
-              />
-              <Text
-                className={
-                  showFavoritesOnly ? "text-base-content" : "text-gray"
-                }
-              >
-                Show Favorites Only
-              </Text>
-            </View>
-
-            <Divider />
-
-            <ScrollView
-              className="w-full"
-              contentContainerStyle={{
-                paddingBottom: insets.bottom + 150,
-              }}
+            <Text
+              className={showFavoritesOnly ? "text-base-content" : "text-gray"}
             >
-              {recentExercises.length > 0 && (
-                <View className="mb-4">
-                  <View>
-                    <Text className="text-base-content font-bold text-2xl">
-                      Recent Exercises
-                    </Text>
-                  </View>
-                  {recentExercises.map((exercise) => (
-                    <ExerciseSelectorButton
-                      key={exercise.id}
-                      exercise={exercise}
-                      handleSelect={handleSelect}
-                      addToRecent={addToRecentExercises}
-                      isFavorite={favoriteExerciseIds.has(exercise.id)}
-                      onToggleFavorite={() => toggleFavorite(exercise)}
-                    />
-                  ))}
+              Show Favorites Only
+            </Text>
+          </View>
+
+          <Divider />
+
+          <ScrollView className="w-full">
+            {recentExercises.length > 0 && showFavoritesOnly === false && (
+              <View className="mb-4">
+                <View>
+                  <Text className="text-base-content font-bold text-2xl">
+                    Recent Exercises
+                  </Text>
                 </View>
-              )}
-
-              <View>
-                <Text className="text-base-content font-bold text-2xl">
-                  {showFavoritesOnly ? "Favorites" : "Exercises"}
-                </Text>
-              </View>
-
-              {(showFavoritesOnly ? favoriteExercises : filteredExercises).map(
-                (exercise) => (
+                {recentExercises.map((exercise) => (
                   <ExerciseSelectorButton
                     key={exercise.id}
                     exercise={exercise}
@@ -334,11 +313,30 @@ const ExerciseSelector = ({
                     isFavorite={favoriteExerciseIds.has(exercise.id)}
                     onToggleFavorite={() => toggleFavorite(exercise)}
                   />
-                )
-              )}
-            </ScrollView>
-          </View>
-        </SafeAreaView>
+                ))}
+              </View>
+            )}
+
+            <View>
+              <Text className="text-base-content font-bold text-2xl">
+                {showFavoritesOnly ? "Favorites" : "Exercises"}
+              </Text>
+            </View>
+
+            {(showFavoritesOnly ? favoriteExercises : filteredExercises).map(
+              (exercise) => (
+                <ExerciseSelectorButton
+                  key={exercise.id}
+                  exercise={exercise}
+                  handleSelect={handleSelect}
+                  addToRecent={addToRecentExercises}
+                  isFavorite={favoriteExerciseIds.has(exercise.id)}
+                  onToggleFavorite={() => toggleFavorite(exercise)}
+                />
+              )
+            )}
+          </ScrollView>
+        </View>
       </Modal>
     </View>
   );
