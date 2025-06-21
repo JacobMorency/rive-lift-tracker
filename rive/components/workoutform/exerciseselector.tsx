@@ -5,6 +5,7 @@ import { ExercisesInWorkout, Exercise } from "@/types/workout";
 import { debounce } from "lodash";
 import { useAuth } from "../../hooks/useAuth";
 import ExerciseSelectorButton from "./exerciseselectorbutton";
+import Button from "../ui/button";
 import {
   View,
   Text,
@@ -60,6 +61,13 @@ const ExerciseSelector = ({
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
 
+  const filterOptions = [
+    { label: "Arms", value: "Arms" },
+    { label: "Chest", value: "Chest" },
+    { label: "Back", value: "Back" },
+    { label: "Legs", value: "Legs" },
+  ];
+
   const fetchExercises = async (
     searchTerm: string,
     filter: string
@@ -105,6 +113,21 @@ const ExerciseSelector = ({
   const filteredExercises = exerciseOptions.filter((ex) =>
     ex.name.toLowerCase().includes(searchValue.toLowerCase())
   );
+
+  const filteredFavorites = favoriteExercises.filter((ex) => {
+    const matchesSearch = ex.name
+      .toLowerCase()
+      .includes(searchValue.toLowerCase());
+
+    const matchesFilter =
+      selectedFilter === ""
+        ? true
+        : selectedFilter === "Arms"
+          ? ["Biceps", "Triceps", "Shoulders"].includes(ex.category)
+          : ex.category === selectedFilter;
+
+    return matchesSearch && matchesFilter;
+  });
 
   const handleSelect = (exercise: Exercise): void => {
     setExerciseName(exercise.name);
@@ -281,7 +304,7 @@ const ExerciseSelector = ({
           />
           <Divider>Filters</Divider>
 
-          <View className="flex-row items-center gap-2">
+          <View className="flex-row items-center justify-center gap-2 mb-2">
             <Switch
               value={showFavoritesOnly}
               onValueChange={setShowFavoritesOnly}
@@ -292,6 +315,34 @@ const ExerciseSelector = ({
             >
               Show Favorites Only
             </Text>
+          </View>
+
+          <View className="flex-row justify-center my-3 flex-wrap gap-1">
+            {selectedFilter ? (
+              <>
+                <Button onPress={() => setSelectedFilter("")} variant="primary">
+                  x
+                </Button>
+                <View className="rounded-md px-4 py-2 bg-primary">
+                  <Text className="text-center text-lg font-bold text-primary-content">
+                    {filterOptions.find((f) => f.value === selectedFilter)
+                      ?.label || selectedFilter}
+                  </Text>
+                </View>
+              </>
+            ) : (
+              filterOptions.map((filter) => (
+                <Button
+                  key={filter.value}
+                  onPress={() => {
+                    setSelectedFilter(filter.value);
+                    setSearchValue("");
+                  }}
+                >
+                  {filter.label}
+                </Button>
+              ))
+            )}
           </View>
 
           <Divider />
@@ -319,11 +370,13 @@ const ExerciseSelector = ({
 
             <View>
               <Text className="text-base-content font-bold text-2xl">
-                {showFavoritesOnly ? "Favorites" : "Exercises"}
+                {showFavoritesOnly
+                  ? "Favorites"
+                  : `${selectedFilter || ""} Exercises`}
               </Text>
             </View>
 
-            {(showFavoritesOnly ? favoriteExercises : filteredExercises).map(
+            {(showFavoritesOnly ? filteredFavorites : filteredExercises).map(
               (exercise) => (
                 <ExerciseSelectorButton
                   key={exercise.id}
