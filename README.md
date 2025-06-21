@@ -2,6 +2,9 @@
 
 A progressive web app that allows users to track their workouts and their reps, sets, weight, and exercises.
 
+## Live Demo Link
+[Rive Lift Tracker](https://project-hyper.vercel.app/)
+
 ## 🔥 Features
 - 🔎 Search and filter exercises
 - ⭐ Add exercises to favorites list
