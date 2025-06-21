@@ -23,7 +23,8 @@ A progressive web app that allows users to track their workouts and their reps, 
 
 <details>
   <summary>📸 Click to View Screenshots</summary>
-  ### Login Screen
+  
+### Login Screen
 <img src="screenshots/login.png" width="300">
 
 ### Exercise Selector
