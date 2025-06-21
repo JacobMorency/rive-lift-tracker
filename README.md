@@ -20,20 +20,23 @@ A progressive web app that allows users to track their workouts and their reps, 
 
 ## 📸 Demo Screenshots
 
+### Login Screen
+<img src="screenshots/login.png" width="300">
+
 ### Exercise Selector
 <img src="screenshots/exerciseselector1.png" width="300">
 
 ### Exercise Selector With Filter
-<img src="screenshots/exerciseselector2.png" width="600">
+<img src="screenshots/exerciseselector2.png" width="300">
 
 ### Exercise Selector With Favorites Only
-<img src="screenshots/exerciseselector3.png" width="600">
+<img src="screenshots/exerciseselector3.png" width="300">
 
 ### Workout History Screen
-<img src="screenshots/workouthistory.png" width="600">
+<img src="screenshots/workouthistory.png" width="300">
 
 ### Add Workout Screen
-<img src="screenshots/addworkout.png" width="600">
+<img src="screenshots/addworkout.png" width="300">
 
 ## 🧠 What I learned
 - Using Supabase and Row-Level Security (RLS)
