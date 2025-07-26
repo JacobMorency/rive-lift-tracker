@@ -1,6 +1,7 @@
 import AddSetButtons from "@/app/components/workoutform/addsetbuttons";
 import { AddSetButtonProps } from "@/app/components/workoutform/addsetbuttons";
 import { NullableNumber } from "@/types/workout";
+import QuickActionButtons from "./quickactionbuttons";
 
 // Imports types for the AddSetButtonProps and new ones for the spread at the bottom
 type SetInputFormProps = AddSetButtonProps & {
@@ -15,6 +16,14 @@ type SetInputFormProps = AddSetButtonProps & {
   partialRepsInvalid: boolean;
   weightInvalid: boolean;
   repsInvalid: boolean;
+  lastSet?: {
+    reps: NullableNumber;
+    weight: NullableNumber;
+    partialReps: NullableNumber;
+  };
+  repeatLastSet: boolean;
+  setRepeatLastSet: (value: boolean) => void;
+  handleAddSet: () => void;
 };
 
 const SetInputForm = (props: SetInputFormProps) => {
@@ -112,6 +121,18 @@ const SetInputForm = (props: SetInputFormProps) => {
             </p>
           )}
         </div>
+      </div>
+      <div className="mt-3">
+        <QuickActionButtons
+          reps={reps}
+          weight={weight}
+          setReps={setReps}
+          setWeight={setWeight}
+          setPartialReps={setPartialReps}
+          lastSet={props.lastSet}
+          repeatLastSet={props.repeatLastSet}
+          setRepeatLastSet={props.setRepeatLastSet}
+        />
       </div>
       <div className="mt-3">
         <AddSetButtons {...props} />

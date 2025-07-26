@@ -44,6 +44,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
   const [partialRepsInvalid, setPartialRepsInvalid] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const [repeatLastSet, setRepeatLastSet] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -561,6 +562,9 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
                 handleSaveUpdatedSet={handleSaveUpdatedSet}
                 cancelUpdateSet={cancelUpdateSet}
                 updateSetIndex={updateSetIndex}
+                lastSet={sets.length > 0 ? sets[sets.length - 1] : undefined}
+                repeatLastSet={repeatLastSet}
+                setRepeatLastSet={setRepeatLastSet}
               />
             )}
           </div>
