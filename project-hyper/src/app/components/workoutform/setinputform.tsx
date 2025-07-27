@@ -2,6 +2,7 @@ import AddSetButtons from "@/app/components/workoutform/addsetbuttons";
 import { AddSetButtonProps } from "@/app/components/workoutform/addsetbuttons";
 import { NullableNumber } from "@/types/workout";
 import QuickActionButtons from "./quickactionbuttons";
+import { useState } from "react";
 
 // Imports types for the AddSetButtonProps and new ones for the spread at the bottom
 type SetInputFormProps = AddSetButtonProps & {
@@ -27,6 +28,8 @@ type SetInputFormProps = AddSetButtonProps & {
 };
 
 const SetInputForm = (props: SetInputFormProps) => {
+  const [showSteppers, setShowSteppers] = useState(true);
+
   const {
     reps,
     weight,
@@ -42,6 +45,23 @@ const SetInputForm = (props: SetInputFormProps) => {
   } = props;
   return (
     <div className="px-4">
+      <div className="flex items-center justify-end mb-2">
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="show-steppers-toggle"
+            checked={showSteppers}
+            onChange={() => setShowSteppers(!showSteppers)}
+            className="toggle toggle-xs toggle-primary"
+          />
+          <label
+            htmlFor="show-steppers-toggle"
+            className="cursor-pointer text-xs"
+          >
+            Quick Actions
+          </label>
+        </div>
+      </div>
       <div className="flex gap-1 w-full">
         <div className="flex-1">
           <label htmlFor="reps">Reps</label>
@@ -59,6 +79,24 @@ const SetInputForm = (props: SetInputFormProps) => {
               repsEmpty || repsInvalid ? "border-error input" : "input"
             } w-full`}
           />
+          {showSteppers && (
+            <div className="flex gap-1 mt-1">
+              <button
+                type="button"
+                className="btn btn-xs btn-outline flex-1"
+                onClick={() => setReps((reps || 0) - 1)}
+              >
+                -1
+              </button>
+              <button
+                type="button"
+                className="btn btn-xs btn-outline flex-1"
+                onClick={() => setReps((reps || 0) + 1)}
+              >
+                +1
+              </button>
+            </div>
+          )}
           {repsEmpty && (
             <p className="text-error italic text-sm">Reps required</p>
           )}
@@ -89,6 +127,24 @@ const SetInputForm = (props: SetInputFormProps) => {
               weightEmpty || weightInvalid ? "border-error input" : "input"
             } w-full`}
           />
+          {showSteppers && (
+            <div className="flex gap-1 mt-1">
+              <button
+                type="button"
+                className="btn btn-xs btn-outline flex-1"
+                onClick={() => setWeight((weight || 0) - 5)}
+              >
+                -5
+              </button>
+              <button
+                type="button"
+                className="btn btn-xs btn-outline flex-1"
+                onClick={() => setWeight((weight || 0) + 5)}
+              >
+                +5
+              </button>
+            </div>
+          )}
           {weightEmpty && (
             <p className="text-error italic text-sm">Weight required</p>
           )}
@@ -115,6 +171,24 @@ const SetInputForm = (props: SetInputFormProps) => {
               partialRepsInvalid ? "border-error input" : "input"
             } w-full`}
           />
+          {showSteppers && (
+            <div className="flex gap-1 mt-1">
+              <button
+                type="button"
+                className="btn btn-xs btn-outline flex-1"
+                onClick={() => setPartialReps((partialReps || 0) - 1)}
+              >
+                -1
+              </button>
+              <button
+                type="button"
+                className="btn btn-xs btn-outline flex-1"
+                onClick={() => setPartialReps((partialReps || 0) + 1)}
+              >
+                +1
+              </button>
+            </div>
+          )}
           {partialRepsInvalid && (
             <p className="text-error italic text-sm">
               Invalid amount of partial reps
@@ -122,7 +196,7 @@ const SetInputForm = (props: SetInputFormProps) => {
           )}
         </div>
       </div>
-      <div className="mt-3">
+      {/* <div className="mt-3">
         <QuickActionButtons
           reps={reps}
           weight={weight}
@@ -133,7 +207,7 @@ const SetInputForm = (props: SetInputFormProps) => {
           repeatLastSet={props.repeatLastSet}
           setRepeatLastSet={props.setRepeatLastSet}
         />
-      </div>
+      </div> */}
       <div className="mt-3">
         <AddSetButtons {...props} />
       </div>

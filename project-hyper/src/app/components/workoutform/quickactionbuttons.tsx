@@ -53,7 +53,7 @@ const QuickActionButtons = ({
 
   return (
     <div className="space-y-2">
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap justify-center">
         <button
           type="button"
           className="btn btn-sm btn-outline w-20"
@@ -104,7 +104,7 @@ const QuickActionButtons = ({
             id="repeat-last-set-toggle"
             checked={repeatLastSet}
             onChange={handleRepeatLastSetToggle}
-            className="checkbox checkbox-sm"
+            className="toggle toggle-primary"
           />
           <label
             htmlFor="repeat-last-set-toggle"
