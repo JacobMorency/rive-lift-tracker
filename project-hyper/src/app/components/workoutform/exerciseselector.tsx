@@ -28,6 +28,7 @@ const ExerciseSelector = ({
   setExerciseId,
   isSetUpdating,
   isSetsEmpty,
+  exercisesInWorkout,
 }: ExerciseSelectorProps) => {
   const [exerciseOptions, setExerciseOptionsState] = useState<ExerciseOption>(
     []
@@ -43,6 +44,18 @@ const ExerciseSelector = ({
   );
 
   const { user } = useAuth();
+
+  // Get completed exercise IDs for filtering
+  const completedExerciseIds = new Set(exercisesInWorkout.map((ex) => ex.id));
+
+  // Filter out completed exercises from the exercise list
+  const filterCompletedExercises = (
+    exercises: ExerciseOption
+  ): ExerciseOption => {
+    return exercises.filter(
+      (exercise) => !completedExerciseIds.has(exercise.id)
+    );
+  };
 
   // TODO: Potentially filter out exercisesInWorkout from the list instead of disabling
 
@@ -93,31 +106,27 @@ const ExerciseSelector = ({
   }, [debouncedFetch]);
 
   // Filter exercises based on search input
-  const filteredExercises = exerciseOptions.filter((ex) =>
-    ex.name.toLowerCase().includes(searchValue.toLowerCase())
+  const filteredExercises = filterCompletedExercises(
+    exerciseOptions.filter((ex) =>
+      ex.name.toLowerCase().includes(searchValue.toLowerCase())
+    )
   );
+
+  // Filter recent exercises to remove completed ones
+  const getRecentExercises = (): Exercise[] => {
+    const recentExercises = JSON.parse(
+      localStorage.getItem("recentExercises") || "[]"
+    );
+    return filterCompletedExercises(recentExercises);
+  };
+
+  // Filter favorite exercises to remove completed ones
+  const filteredFavoriteExercises = filterCompletedExercises(favoriteExercises);
 
   // Handle the select
   const handleSelect = (exercise: Exercise): void => {
     setExerciseName(exercise.name);
     setExerciseId(exercise.id);
-  };
-
-  // Get recent exercises from local storage
-  const getRecentExercises = (): Exercise[] => {
-    const recentExercises = localStorage.getItem("recentExercises");
-    if (recentExercises) {
-      try {
-        return JSON.parse(recentExercises) as Exercise[];
-      } catch (error) {
-        console.error(
-          "Error parsing recent exercises from local storage:",
-          error
-        );
-        return [];
-      }
-    }
-    return [];
   };
 
   // Add to recent exercises in local storage
@@ -269,6 +278,7 @@ const ExerciseSelector = ({
           <div className="flex justify-center">
             <h3 className="font-bold text-center mb-3">Select an Exercise</h3>
             <button
+              type="button"
               className="btn btn-square btn-ghost absolute left-3 top-4"
               onClick={() => {
                 (
@@ -400,9 +410,9 @@ const ExerciseSelector = ({
                             </span>
                           </h4>
                           <>
-                            {favoriteExercises.length > 0 ? (
+                            {filteredFavoriteExercises.length > 0 ? (
                               <>
-                                {favoriteExercises
+                                {filteredFavoriteExercises
                                   .filter((ex) => {
                                     const matchesSearch = ex.name
                                       .toLowerCase()
