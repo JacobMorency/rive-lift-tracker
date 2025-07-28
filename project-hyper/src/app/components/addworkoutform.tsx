@@ -531,7 +531,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
   return (
     <div className="">
       <form action="" className="overflow-y-auto pb-24">
-        <div className="bg-base-300 rounded-lg py-3 mt-3">
+        <div className="bg-base-300 rounded-lg py-3 mt-3 px-2">
           <div className={`${exerciseName ? "mb-3" : ""}`}>
             <ExerciseSelector
               exerciseName={exerciseName}
@@ -570,7 +570,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
           </div>
         </div>
         {sets.length > 0 && (
-          <div className="bg-base-300 rounded-lg py-3 mt-3">
+          <div className="bg-base-300 rounded-lg py-3 mt-3 px-2">
             <SetList
               sets={sets}
               handleUpdateSet={handleUpdateSet}
@@ -586,7 +586,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
           </div>
         )}
 
-        <div className="bg-base-300 rounded-lg py-3 mt-3">
+        <div className="bg-base-300 rounded-lg py-3 mt-3 px-2">
           <CompletedExerciseList
             exercisesInWorkout={exercisesInWorkout}
             handleDeleteExercise={handleDeleteExercise}

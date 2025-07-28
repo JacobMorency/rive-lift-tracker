@@ -23,7 +23,7 @@ const CompletedExerciseList = ({
     }
   };
   return (
-    <div className="px-4">
+    <div>
       <h3 className="font-bold text-lg">Exercises Completed This Workout:</h3>
       <ul>
         {exercisesInWorkout.length > 0 ? (

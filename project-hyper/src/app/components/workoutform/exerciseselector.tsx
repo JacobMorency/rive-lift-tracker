@@ -239,7 +239,7 @@ const ExerciseSelector = ({
   };
 
   return (
-    <div className="w-full px-4">
+    <div className="w-full">
       <button
         tabIndex={0}
         type="button"

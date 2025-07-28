@@ -14,7 +14,7 @@ const AddExerciseButton = ({
   isExerciseUpdating,
 }: AddExerciseButtonProps) => {
   return (
-    <div className="px-4">
+    <div>
       {isExerciseUpdating ? (
         <div>
           <button

@@ -16,7 +16,7 @@ const WorkoutActionButtons = ({
 }: WorkoutActionButtonsProps) => {
   const router = useRouter();
   return (
-    <div className="px-4">
+    <div>
       <button
         className="w-full my-2 btn btn-primary"
         type="button"

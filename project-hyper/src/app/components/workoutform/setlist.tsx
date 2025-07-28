@@ -24,7 +24,7 @@ const SetList = ({
     }
   };
   return (
-    <div className="px-4">
+    <div>
       <h3 className="font-bold text-lg">Sets for {exerciseName}:</h3>
       <ul>
         {sets.map((set, index) => (
