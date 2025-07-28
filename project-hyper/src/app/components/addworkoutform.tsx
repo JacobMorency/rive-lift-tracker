@@ -45,6 +45,10 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [repeatLastSet, setRepeatLastSet] = useState<boolean>(false);
+  const [
+    isCompletedExerciseListCollapsed,
+    setIsCompletedExerciseListCollapsed,
+  ] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -586,11 +590,17 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
           </div>
         )}
 
-        <div className="bg-base-300 rounded-lg py-3 mt-3 px-2">
+        <div
+          className={`bg-base-300 rounded-lg ${
+            isCompletedExerciseListCollapsed ? "py-1" : "py-3"
+          } mt-3 px-2`}
+        >
           <CompletedExerciseList
             exercisesInWorkout={exercisesInWorkout}
             handleDeleteExercise={handleDeleteExercise}
             handleUpdateExercise={handleUpdateExercise}
+            isCollapsed={isCompletedExerciseListCollapsed}
+            setIsCollapsed={setIsCompletedExerciseListCollapsed}
           />
           <WorkoutActionButtons
             handleSaveWorkout={handleSaveWorkout}

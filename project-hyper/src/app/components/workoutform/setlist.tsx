@@ -1,4 +1,4 @@
-import { SquarePen, Trash2 } from "lucide-react";
+import { SquarePen, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { SetInputs } from "@/types/workout";
 
@@ -16,6 +16,7 @@ const SetList = ({
   exerciseName,
 }: SetListProps) => {
   const [deleteSetIndex, setDeleteSetIndex] = useState<number | null>(null);
+  const [showAllSets, setShowAllSets] = useState(false);
 
   const handleConfirmDeleteSet = (): void => {
     if (deleteSetIndex !== null) {
@@ -23,45 +24,80 @@ const SetList = ({
       (document.getElementById("delete_modal") as HTMLDialogElement)?.close();
     }
   };
+
+  // Reverse the sets array to show latest first
+  const reversedSets = [...sets].reverse();
+
+  // Show only the latest 3 sets by default, or all if showAllSets is true
+  const displayedSets = showAllSets ? reversedSets : reversedSets.slice(0, 3);
+  const hasMoreSets = sets.length > 3;
+
   return (
     <div>
       <h3 className="font-bold text-lg">Sets for {exerciseName}:</h3>
+
+      {hasMoreSets && (
+        <button
+          type="button"
+          className="btn btn-ghost w-full my-2 bg-base-200"
+          onClick={() => setShowAllSets(!showAllSets)}
+        >
+          {showAllSets ? (
+            <>
+              <ChevronUp className="w-4 h-4" />
+              Show Less
+            </>
+          ) : (
+            <>
+              <ChevronDown className="w-4 h-4" />
+              Show All Sets ({sets.length} total)
+            </>
+          )}
+        </button>
+      )}
+
       <ul>
-        {sets.map((set, index) => (
-          <li
-            key={index}
-            className="rounded bg-base-100 py-3 px-2 my-3 flex items-center justify-between"
-          >
-            <p>
-              <span className="font-bold">Set {index + 1}:</span> {set.reps}{" "}
-              reps at {set.weight} lbs
-              {set.partialReps !== null &&
-                set.partialReps > 0 &&
-                ` with ${set.partialReps} partial reps`}
-            </p>
-            <span className="flex gap-2">
-              <button
-                className="bg-primary rounded p-2"
-                type="button"
-                onClick={() => handleUpdateSet(index)}
-              >
-                <SquarePen />
-              </button>
-              <button
-                className="bg-error rounded p-2"
-                type="button"
-                onClick={() => {
-                  setDeleteSetIndex(index);
-                  (
-                    document.getElementById("delete_modal") as HTMLDialogElement
-                  )?.showModal();
-                }}
-              >
-                <Trash2 />
-              </button>
-            </span>
-          </li>
-        ))}
+        {displayedSets.map((set, displayIndex) => {
+          // Calculate the original index for proper set numbering and operations
+          const originalIndex = sets.length - 1 - displayIndex;
+          return (
+            <li
+              key={originalIndex}
+              className="rounded bg-base-100 py-3 px-2 my-2 flex items-center justify-between"
+            >
+              <p>
+                <span className="font-bold">Set {originalIndex + 1}:</span>{" "}
+                {set.reps} reps at {set.weight} lbs
+                {set.partialReps !== null &&
+                  set.partialReps > 0 &&
+                  ` with ${set.partialReps} partial reps`}
+              </p>
+              <span className="flex gap-2">
+                <button
+                  className="bg-primary rounded p-2"
+                  type="button"
+                  onClick={() => handleUpdateSet(originalIndex)}
+                >
+                  <SquarePen />
+                </button>
+                <button
+                  className="bg-error rounded p-2"
+                  type="button"
+                  onClick={() => {
+                    setDeleteSetIndex(originalIndex);
+                    (
+                      document.getElementById(
+                        "delete_modal"
+                      ) as HTMLDialogElement
+                    )?.showModal();
+                  }}
+                >
+                  <Trash2 />
+                </button>
+              </span>
+            </li>
+          );
+        })}
       </ul>
 
       <dialog id="delete_modal" className="modal">

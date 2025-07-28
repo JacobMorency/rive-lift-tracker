@@ -38,6 +38,9 @@
   --color-error: oklch(57% 0.245 27.325); /* Red for errors */
   --color-error-content: #ffffff;
 
+  --color-muted: #9ca3af; /* Muted gray for secondary text */
+  --color-muted-content: #1b1b1b;
+
   /* Keep your existing radius and sizing values */
   --radius-selector: 0.5rem;
   --radius-field: 0.25rem;
