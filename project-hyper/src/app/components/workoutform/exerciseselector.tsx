@@ -384,7 +384,10 @@ const ExerciseSelector = ({
                           <div>
                             <h4>
                               <span className="text-lg font-semibold">
-                                {selectedFilter} Exercises
+                                {selectedFilter === "Arms"
+                                  ? "Arm"
+                                  : selectedFilter}{" "}
+                                Exercises
                               </span>
                             </h4>
                             {filteredExercises.map((exercise) => (
@@ -406,7 +409,13 @@ const ExerciseSelector = ({
                         <div>
                           <h4>
                             <span className="text-lg font-semibold">
-                              Favorite Exercises
+                              {selectedFilter
+                                ? `Favorite ${
+                                    selectedFilter === "Arms"
+                                      ? "Arm"
+                                      : selectedFilter
+                                  } Exercises`
+                                : "Favorite Exercises"}
                             </span>
                           </h4>
                           <>
