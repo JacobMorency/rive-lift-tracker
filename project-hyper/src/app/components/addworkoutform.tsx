@@ -592,7 +592,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
 
         <div
           className={`bg-base-300 rounded-lg ${
-            isCompletedExerciseListCollapsed ? "py-1" : "py-3"
+            isCompletedExerciseListCollapsed ? "pb-3 pt-1" : "py-3"
           } mt-3 px-2`}
         >
           <CompletedExerciseList
