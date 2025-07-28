@@ -9,8 +9,8 @@
   color-scheme: "dark";
 
   /* Core Theme Colors */
-  --color-base-100: #1b1b1b; /* Deep dark blue */
-  --color-base-200: #1b1b1b; /* Charcoal surface */
+  --color-base-100: #1b1b1b; /* Dark background */
+  --color-base-200: #1b1b1b; /* Dark surface */
   --color-base-300: #2d2d2d; /* Card/Panel background */
   --color-base-content: #fefbee; /* Creamy text for readability */
 
@@ -37,6 +37,9 @@
 
   --color-error: oklch(57% 0.245 27.325); /* Red for errors */
   --color-error-content: #ffffff;
+
+  --color-muted: #9ca3af; /* Muted gray for secondary text */
+  --color-muted-content: #1b1b1b;
 
   /* Keep your existing radius and sizing values */
   --radius-selector: 0.5rem;

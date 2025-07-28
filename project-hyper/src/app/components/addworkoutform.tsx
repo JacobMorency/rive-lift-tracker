@@ -44,6 +44,11 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
   const [partialRepsInvalid, setPartialRepsInvalid] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const [repeatLastSet, setRepeatLastSet] = useState<boolean>(false);
+  const [
+    isCompletedExerciseListCollapsed,
+    setIsCompletedExerciseListCollapsed,
+  ] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -530,7 +535,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
   return (
     <div className="">
       <form action="" className="overflow-y-auto pb-24">
-        <div className="bg-base-300 rounded-lg py-3 mt-3">
+        <div className="bg-base-300 rounded-lg py-3 mt-3 px-2">
           <div className={`${exerciseName ? "mb-3" : ""}`}>
             <ExerciseSelector
               exerciseName={exerciseName}
@@ -561,12 +566,15 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
                 handleSaveUpdatedSet={handleSaveUpdatedSet}
                 cancelUpdateSet={cancelUpdateSet}
                 updateSetIndex={updateSetIndex}
+                lastSet={sets.length > 0 ? sets[sets.length - 1] : undefined}
+                repeatLastSet={repeatLastSet}
+                setRepeatLastSet={setRepeatLastSet}
               />
             )}
           </div>
         </div>
         {sets.length > 0 && (
-          <div className="bg-base-300 rounded-lg py-3 mt-3">
+          <div className="bg-base-300 rounded-lg py-3 mt-3 px-2">
             <SetList
               sets={sets}
               handleUpdateSet={handleUpdateSet}
@@ -582,11 +590,17 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
           </div>
         )}
 
-        <div className="bg-base-300 rounded-lg py-3 mt-3">
+        <div
+          className={`bg-base-300 rounded-lg ${
+            isCompletedExerciseListCollapsed ? "pb-3 pt-1" : "py-3"
+          } mt-3 px-2`}
+        >
           <CompletedExerciseList
             exercisesInWorkout={exercisesInWorkout}
             handleDeleteExercise={handleDeleteExercise}
             handleUpdateExercise={handleUpdateExercise}
+            isCollapsed={isCompletedExerciseListCollapsed}
+            setIsCollapsed={setIsCompletedExerciseListCollapsed}
           />
           <WorkoutActionButtons
             handleSaveWorkout={handleSaveWorkout}
