@@ -270,19 +270,7 @@ const SetInputForm = (props: SetInputFormProps) => {
           )}
         </div>
       </div>
-      {/* <div className="mt-3">
-        <QuickActionButtons
-          reps={reps}
-          weight={weight}
-          setReps={setReps}
-          setWeight={setWeight}
-          setPartialReps={setPartialReps}
-          lastSet={props.lastSet}
-          repeatLastSet={props.repeatLastSet}
-          setRepeatLastSet={props.setRepeatLastSet}
-        />
-      </div> */}
-      <div className="mt-3">
+      <div>
         <AddSetButtons {...props} />
       </div>
 
