@@ -274,12 +274,12 @@ const ExerciseSelector = ({
       </button>
 
       <dialog id="exercise_modal" className="modal">
-        <div className="modal-box h-screen rounded-none w-full flex flex-col">
+        <div className="modal-box h-screen rounded-none w-full flex flex-col px-4">
           <div className="flex justify-center">
             <h3 className="font-bold text-center mb-3">Select an Exercise</h3>
             <button
               type="button"
-              className="btn btn-square btn-ghost absolute left-3 top-4"
+              className="btn btn-square btn-ghost absolute left-1 top-4"
               onClick={() => {
                 (
                   document.getElementById("exercise_modal") as HTMLDialogElement
