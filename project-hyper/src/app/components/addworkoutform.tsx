@@ -42,6 +42,11 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
   const [repsInvalid, setRepsInvalid] = useState<boolean>(false);
   const [weightInvalid, setWeightInvalid] = useState<boolean>(false);
   const [partialRepsInvalid, setPartialRepsInvalid] = useState<boolean>(false);
+
+  // Real-time validation states
+  const [repsError, setRepsError] = useState<string>("");
+  const [weightError, setWeightError] = useState<string>("");
+  const [partialRepsError, setPartialRepsError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [repeatLastSet, setRepeatLastSet] = useState<boolean>(false);
@@ -52,104 +57,206 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
 
   const router = useRouter();
 
+  // Auto-save functionality
+  const AUTO_SAVE_KEY = `workout_autosave_${workoutId}`;
+  const AUTO_SAVE_INTERVAL = 30000; // 30 seconds
+
+  const saveWorkoutProgress = () => {
+    const workoutProgress = {
+      exerciseName,
+      exerciseId,
+      reps,
+      weight,
+      partialReps,
+      sets,
+      exercisesInWorkout,
+      completedSets,
+      updateSetIndex,
+      isSetUpdating,
+      updateExerciseIndex,
+      isExerciseUpdating,
+      timestamp: Date.now(),
+    };
+
+    try {
+      localStorage.setItem(AUTO_SAVE_KEY, JSON.stringify(workoutProgress));
+      console.log("Workout progress auto-saved");
+    } catch (error) {
+      console.error("Failed to auto-save workout progress:", error);
+    }
+  };
+
+  const loadWorkoutProgress = () => {
+    try {
+      const savedProgress = localStorage.getItem(AUTO_SAVE_KEY);
+      if (savedProgress) {
+        const progress = JSON.parse(savedProgress);
+
+        // Only restore if the save is less than 24 hours old
+        const isRecent = Date.now() - progress.timestamp < 24 * 60 * 60 * 1000;
+
+        if (isRecent) {
+          setExerciseName(progress.exerciseName || "");
+          setExerciseId(progress.exerciseId || null);
+          setReps(progress.reps || null);
+          setWeight(progress.weight || null);
+          setPartialReps(progress.partialReps || null);
+          setSets(progress.sets || []);
+          setExercisesInWorkout(progress.exercisesInWorkout || []);
+          setCompletedSets(progress.completedSets || []);
+          setUpdateSetIndex(progress.updateSetIndex || null);
+          setIsSetUpdating(progress.isSetUpdating || false);
+          setUpdateExerciseIndex(progress.updateExerciseIndex || null);
+          setIsExerciseUpdating(progress.isExerciseUpdating || false);
+
+          console.log("Workout progress restored from auto-save");
+          return true;
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load auto-saved workout progress:", error);
+    }
+    return false;
+  };
+
+  const clearWorkoutProgress = () => {
+    try {
+      localStorage.removeItem(AUTO_SAVE_KEY);
+      console.log("Workout progress cleared");
+    } catch (error) {
+      console.error("Failed to clear auto-saved workout progress:", error);
+    }
+  };
+
+  // Auto-save effect
+  useEffect(() => {
+    const autoSaveInterval = setInterval(() => {
+      // Only auto-save if there's actual progress (not just initialized)
+      if (
+        isInitialized &&
+        (sets.length > 0 || exercisesInWorkout.length > 0 || exerciseName)
+      ) {
+        saveWorkoutProgress();
+      }
+    }, AUTO_SAVE_INTERVAL);
+
+    return () => {
+      clearInterval(autoSaveInterval);
+    };
+  }, [sets, exercisesInWorkout, exerciseName, isInitialized]);
+
+  // Save on component unmount
+  useEffect(() => {
+    return () => {
+      if (
+        isInitialized &&
+        (sets.length > 0 || exercisesInWorkout.length > 0 || exerciseName)
+      ) {
+        saveWorkoutProgress();
+      }
+    };
+  }, [sets, exercisesInWorkout, exerciseName, isInitialized]);
+
+  // Real-time validation effects
+  useEffect(() => {
+    if (reps === null) {
+      setRepsError("");
+    } else if (reps <= 0) {
+      setRepsError("Reps must be greater than 0");
+    } else if (reps > 999) {
+      setRepsError("Reps cannot exceed 999");
+    } else {
+      setRepsError("");
+    }
+  }, [reps]);
+
+  useEffect(() => {
+    if (weight === null) {
+      setWeightError("");
+    } else if (weight <= 0) {
+      setWeightError("Weight must be greater than 0");
+    } else if (weight > 9999) {
+      setWeightError("Weight cannot exceed 9999");
+    } else {
+      setWeightError("");
+    }
+  }, [weight]);
+
+  useEffect(() => {
+    if (partialReps === null) {
+      setPartialRepsError("");
+    } else if (partialReps < 0) {
+      setPartialRepsError("Partial reps cannot be negative");
+    } else if (partialReps > 999) {
+      setPartialRepsError("Partial reps cannot exceed 999");
+    } else {
+      setPartialRepsError("");
+    }
+  }, [partialReps]);
+
   const handleCompleteWorkout = (): void => {
     localStorage.removeItem("workoutId");
     localStorage.removeItem("workoutProgress");
+    clearWorkoutProgress(); // Clear auto-save when workout is completed
     router.push("/workouts");
   };
 
   const handleSaveWorkout = async (): Promise<void> => {
-    // If editing, delete all sets and workout_exercises first
-    if (isEditing) {
-      // 1. Fetch all workout_exercise ids for the current workout
-      const { data: workoutExercises, error: fetchError } = await supabase
-        .from("workout_exercises")
-        .select("id")
-        .eq("workout_id", workoutId);
-      if (fetchError) {
-        console.error("Error fetching workout exercises:", fetchError.message);
-        return;
-      }
-
-      const workoutExerciseIds = workoutExercises.map(
-        (exercise) => exercise.id
-      );
-
-      // 2. Delete all sets for the current workout_exercise ids
-      const { error: deleteSetsError } = await supabase
-        .from("sets")
-        .delete()
-        .in("workout_exercise_id", workoutExerciseIds);
-      if (deleteSetsError) {
-        console.error("Error deleting sets:", deleteSetsError.message);
-        return;
-      }
-      // 3. Delete all workout_exercises for the current workout
-      const { error: deleteExercisesError } = await supabase
-        .from("workout_exercises")
-        .delete()
-        .eq("workout_id", workoutId);
-      if (deleteExercisesError) {
-        console.error(
-          "Error deleting workout exercises:",
-          deleteExercisesError.message
-        );
-        return;
-      }
-    }
-
-    for (const completedSet of completedSets) {
-      const { data: workoutExercisesData, error: exerciseError } =
-        await supabase
-          .from("workout_exercises")
-          .insert([
-            {
-              exercise_id: completedSet.exerciseId,
-              workout_id: workoutId,
-              created_at: new Date(),
-            },
-          ])
-          .select("id")
-          .single();
-      if (exerciseError) {
-        console.error(
-          "Error adding exercise to workout:",
-          exerciseError.message
-        );
-        toast.error("Error saving exercise to workout. Please try again.");
-        return;
-      }
-
-      const setsData = completedSet.sets.map((set, index) => ({
-        workout_exercise_id: workoutExercisesData.id,
-        set_number: index + 1,
-        weight: set.weight,
-        reps: set.reps,
-        partial_reps: set.partialReps,
-        exercise_name: completedSet.exerciseName,
-        workout_id: workoutId,
-      }));
-
-      const { error: setsError } = await supabase.from("sets").insert(setsData);
-      if (setsError) {
-        console.error("Error adding sets to workout:", setsError.message);
-        toast.error("Error saving sets to workout. Please try again.");
-        return;
-      }
-    }
-
-    const { error } = await supabase
-      .from("workouts")
-      .update({ is_complete: true })
-      .eq("id", workoutId)
-      .select();
-    if (error) {
-      console.error("Error saving workout:", error.message);
-      toast.error("Error saving workout. Please try again.");
+    if (exercisesInWorkout.length === 0) {
+      toast.error("Please add at least one exercise to your workout.");
       return;
     }
-    toast.success("Workout saved successfully!");
-    handleCompleteWorkout();
+
+    try {
+      // Save each exercise and its sets
+      for (const exercise of exercisesInWorkout) {
+        const { data: workoutExercise, error: exerciseError } = await supabase
+          .from("workout_exercises")
+          .insert({
+            workout_id: workoutId,
+            exercise_id: exercise.id,
+          })
+          .select()
+          .single();
+
+        if (exerciseError) {
+          console.error("Error saving exercise:", exerciseError);
+          toast.error("Failed to save exercise.");
+          return;
+        }
+
+        // Save sets for this exercise
+        const exerciseSets = sets.filter(
+          (set) => set.exerciseId === exercise.id
+        );
+        if (exerciseSets.length > 0) {
+          const setsToInsert = exerciseSets.map((set, index) => ({
+            workout_exercise_id: workoutExercise.id,
+            set_number: index + 1,
+            reps: set.reps,
+            weight: set.weight,
+            partial_reps: set.partialReps,
+          }));
+
+          const { error: setsError } = await supabase
+            .from("sets")
+            .insert(setsToInsert);
+
+          if (setsError) {
+            console.error("Error saving sets:", setsError);
+            toast.error("Failed to save sets.");
+            return;
+          }
+        }
+      }
+
+      clearWorkoutProgress(); // Clear auto-save when workout is saved
+      toast.success("Workout saved successfully!");
+      handleCompleteWorkout();
+    } catch (error) {
+      console.error("Error saving workout:", error);
+      toast.error("Failed to save workout.");
+    }
   };
 
   const handleAddSet = (): void => {
@@ -166,6 +273,9 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
     } else if (reps <= 0) {
       setRepsInvalid(true);
       hasError = true;
+    } else if (reps > 999) {
+      setRepsInvalid(true);
+      hasError = true;
     }
 
     if (!weight) {
@@ -178,6 +288,9 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
 
     if (partialReps) {
       if (partialReps < 0) {
+        setPartialRepsInvalid(true);
+        hasError = true;
+      } else if (partialReps > 999) {
         setPartialRepsInvalid(true);
         hasError = true;
       }
@@ -447,78 +560,93 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
     if (!isEditing || !workoutId) return;
 
     const loadCompletedWorkout = async (): Promise<void> => {
-      setLoading(true);
-      const { data: workoutExercises, error: workoutExercisesError } =
-        await supabase
-          .from("workout_exercises")
-          .select("*")
-          .eq("workout_id", workoutId);
+      if (isEditing) {
+        try {
+          // Try to load auto-saved progress first
+          const autoSaveRestored = loadWorkoutProgress();
+          if (autoSaveRestored) {
+            toast.success("Workout progress restored from auto-save");
+            setLoading(false);
+            setIsInitialized(true);
+            return;
+          }
 
-      if (workoutExercisesError) {
-        console.error(
-          "Error fetching workout exercises:",
-          workoutExercisesError.message
-        );
-        setLoading(false);
-        return;
-      }
+          const { data: workoutExercises, error: workoutExercisesError } =
+            await supabase
+              .from("workout_exercises")
+              .select("*")
+              .eq("workout_id", workoutId);
 
-      const exerciseIds = workoutExercises.map(
-        (exercise) => exercise.exercise_id
-      );
-      const { data: exerciseNames, error: exerciseNamesError } = await supabase
-        .from("exercise_library")
-        .select("id, name")
-        .in("id", exerciseIds);
+          if (workoutExercisesError) {
+            console.error(
+              "Error fetching workout exercises:",
+              workoutExercisesError.message
+            );
+            return;
+          }
 
-      if (exerciseNamesError) {
-        console.error(
-          "Error fetching exercise names:",
-          exerciseNamesError.message
-        );
-        setLoading(false);
-        return;
-      }
+          const { data: exerciseNames, error: exerciseNamesError } =
+            await supabase.from("exercise_library").select("*");
 
-      const workoutExerciseIds = workoutExercises.map(
-        (exercise) => exercise.id
-      );
-      const { data: sets, error: setsError } = await supabase
-        .from("sets")
-        .select("*")
-        .in("workout_exercise_id", workoutExerciseIds);
+          if (exerciseNamesError) {
+            console.error(
+              "Error fetching exercise names:",
+              exerciseNamesError.message
+            );
+            return;
+          }
 
-      if (setsError) {
-        console.error("Error fetching sets:", setsError.message);
-        setLoading(false);
-        return;
-      }
+          const { data: sets, error: setsError } = await supabase
+            .from("sets")
+            .select("*")
+            .in(
+              "workout_exercise_id",
+              workoutExercises.map((exercise) => exercise.id)
+            );
 
-      const completedSetsData: CompletedSet[] = workoutExercises.map(
-        (exercise) => ({
-          exerciseId: exercise.exercise_id,
-          exerciseName:
-            exerciseNames.find((e) => e.id === exercise.exercise_id)?.name ||
-            "",
-          sets: sets
-            .filter((set) => set.workout_exercise_id === exercise.id)
-            .map((set) => ({
+          if (setsError) {
+            console.error("Error fetching sets:", setsError.message);
+            return;
+          }
+
+          const completedSetsData: CompletedSet[] = workoutExercises.map(
+            (exercise) => ({
               exerciseId: exercise.exercise_id,
-              reps: set.reps,
-              weight: set.weight,
-              partialReps: set.partial_reps || 0,
-            })),
-        })
-      );
+              exerciseName:
+                exerciseNames.find((e) => e.id === exercise.exercise_id)
+                  ?.name || "",
+              sets: sets
+                .filter((set) => set.workout_exercise_id === exercise.id)
+                .map((set) => ({
+                  exerciseId: exercise.exercise_id,
+                  reps: set.reps,
+                  weight: set.weight,
+                  partialReps: set.partial_reps || 0,
+                })),
+            })
+          );
 
-      setCompletedSets(completedSetsData);
-      setExercisesInWorkout(
-        completedSetsData.map((cs) => ({
-          id: cs.exerciseId,
-          name: cs.exerciseName,
-        }))
-      );
-      setLoading(false);
+          setCompletedSets(completedSetsData);
+          setExercisesInWorkout(
+            completedSetsData.map((cs) => ({
+              id: cs.exerciseId,
+              name: cs.exerciseName,
+            }))
+          );
+          setLoading(false);
+        } catch (error) {
+          console.error("Error loading completed workout:", error);
+          setLoading(false);
+        }
+      } else {
+        // For new workouts, try to load auto-saved progress
+        const autoSaveRestored = loadWorkoutProgress();
+        if (autoSaveRestored) {
+          toast.success("Workout progress restored from auto-save");
+        }
+        setLoading(false);
+        setIsInitialized(true);
+      }
     };
     loadCompletedWorkout();
   }, [isEditing, workoutId]);
@@ -561,6 +689,9 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
                 partialRepsInvalid={partialRepsInvalid}
                 weightInvalid={weightInvalid}
                 repsInvalid={repsInvalid}
+                repsError={repsError}
+                weightError={weightError}
+                partialRepsError={partialRepsError}
                 isSetUpdating={isSetUpdating}
                 handleAddSet={handleAddSet}
                 handleSaveUpdatedSet={handleSaveUpdatedSet}

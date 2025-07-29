@@ -16,6 +16,9 @@ type SetInputFormProps = AddSetButtonProps & {
   partialRepsInvalid: boolean;
   weightInvalid: boolean;
   repsInvalid: boolean;
+  repsError: string;
+  weightError: string;
+  partialRepsError: string;
   lastSet?: {
     reps: NullableNumber;
     weight: NullableNumber;
@@ -36,9 +39,10 @@ const SetInputForm = (props: SetInputFormProps) => {
     setPartialReps,
     repsEmpty,
     weightEmpty,
-    partialRepsInvalid,
-    weightInvalid,
-    repsInvalid,
+    repsError,
+    weightError,
+    partialRepsError,
+    lastSet,
   } = props;
   const [weightIncrement, setWeightIncrement] = useState<number>(5);
 
@@ -52,7 +56,12 @@ const SetInputForm = (props: SetInputFormProps) => {
               <button
                 type="button"
                 className="px-4 py-1 text-sm hover:bg-base-300 rounded-l"
-                onClick={() => setReps((reps || 0) - 1)}
+                onClick={() => {
+                  const newValue = (reps || 0) - 1;
+                  if (newValue >= 0) {
+                    setReps(newValue);
+                  }
+                }}
               >
                 -
               </button>
@@ -61,15 +70,22 @@ const SetInputForm = (props: SetInputFormProps) => {
                 inputMode="numeric"
                 pattern="[0-9]*"
                 id="reps"
-                value={reps !== null ? reps : ""}
-                onChange={(e) =>
-                  setReps(
-                    e.target.value !== "" ? parseInt(e.target.value) : null
-                  )
-                }
+                maxLength={3}
+                value={reps !== null ? reps.toString() : ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "" || value === "-") {
+                    setReps(null);
+                  } else {
+                    const parsed = parseInt(value);
+                    if (!isNaN(parsed)) {
+                      setReps(parsed);
+                    }
+                  }
+                }}
                 placeholder="0"
                 className={`${
-                  repsEmpty || repsInvalid ? "border-error input" : "input"
+                  repsError ? "border-error input" : "input"
                 } flex-1 text-center border-none shadow-none p-0 m-0 w-full min-w-0`}
               />
               <button
@@ -84,8 +100,8 @@ const SetInputForm = (props: SetInputFormProps) => {
           {repsEmpty && (
             <p className="text-error italic text-sm">Reps required</p>
           )}
-          {repsInvalid && (
-            <p className="text-error italic text-sm">Invalid amount of reps</p>
+          {repsError && (
+            <p className="text-error italic text-sm">{repsError}</p>
           )}
         </div>
         <div className="flex-1">
@@ -95,7 +111,12 @@ const SetInputForm = (props: SetInputFormProps) => {
               <button
                 type="button"
                 className="px-4 py-1 text-sm hover:bg-base-300 rounded-l"
-                onClick={() => setWeight((weight || 0) - weightIncrement)}
+                onClick={() => {
+                  const newValue = (weight || 0) - weightIncrement;
+                  if (newValue >= 0) {
+                    setWeight(newValue);
+                  }
+                }}
               >
                 -
               </button>
@@ -104,20 +125,23 @@ const SetInputForm = (props: SetInputFormProps) => {
                 inputMode="decimal"
                 pattern="[0-9]*[.,]?[0-9]*"
                 id="weight"
-                value={weight !== null ? weight : ""}
+                maxLength={6}
+                value={weight !== null ? weight.toString() : ""}
                 onChange={(e) => {
-                  const val = e.target.value;
-                  const parsed = parseFloat(val);
-                  if (val === "" || isNaN(parsed)) {
+                  const value = e.target.value;
+                  if (value === "" || value === "-" || value === ".") {
                     setWeight(null);
                   } else {
-                    const rounded = Math.floor(parsed * 10) / 10;
-                    setWeight(rounded);
+                    const parsed = parseFloat(value);
+                    if (!isNaN(parsed)) {
+                      const rounded = Math.floor(parsed * 10) / 10;
+                      setWeight(rounded);
+                    }
                   }
                 }}
                 placeholder="0"
                 className={`${
-                  weightEmpty || weightInvalid ? "border-error input" : "input"
+                  weightError ? "border-error input" : "input"
                 } flex-1 text-center border-none shadow-none p-0 m-0 w-full min-w-0`}
               />
               <button
@@ -188,10 +212,8 @@ const SetInputForm = (props: SetInputFormProps) => {
           {weightEmpty && (
             <p className="text-error italic text-sm">Weight required</p>
           )}
-          {weightInvalid && (
-            <p className="text-error italic text-sm">
-              Invalid amount of weight
-            </p>
+          {weightError && (
+            <p className="text-error italic text-sm">{weightError}</p>
           )}
         </div>
         {/* TODO: Add a help icon and potentially a toggle for partial reps */}
@@ -202,7 +224,12 @@ const SetInputForm = (props: SetInputFormProps) => {
               <button
                 type="button"
                 className="px-4 py-1 text-sm hover:bg-base-300 rounded-l"
-                onClick={() => setPartialReps((partialReps || 0) - 1)}
+                onClick={() => {
+                  const newValue = (partialReps || 0) - 1;
+                  if (newValue >= 0) {
+                    setPartialReps(newValue);
+                  }
+                }}
               >
                 -
               </button>
@@ -211,15 +238,22 @@ const SetInputForm = (props: SetInputFormProps) => {
                 inputMode="numeric"
                 pattern="[0-9]*"
                 id="partialReps"
-                value={partialReps !== null ? partialReps : ""}
-                onChange={(e) =>
-                  setPartialReps(
-                    e.target.value ? parseInt(e.target.value) : null
-                  )
-                }
+                maxLength={3}
+                value={partialReps !== null ? partialReps.toString() : ""}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "" || value === "-") {
+                    setPartialReps(null);
+                  } else {
+                    const parsed = parseInt(value);
+                    if (!isNaN(parsed)) {
+                      setPartialReps(parsed);
+                    }
+                  }
+                }}
                 placeholder="0"
                 className={`${
-                  partialRepsInvalid ? "border-error input" : "input"
+                  partialRepsError ? "border-error input" : "input"
                 } flex-1 text-center border-none shadow-none p-0 m-0 w-full min-w-0`}
               />
               <button
@@ -231,10 +265,8 @@ const SetInputForm = (props: SetInputFormProps) => {
               </button>
             </div>
           </div>
-          {partialRepsInvalid && (
-            <p className="text-error italic text-sm">
-              Invalid amount of partial reps
-            </p>
+          {partialRepsError && (
+            <p className="text-error italic text-sm">{partialRepsError}</p>
           )}
         </div>
       </div>
@@ -253,6 +285,36 @@ const SetInputForm = (props: SetInputFormProps) => {
       <div className="mt-3">
         <AddSetButtons {...props} />
       </div>
+
+      {/* Copy Last Set Button */}
+      {lastSet && (
+        <div className="mt-3 flex justify-center">
+          <button
+            type="button"
+            onClick={() => {
+              setReps(lastSet.reps);
+              setWeight(lastSet.weight);
+              setPartialReps(lastSet.partialReps);
+            }}
+            className="btn btn-sm btn-outline btn-primary"
+          >
+            <svg
+              className="w-4 h-4 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
+            </svg>
+            Copy Last Set
+          </button>
+        </div>
+      )}
     </div>
   );
 };
