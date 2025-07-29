@@ -2,11 +2,26 @@
 
 type PageHeaderProps = {
   heading: string;
+  subtitle?: string;
+  action?: React.ReactNode;
 };
-const PageHeader = ({ heading }: PageHeaderProps) => {
+
+const PageHeader = ({ heading, subtitle, action }: PageHeaderProps) => {
   return (
-    <header className="border-b-2 border-gray-200 py-4">
-      <h1 className="font-bold text-3xl px-4">{heading}</h1>
+    <header className="bg-base-100 border-b border-base-300 px-4 py-6 safe-top">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <h1 className="text-2xl font-bold text-base-content mb-1">
+            {heading}
+          </h1>
+          {subtitle && (
+            <p className="text-sm text-base-content/60 font-medium">
+              {subtitle}
+            </p>
+          )}
+        </div>
+        {action && <div className="flex-shrink-0 ml-4">{action}</div>}
+      </div>
     </header>
   );
 };
