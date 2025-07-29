@@ -662,7 +662,7 @@ const AddWorkoutForm = ({ workoutId, isEditing }: AddWorkoutFormProps) => {
 
   return (
     <div className="">
-      <form action="" className="overflow-y-auto pb-24">
+      <form action="" className="overflow-y-auto">
         <div className="bg-base-300 rounded-lg py-3 mt-3 px-2">
           <div className={`${exerciseName ? "mb-3" : ""}`}>
             <ExerciseSelector
