@@ -105,8 +105,8 @@ const WorkoutTemplatesModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-base-100">
-      <div className="w-full h-full flex flex-col">
+    <div className="modal modal-open">
+      <div className="modal-box w-full h-full p-0 rounded-none">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-base-300">
           <h2 className="text-lg font-semibold text-base-content">
