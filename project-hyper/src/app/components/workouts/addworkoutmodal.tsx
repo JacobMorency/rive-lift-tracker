@@ -81,10 +81,10 @@ const AddWorkoutModal = ({ isOpen, onClose }: AddWorkoutModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="modal modal-open">
       {currentStep === "create-workout" ? (
-        <div className="bg-base-100 rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col">
-          <div className="flex items-center justify-between p-4 border-b border-base-300">
+        <div className="modal-box flex flex-col">
+          <div className="flex items-center justify-between py-2 border-b border-base-300">
             <h2 className="text-lg font-semibold text-base-content">
               Add New Workout
             </h2>
@@ -96,13 +96,10 @@ const AddWorkoutModal = ({ isOpen, onClose }: AddWorkoutModalProps) => {
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-4">
+          <form onSubmit={handleSubmit} className="py-4">
             <div className="space-y-4">
               <div>
-                <label
-                  htmlFor="workoutName"
-                  className="block text-sm font-medium text-base-content mb-2"
-                >
+                <label htmlFor="workoutName" className="label text-sm">
                   Workout Name *
                 </label>
                 <input
@@ -111,17 +108,14 @@ const AddWorkoutModal = ({ isOpen, onClose }: AddWorkoutModalProps) => {
                   value={workoutName}
                   onChange={(e) => setWorkoutName(e.target.value)}
                   placeholder="Enter workout name"
-                  className="input input-bordered w-full"
+                  className="input w-full"
                   required
                   maxLength={50}
                 />
               </div>
 
               <div>
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-base-content mb-2"
-                >
+                <label htmlFor="description" className="label text-sm">
                   Description (Optional)
                 </label>
                 <textarea
@@ -140,7 +134,7 @@ const AddWorkoutModal = ({ isOpen, onClose }: AddWorkoutModalProps) => {
               <button
                 type="button"
                 onClick={handleClose}
-                className="btn btn-outline flex-1"
+                className="btn btn-error flex-1"
                 disabled={loading}
               >
                 Cancel
@@ -153,14 +147,14 @@ const AddWorkoutModal = ({ isOpen, onClose }: AddWorkoutModalProps) => {
                 {loading ? (
                   <span className="loading loading-spinner loading-sm"></span>
                 ) : (
-                  "Create Workout"
+                  "Create"
                 )}
               </button>
             </div>
           </form>
         </div>
       ) : (
-        <div className="w-full h-full bg-base-100">
+        <div className="modal-box w-full h-full p-0 rounded-none">
           <AddExercisesContent
             workoutId={createdWorkoutId}
             onComplete={handleExercisesComplete}
