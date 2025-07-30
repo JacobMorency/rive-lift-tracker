@@ -2,13 +2,14 @@
 
 import { useAuth } from "@/app/context/authcontext";
 import { useState, useEffect } from "react";
-import { X, Dumbbell, ChevronRight } from "lucide-react";
+import { X, Dumbbell, ChevronRight, Plus } from "lucide-react";
 import supabase from "@/app/lib/supabaseClient";
 import WorkoutDetailsModal from "./workoutdetailsmodal";
 
 type WorkoutTemplatesModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  onAddNewWorkout?: () => void;
 };
 
 type WorkoutTemplate = {
@@ -30,6 +31,7 @@ type WorkoutWithExercises = {
 const WorkoutTemplatesModal = ({
   isOpen,
   onClose,
+  onAddNewWorkout,
 }: WorkoutTemplatesModalProps) => {
   const [workoutTemplates, setWorkoutTemplates] = useState<WorkoutTemplate[]>(
     []
@@ -117,6 +119,18 @@ const WorkoutTemplatesModal = ({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
+          {/* Add New Workout Button */}
+          {onAddNewWorkout && (
+            <div className="mb-4">
+              <button
+                onClick={onAddNewWorkout}
+                className="btn btn-primary w-full"
+              >
+                <Plus className="size-5 mr-2" />
+                Add New Workout
+              </button>
+            </div>
+          )}
           {loading ? (
             <div className="flex justify-center items-center h-32">
               <span className="loading loading-spinner loading-md"></span>

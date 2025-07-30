@@ -160,6 +160,10 @@ const WorkoutsContent = () => {
       <WorkoutTemplatesModal
         isOpen={isWorkoutTemplatesModalOpen}
         onClose={() => setIsWorkoutTemplatesModalOpen(false)}
+        onAddNewWorkout={() => {
+          setIsWorkoutTemplatesModalOpen(false);
+          setIsModalOpen(true);
+        }}
       />
     </div>
   );
