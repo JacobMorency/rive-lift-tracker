@@ -4,24 +4,33 @@ import { useAuth } from "@/app/context/authcontext";
 import { useState, useEffect } from "react";
 import { Plus, Play, ChevronRight } from "lucide-react";
 import supabase from "@/app/lib/supabaseClient";
+import SelectWorkoutModal from "./selectworkoutmodal";
 
 type Session = {
   id: string;
   name: string;
   created_at: string;
   exercise_count: number;
+  completed: boolean;
 };
 
 type SessionWithExercises = {
   id: string;
-  name: string;
-  created_at: string;
-  workout_exercises: { count: number }[];
+  started_at: string;
+  ended_at: string | null;
+  completed: boolean;
+  workout_id: string;
+  workouts: {
+    name: string;
+    workout_exercises: { count: number }[];
+  }[];
 };
 
 const SessionsContent = () => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isSelectWorkoutModalOpen, setIsSelectWorkoutModalOpen] =
+    useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -35,19 +44,24 @@ const SessionsContent = () => {
 
     setLoading(true);
     try {
-      // Fetch sessions with exercise count
+      // Fetch sessions with workout and exercise count
       const { data, error } = await supabase
-        .from("workouts")
+        .from("workout_sessions")
         .select(
           `
           id,
-          name,
-          created_at,
-          workout_exercises(count)
+          started_at,
+          ended_at,
+          completed,
+          workout_id,
+          workouts!inner(
+            name,
+            workout_exercises(count)
+          )
         `
         )
         .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+        .order("started_at", { ascending: false });
 
       if (error) {
         console.error("Error fetching sessions:", error.message);
@@ -58,9 +72,11 @@ const SessionsContent = () => {
       const sessionsData =
         data?.map((session: SessionWithExercises) => ({
           id: session.id,
-          name: session.name,
-          created_at: session.created_at,
-          exercise_count: session.workout_exercises?.[0]?.count || 0,
+          name: session.workouts[0]?.name || "Unknown Workout",
+          created_at: session.started_at,
+          exercise_count:
+            session.workouts[0]?.workout_exercises?.[0]?.count || 0,
+          completed: session.completed || false,
         })) || [];
 
       setSessions(sessionsData);
@@ -72,8 +88,7 @@ const SessionsContent = () => {
   };
 
   const handleNewSession = () => {
-    // TODO: Implement new session logic
-    console.log("Create new session");
+    setIsSelectWorkoutModalOpen(true);
   };
 
   const handleSessionClick = (sessionId: string) => {
@@ -131,6 +146,13 @@ const SessionsContent = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      <span
+                        className={`badge badge-sm ${
+                          session.completed ? "badge-success" : "badge-warning"
+                        }`}
+                      >
+                        {session.completed ? "Completed" : "In Progress"}
+                      </span>
                       <p className="text-base-content/40">
                         {session.exercise_count}
                       </p>
@@ -143,6 +165,12 @@ const SessionsContent = () => {
           )}
         </div>
       </div>
+
+      {/* Select Workout Modal */}
+      <SelectWorkoutModal
+        isOpen={isSelectWorkoutModalOpen}
+        onClose={() => setIsSelectWorkoutModalOpen(false)}
+      />
     </div>
   );
 };
