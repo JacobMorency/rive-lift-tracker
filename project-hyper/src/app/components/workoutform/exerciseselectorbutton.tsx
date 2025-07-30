@@ -8,6 +8,7 @@ type ExerciseSelectorButtonProps = {
   isFavorite: boolean;
   onToggleFavorite: (exercise: Exercise) => void;
   isDisabled?: boolean;
+  isSelected?: boolean;
 };
 
 const ExerciseSelectorButton = ({
@@ -17,12 +18,15 @@ const ExerciseSelectorButton = ({
   isFavorite,
   onToggleFavorite,
   isDisabled = false,
+  isSelected = false,
 }: ExerciseSelectorButtonProps) => {
   return (
     <button
       className={`btn btn-xl my-1 w-full relative py-4 ${
         isDisabled
           ? "btn-disabled opacity-50 cursor-not-allowed"
+          : isSelected
+          ? "btn-success"
           : "btn-primary"
       }`}
       type="button"
@@ -30,9 +34,13 @@ const ExerciseSelectorButton = ({
       onClick={() => {
         if (!isDisabled) {
           handleSelect(exercise);
-          (
-            document.getElementById("exercise_modal") as HTMLDialogElement
-          )?.close();
+          // Only close modal if it's the exercise selector modal
+          const modal = document.getElementById(
+            "exercise_modal"
+          ) as HTMLDialogElement;
+          if (modal) {
+            modal.close();
+          }
           addToRecent(exercise);
         }
       }}
