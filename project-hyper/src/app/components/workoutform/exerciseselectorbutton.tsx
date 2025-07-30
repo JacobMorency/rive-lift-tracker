@@ -37,15 +37,12 @@ const ExerciseSelectorButton = ({
         }
       }}
     >
-      <div className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-2">
-          {exercise.name}
-          {isFavorite && (
-            <Star size={12} fill="currentColor" className="text-yellow-500" />
-          )}
+      <div className="flex items-start justify-between w-full">
+        <div className="flex items-start gap-2 text-left flex-1 min-w-0">
+          <span className="break-words leading-tight">{exercise.name}</span>
         </div>
         {!isDisabled && (
-          <div>
+          <div className="flex-shrink-0 ml-2 mt-0.5">
             {isFavorite ? (
               <Star
                 size={20}
