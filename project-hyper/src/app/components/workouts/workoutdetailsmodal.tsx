@@ -13,6 +13,16 @@ type WorkoutDetailsModalProps = {
   workoutId: string | null;
 };
 
+type WorkoutExercise = {
+  exercise_id: number;
+  order_index: number;
+  exercise_library: {
+    id: number;
+    name: string;
+    category: string;
+  }[];
+};
+
 type WorkoutDetails = {
   id: string;
   name: string;
@@ -79,11 +89,14 @@ const WorkoutDetailsModal = ({
       // Transform the data
       const exercises =
         data.workout_exercises
-          ?.sort((a: any, b: any) => a.order_index - b.order_index)
-          .map((we: any) => ({
-            id: we.exercise_library.id,
-            name: we.exercise_library.name,
-            category: we.exercise_library.category,
+          ?.sort(
+            (a: WorkoutExercise, b: WorkoutExercise) =>
+              a.order_index - b.order_index
+          )
+          .map((we: WorkoutExercise) => ({
+            id: we.exercise_library[0]?.id || 0,
+            name: we.exercise_library[0]?.name || "",
+            category: we.exercise_library[0]?.category || "",
           })) || [];
 
       setWorkoutDetails({

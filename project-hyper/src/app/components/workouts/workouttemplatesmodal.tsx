@@ -133,7 +133,7 @@ const WorkoutTemplatesModal = ({
           )}
 
           {/* Scrollable List Section */}
-          <div className="flex-1 overflow-y-auto max-h-[calc(100vh-10rem)]">
+          <div className="flex-1 overflow-y-auto max-h-[calc(100vh-10rem)] scroll-smooth">
             {loading ? (
               <div className="flex justify-center items-center h-32">
                 <span className="loading loading-spinner loading-md"></span>
@@ -149,11 +149,11 @@ const WorkoutTemplatesModal = ({
                 </p>
               </div>
             ) : (
-              <div className="space-y-1">
+              <div className="space-y-1 snap-y snap-mandatory">
                 {workoutTemplates.map((workout) => (
                   <button
                     key={workout.id}
-                    className="btn w-full py-4 text-left bg-base-100 hover:bg-base-200 border border-base-300"
+                    className="btn w-full py-4 text-left bg-base-100 hover:bg-base-200 border border-base-300 snap-start"
                     onClick={() => handleWorkoutClick(workout.id)}
                   >
                     <div className="flex items-center justify-between w-full">
