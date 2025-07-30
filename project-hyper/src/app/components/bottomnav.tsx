@@ -12,36 +12,34 @@ const BottomNav = () => {
       <div className="flex items-center justify-around px-2 py-1">
         <button
           className={`flex flex-col items-center justify-center w-full py-2 px-1 transition-all duration-200 ${
-            pathname === "/dashboard"
-              ? "text-primary"
-              : "text-base-content/60 hover:text-base-content"
-          }`}
-          onClick={() => router.push("/dashboard")}
-        >
-          <House
-            className={`size-5 mb-1 transition-all duration-200 ${
-              pathname === "/dashboard" ? "scale-110" : ""
-            }`}
-          />
-          <span className="text-xs font-medium">Home</span>
-        </button>
-
-        <button
-          className={`flex flex-col items-center justify-center w-full py-2 px-1 transition-all duration-200 ${
-            pathname === "/workouts" || pathname.includes("addworkout")
+            pathname === "/workouts"
               ? "text-primary"
               : "text-base-content/60 hover:text-base-content"
           }`}
           onClick={() => router.push("/workouts")}
         >
-          <Dumbbell
+          <House
             className={`size-5 mb-1 transition-all duration-200 ${
-              pathname === "/workouts" || pathname.includes("addworkout")
-                ? "scale-110"
-                : ""
+              pathname === "/workouts" ? "scale-110" : ""
             }`}
           />
           <span className="text-xs font-medium">Workouts</span>
+        </button>
+
+        <button
+          className={`flex flex-col items-center justify-center w-full py-2 px-1 transition-all duration-200 ${
+            pathname === "/sessions"
+              ? "text-primary"
+              : "text-base-content/60 hover:text-base-content"
+          }`}
+          onClick={() => router.push("/sessions")}
+        >
+          <Dumbbell
+            className={`size-5 mb-1 transition-all duration-200 ${
+              pathname === "/sessions" ? "scale-110" : ""
+            }`}
+          />
+          <span className="text-xs font-medium">Sessions</span>
         </button>
 
         <button
