@@ -206,7 +206,7 @@ const SetInputForm = (props: SetInputFormProps) => {
               10
             </label>
           </div>
-          <div className="text-xs text-base-content/60 text-center mt-1 mb-2">
+          <div className="text-xs opacity-40 text-center mt-1 mb-2">
             Weight increment
           </div>
           {weightEmpty && (
