@@ -118,10 +118,10 @@ const WorkoutTemplatesModal = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 flex flex-col p-4">
           {/* Add New Workout Button */}
           {onAddNewWorkout && (
-            <div className="mb-4">
+            <div className="mb-4 flex-shrink-0">
               <button
                 onClick={onAddNewWorkout}
                 className="btn btn-primary w-full"
@@ -131,44 +131,48 @@ const WorkoutTemplatesModal = ({
               </button>
             </div>
           )}
-          {loading ? (
-            <div className="flex justify-center items-center h-32">
-              <span className="loading loading-spinner loading-md"></span>
-            </div>
-          ) : workoutTemplates.length === 0 ? (
-            <div className="text-center py-8">
-              <Dumbbell className="size-12 text-base-content/40 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-base-content mb-2">
-                No Workout Templates
-              </h3>
-              <p className="text-base-content/60">
-                Create your first workout template to get started
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-1">
-              {workoutTemplates.map((workout) => (
-                <button
-                  key={workout.id}
-                  className="btn w-full py-4 text-left bg-base-100 hover:bg-base-200 border border-base-300"
-                  onClick={() => handleWorkoutClick(workout.id)}
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <Dumbbell className="size-5 text-primary mr-4" />
-                    <div className="flex-1 text-left">
-                      <div className="font-medium text-base-content">
-                        {workout.name}
+
+          {/* Scrollable List Section */}
+          <div className="flex-1 overflow-y-auto max-h-[calc(100vh-10rem)]">
+            {loading ? (
+              <div className="flex justify-center items-center h-32">
+                <span className="loading loading-spinner loading-md"></span>
+              </div>
+            ) : workoutTemplates.length === 0 ? (
+              <div className="text-center py-8">
+                <Dumbbell className="size-12 text-base-content/40 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-base-content mb-2">
+                  No Workout Templates
+                </h3>
+                <p className="text-base-content/60">
+                  Create your first workout template to get started
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {workoutTemplates.map((workout) => (
+                  <button
+                    key={workout.id}
+                    className="btn w-full py-4 text-left bg-base-100 hover:bg-base-200 border border-base-300"
+                    onClick={() => handleWorkoutClick(workout.id)}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <Dumbbell className="size-5 text-primary mr-4" />
+                      <div className="flex-1 text-left">
+                        <div className="font-medium text-base-content">
+                          {workout.name}
+                        </div>
                       </div>
+                      <p className="text-base-content/40">
+                        {workout.exercise_count}
+                      </p>
+                      <ChevronRight className="size-5 text-base-content/40 flex-shrink-0 ml-2" />
                     </div>
-                    <p className="text-base-content/40">
-                      {workout.exercise_count}
-                    </p>
-                    <ChevronRight className="size-5 text-base-content/40 flex-shrink-0 ml-2" />
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
