@@ -145,7 +145,7 @@ const SessionTabs = ({ sessions }: SessionTabsProps) => {
                     <div className="flex items-center gap-2">
                       <span
                         className={`badge badge-sm ${
-                          session.completed ? "badge-success" : "badge-warning"
+                          session.completed ? "badge-primary" : "badge-warning"
                         }`}
                       >
                         {session.completed ? "Completed" : "In Progress"}
