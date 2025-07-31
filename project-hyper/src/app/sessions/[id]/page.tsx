@@ -9,7 +9,7 @@ import ClientLayout from "@/app/components/clientlayout";
 import PageHeader from "@/app/components/pageheader";
 import ExerciseTracker from "@/app/components/sessions/exercise-tracker";
 import { use } from "react";
-import { NullableNumber } from "@/types/workout";
+import { ExerciseSet } from "@/types/workout";
 import { formatExerciseName } from "@/app/lib/utils";
 
 type SessionPageProps = {
@@ -30,21 +30,6 @@ type SessionData = {
   workout_id: string;
   workout_name: string;
   exercises: Exercise[];
-  completed: boolean;
-};
-
-type ExerciseSet = {
-  id?: string;
-  reps: NullableNumber;
-  weight: NullableNumber;
-  partialReps: NullableNumber;
-  set_number: number;
-};
-
-type RawSession = {
-  id: string;
-  started_at: string;
-  workout_id: string;
   completed: boolean;
 };
 
@@ -71,6 +56,7 @@ type RawExerciseSet = {
   reps: number;
   weight: number;
   partial_reps: number;
+  created_at: string;
 };
 
 const SessionPage = ({ params }: SessionPageProps) => {
@@ -182,15 +168,6 @@ const SessionPage = ({ params }: SessionPageProps) => {
         })
         .filter((exercise): exercise is Exercise => exercise !== null);
 
-      setSessionData({
-        id: sessionData.id,
-        started_at: sessionData.started_at,
-        workout_id: sessionData.workout_id,
-        workout_name: workoutData.name,
-        exercises,
-        completed: sessionData.completed || false,
-      });
-
       // Initialize exercise progress
       const initialProgress = exercises.map((exercise) => ({
         exerciseId: exercise.id,
@@ -198,10 +175,25 @@ const SessionPage = ({ params }: SessionPageProps) => {
         sets: [],
         completed: false,
       }));
-      setExerciseProgress(initialProgress);
 
-      // Load existing exercise data
-      await loadExistingExerciseData(exercises);
+      // Set session data first
+      const finalSessionData = {
+        id: sessionData.id,
+        started_at: sessionData.started_at,
+        workout_id: sessionData.workout_id,
+        workout_name: workoutData.name,
+        exercises,
+        completed: sessionData.completed || false,
+      };
+      setSessionData(finalSessionData);
+
+      // Load existing exercise data from database
+      const loadedProgress = await loadExistingExerciseData(
+        exercises,
+        initialProgress,
+        finalSessionData
+      );
+      setExerciseProgress(loadedProgress);
     } catch (error) {
       console.error("Error fetching session:", error);
     } finally {
@@ -229,11 +221,17 @@ const SessionPage = ({ params }: SessionPageProps) => {
     await saveExerciseData(currentExerciseIndex, sets);
   };
 
-  const loadExistingExerciseData = async (exercises: Exercise[]) => {
-    if (!sessionData) return;
+  const loadExistingExerciseData = async (
+    exercises: Exercise[],
+    initialProgress: ExerciseProgress[],
+    sessionDataToUse: SessionData
+  ) => {
+    if (!sessionDataToUse) {
+      return initialProgress;
+    }
 
     try {
-      // Get all session exercises for this session
+      // Get all session exercises for this session with their sets
       const { data: sessionExercises, error: sessionExercisesError } =
         await supabase
           .from("session_exercises")
@@ -246,11 +244,12 @@ const SessionPage = ({ params }: SessionPageProps) => {
             id,
             reps,
             weight,
-            partial_reps
+            partial_reps,
+            created_at
           )
         `
           )
-          .eq("session_id", sessionData.id)
+          .eq("session_id", sessionDataToUse.id)
           .order("order_index");
 
       if (sessionExercisesError) {
@@ -258,27 +257,35 @@ const SessionPage = ({ params }: SessionPageProps) => {
           "Error loading session exercises:",
           sessionExercisesError
         );
-        return;
+        return initialProgress;
       }
 
       // Update exercise progress with loaded data
-      const updatedProgress = [...exerciseProgress];
+      const updatedProgress = [...initialProgress];
 
       sessionExercises?.forEach((sessionExercise) => {
         const exerciseIndex = exercises.findIndex(
           (ex) => ex.id === sessionExercise.exercise_id
         );
+
         if (exerciseIndex !== -1) {
-          const sets: ExerciseSet[] =
-            sessionExercise.exercise_sets?.map(
-              (set: RawExerciseSet, index: number) => ({
-                id: set.id,
-                reps: set.reps,
-                weight: set.weight,
-                partialReps: set.partial_reps,
-                set_number: index + 1,
-              })
+          // Sort sets by created_at to maintain order
+          const sortedSets =
+            sessionExercise.exercise_sets?.sort(
+              (a: RawExerciseSet, b: RawExerciseSet) =>
+                new Date(a.created_at).getTime() -
+                new Date(b.created_at).getTime()
             ) || [];
+
+          const sets: ExerciseSet[] = sortedSets.map(
+            (set: RawExerciseSet, index: number) => ({
+              id: set.id,
+              reps: set.reps,
+              weight: set.weight,
+              partialReps: set.partial_reps,
+              set_number: index + 1,
+            })
+          );
 
           updatedProgress[exerciseIndex] = {
             ...updatedProgress[exerciseIndex],
@@ -288,9 +295,10 @@ const SessionPage = ({ params }: SessionPageProps) => {
         }
       });
 
-      setExerciseProgress(updatedProgress);
+      return updatedProgress;
     } catch (error) {
       console.error("Error loading existing exercise data:", error);
+      return initialProgress;
     }
   };
 
@@ -304,28 +312,26 @@ const SessionPage = ({ params }: SessionPageProps) => {
 
     try {
       // First, check if session_exercise record exists
-      const { data: existingSessionExercise, error: checkError } =
+      const { data: existingSessionExercises, error: checkError } =
         await supabase
           .from("session_exercises")
           .select("id")
           .eq("session_id", sessionData.id)
-          .eq("exercise_id", exercise.id)
-          .single();
+          .eq("exercise_id", exercise.id);
 
-      let sessionExerciseData;
-
-      if (checkError && checkError.code !== "PGRST116") {
-        // PGRST116 is "not found" error, which is expected if no record exists
+      if (checkError) {
         console.error("Error checking session exercise:", checkError);
         return;
       }
 
-      if (existingSessionExercise) {
+      let sessionExerciseData;
+
+      if (existingSessionExercises && existingSessionExercises.length > 0) {
         // Update existing record
         const { data: updatedData, error: updateError } = await supabase
           .from("session_exercises")
           .update({ order_index: exerciseIndex })
-          .eq("id", existingSessionExercise.id)
+          .eq("id", existingSessionExercises[0].id)
           .select()
           .single();
 
@@ -359,13 +365,14 @@ const SessionPage = ({ params }: SessionPageProps) => {
         .delete()
         .eq("session_exercise_id", sessionExerciseData.id);
 
-      // Insert new sets
+      // Insert new sets with proper order
       if (sets.length > 0) {
         const setsToInsert = sets.map((set) => ({
           session_exercise_id: sessionExerciseData.id,
           reps: set.reps,
           weight: set.weight,
           partial_reps: set.partialReps || 0,
+          // created_at will be automatically set by the database
         }));
 
         const { error: setsError } = await supabase
