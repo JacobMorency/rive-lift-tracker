@@ -144,7 +144,7 @@ const SessionsContent = () => {
               {sessions.map((session) => (
                 <button
                   key={session.id}
-                  className="btn w-full py-4 text-left bg-base-100 hover:bg-base-200 border border-base-300"
+                  className="btn btn-ghost w-full py-6 text-left bg-base-100"
                   onClick={() => handleSessionClick(session.id)}
                 >
                   <div className="flex items-center justify-between w-full">
