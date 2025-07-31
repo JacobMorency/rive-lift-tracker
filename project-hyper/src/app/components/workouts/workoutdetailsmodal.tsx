@@ -63,22 +63,43 @@ const WorkoutDetailsModal = ({
 
       console.log("Workout data:", workoutData);
 
-      // Fetch exercises from workout_exercises table
+      // Fetch workout exercises
+      const { data: workoutExercisesData, error: workoutExercisesError } =
+        await supabase
+          .from("workout_exercises")
+          .select("exercise_id, order_index")
+          .eq("workout_id", workoutId)
+          .order("order_index", { ascending: true });
+
+      if (workoutExercisesError) {
+        console.error(
+          "Error fetching workout exercises:",
+          workoutExercisesError.message
+        );
+        return;
+      }
+
+      console.log("Workout exercises data:", workoutExercisesData);
+
+      if (!workoutExercisesData || workoutExercisesData.length === 0) {
+        setWorkoutDetails({
+          id: workoutData.id,
+          name: workoutData.name,
+          description: workoutData.description,
+          created_at: workoutData.created_at,
+          exercises: [],
+        });
+        return;
+      }
+
+      // Get unique exercise IDs
+      const exerciseIds = workoutExercisesData.map((we) => we.exercise_id);
+
+      // Fetch exercise details
       const { data: exercisesData, error: exercisesError } = await supabase
-        .from("workout_exercises")
-        .select(
-          `
-          exercise_id,
-          order_index,
-          exercise_library(
-            id,
-            name,
-            category
-          )
-        `
-        )
-        .eq("workout_id", workoutId)
-        .order("order_index", { ascending: true });
+        .from("exercise_library")
+        .select("id, name, category")
+        .in("id", exerciseIds);
 
       if (exercisesError) {
         console.error("Error fetching exercises:", exercisesError.message);
@@ -87,13 +108,25 @@ const WorkoutDetailsModal = ({
 
       console.log("Exercises data:", exercisesData);
 
+      // Create a map of exercise IDs to exercise details
+      const exerciseMap = new Map();
+      exercisesData?.forEach((exercise) => {
+        exerciseMap.set(exercise.id, exercise);
+      });
+
       // Transform the exercises data
-      const exercises =
-        exercisesData?.map((we: any) => ({
-          id: we.exercise_library?.id || 0,
-          name: we.exercise_library?.name || "",
-          category: we.exercise_library?.category || "",
-        })) || [];
+      const exercises = workoutExercisesData
+        .map((we) => {
+          const exercise = exerciseMap.get(we.exercise_id);
+          return exercise
+            ? {
+                id: exercise.id,
+                name: exercise.name,
+                category: exercise.category,
+              }
+            : null;
+        })
+        .filter((exercise) => exercise !== null);
 
       console.log("Exercises:", exercises);
 
