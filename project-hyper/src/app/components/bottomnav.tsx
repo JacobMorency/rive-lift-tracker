@@ -28,7 +28,7 @@ const BottomNav = () => {
 
         <button
           className={`flex flex-col items-center justify-center w-full py-2 px-1 transition-all duration-200 ${
-            pathname === "/sessions"
+            pathname.includes("/sessions")
               ? "text-primary"
               : "text-base-content/60 hover:text-base-content"
           }`}
@@ -36,7 +36,7 @@ const BottomNav = () => {
         >
           <Dumbbell
             className={`size-5 mb-1 transition-all duration-200 ${
-              pathname === "/sessions" ? "scale-110" : ""
+              pathname.includes("/sessions") ? "scale-110" : ""
             }`}
           />
           <span className="text-xs font-medium">Sessions</span>
