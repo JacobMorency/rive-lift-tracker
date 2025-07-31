@@ -11,8 +11,8 @@ type Exercise = {
   category: string;
 };
 
-type Set = {
-  id?: number;
+type ExerciseSet = {
+  id?: string;
   reps: NullableNumber;
   weight: NullableNumber;
   partialReps: NullableNumber;
@@ -21,9 +21,9 @@ type Set = {
 
 type ExerciseTrackerProps = {
   exercise: Exercise;
-  onComplete: (sets: Set[]) => void;
+  onComplete: (sets: ExerciseSet[]) => void;
   onBack: () => void;
-  initialSets?: Set[];
+  initialSets?: ExerciseSet[];
 };
 
 const ExerciseTracker = ({
@@ -32,8 +32,8 @@ const ExerciseTracker = ({
   onBack,
   initialSets = [],
 }: ExerciseTrackerProps) => {
-  const [sets, setSets] = useState<Set[]>(initialSets);
-  const [currentSet, setCurrentSet] = useState<Set>({
+  const [sets, setSets] = useState<ExerciseSet[]>(initialSets);
+  const [currentSet, setCurrentSet] = useState<ExerciseSet>({
     reps: null,
     weight: null,
     partialReps: null,
