@@ -1,6 +1,7 @@
 import { SquarePen, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { ExercisesInWorkout } from "@/types/workout";
+import { formatExerciseName } from "@/app/lib/utils";
 
 type CompletedExerciseListProps = {
   exercisesInWorkout: ExercisesInWorkout[];
@@ -97,7 +98,7 @@ const CompletedExerciseList = ({
                 key={exercise.id}
                 className="rounded py-3 px-2 my-2 flex items-center justify-between bg-base-100"
               >
-                <p>{exercise.name}</p>
+                <p>{formatExerciseName(exercise.name)}</p>
                 <span className="flex gap-2">
                   <button
                     className="btn btn-primary px-2 rounded"

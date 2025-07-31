@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import supabase from "@/app/lib/supabaseClient";
 import { Dumbbell, ArrowLeft } from "lucide-react";
 import { ExercisesInWorkout, Exercise } from "@/types/workout";
+import { formatExerciseName } from "@/app/lib/utils";
 import { toast } from "sonner";
 import debounce from "lodash/debounce";
 import { useAuth } from "@/app/context/authcontext";
@@ -125,7 +126,7 @@ const ExerciseSelector = ({
 
   // Handle the select
   const handleSelect = (exercise: Exercise): void => {
-    setExerciseName(exercise.name);
+    setExerciseName(formatExerciseName(exercise.name));
     setExerciseId(exercise.id);
   };
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { X, Plus, Dumbbell } from "lucide-react";
+import { formatExerciseName } from "@/app/lib/utils";
 import supabase from "@/app/lib/supabaseClient";
 import ExerciseSelector from "../exerciseselector";
 import { Exercise } from "@/types/workout";
@@ -213,7 +214,7 @@ const WorkoutDetailsModal = ({
                             <Dumbbell className="size-5 text-primary mr-4" />
                             <div className="flex-1 text-left">
                               <div className="font-medium text-base-content">
-                                {exercise.name}
+                                {formatExerciseName(exercise.name)}
                               </div>
                             </div>
                           </div>

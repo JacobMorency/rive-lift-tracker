@@ -1,5 +1,6 @@
 import { Exercise } from "@/types/workout";
 import { Star, StarOff } from "lucide-react";
+import { formatExerciseName } from "@/app/lib/utils";
 
 type ExerciseSelectorButtonProps = {
   exercise: Exercise;
@@ -47,7 +48,9 @@ const ExerciseSelectorButton = ({
     >
       <div className="flex items-start justify-between w-full">
         <div className="flex items-start gap-2 text-left flex-1 min-w-0">
-          <span className="break-words leading-tight">{exercise.name}</span>
+          <span className="break-words leading-tight">
+            {formatExerciseName(exercise.name)}
+          </span>
         </div>
         {!isDisabled && (
           <div className="flex-shrink-0 ml-2 mt-0.5">
