@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Plus, Play, ChevronRight } from "lucide-react";
 import supabase from "@/app/lib/supabaseClient";
 import SelectWorkoutModal from "./selectworkoutmodal";
+import { useRouter } from "next/navigation";
 
 type Session = {
   id: string;
@@ -13,10 +14,6 @@ type Session = {
   ended_at: string | null;
   completed: boolean;
 };
-
-// type Workout = {
-//   name: string;
-// }[];
 
 type RawSession = {
   id: string;
@@ -32,6 +29,7 @@ const SessionsContent = () => {
   const [isSelectWorkoutModalOpen, setIsSelectWorkoutModalOpen] =
     useState(false);
   const { user } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     if (user) {
@@ -107,8 +105,7 @@ const SessionsContent = () => {
   };
 
   const handleSessionClick = (sessionId: string) => {
-    // TODO: Navigate to session details or start session
-    console.log("Open session:", sessionId);
+    router.push(`/sessions/${sessionId}`);
   };
 
   if (loading) {
@@ -168,7 +165,6 @@ const SessionsContent = () => {
                       >
                         {session.completed ? "Completed" : "In Progress"}
                       </span>
-
                       <ChevronRight className="size-5 text-base-content/40 flex-shrink-0 ml-2" />
                     </div>
                   </div>
