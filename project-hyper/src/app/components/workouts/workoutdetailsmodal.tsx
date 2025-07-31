@@ -13,16 +13,6 @@ type WorkoutDetailsModalProps = {
   workoutId: string | null;
 };
 
-type WorkoutExercise = {
-  exercise_id: number;
-  order_index: number;
-  exercise_library: {
-    id: number;
-    name: string;
-    category: string;
-  }[];
-};
-
 type WorkoutDetails = {
   id: string;
   name: string;
@@ -58,52 +48,59 @@ const WorkoutDetailsModal = ({
 
     setLoading(true);
     try {
-      // Fetch workout details with exercises
-      const { data, error } = await supabase
+      // Fetch workout details
+      const { data: workoutData, error: workoutError } = await supabase
         .from("workouts")
-        .select(
-          `
-          id,
-          name,
-          description,
-          created_at,
-          workout_exercises(
-            exercise_id,
-            order_index,
-            exercise_library(
-              id,
-              name,
-              category
-            )
-          )
-        `
-        )
+        .select("id, name, description, created_at")
         .eq("id", workoutId)
         .single();
 
-      if (error) {
-        console.error("Error fetching workout details:", error.message);
+      if (workoutError) {
+        console.error("Error fetching workout details:", workoutError.message);
         return;
       }
 
-      // Transform the data
-      const exercises =
-        data.workout_exercises
-          ?.sort(
-            (a: WorkoutExercise, b: WorkoutExercise) =>
-              a.order_index - b.order_index
+      console.log("Workout data:", workoutData);
+
+      // Fetch exercises from workout_exercises table
+      const { data: exercisesData, error: exercisesError } = await supabase
+        .from("workout_exercises")
+        .select(
+          `
+          exercise_id,
+          order_index,
+          exercise_library(
+            id,
+            name,
+            category
           )
-          .map((we: WorkoutExercise) => ({
-            id: we.exercise_library[0]?.id || 0,
-            name: we.exercise_library[0]?.name || "",
-            category: we.exercise_library[0]?.category || "",
-          })) || [];
+        `
+        )
+        .eq("workout_id", workoutId)
+        .order("order_index", { ascending: true });
+
+      if (exercisesError) {
+        console.error("Error fetching exercises:", exercisesError.message);
+        return;
+      }
+
+      console.log("Exercises data:", exercisesData);
+
+      // Transform the exercises data
+      const exercises =
+        exercisesData?.map((we: any) => ({
+          id: we.exercise_library?.id || 0,
+          name: we.exercise_library?.name || "",
+          category: we.exercise_library?.category || "",
+        })) || [];
+
+      console.log("Exercises:", exercises);
 
       setWorkoutDetails({
-        id: data.id,
-        name: data.name,
-        description: data.description,
-        created_at: data.created_at,
+        id: workoutData.id,
+        name: workoutData.name,
+        description: workoutData.description,
+        created_at: workoutData.created_at,
         exercises,
       });
     } catch (error) {
