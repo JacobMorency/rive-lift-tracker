@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/app/context/authcontext";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Play, Dumbbell } from "lucide-react";
+import { ArrowLeft, Play, Dumbbell, AlertTriangle } from "lucide-react";
 import supabase from "@/app/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import ClientLayout from "@/app/components/clientlayout";
@@ -30,10 +30,11 @@ type SessionData = {
   workout_id: string;
   workout_name: string;
   exercises: Exercise[];
+  completed: boolean;
 };
 
-type Set = {
-  id?: number;
+type ExerciseSet = {
+  id?: string;
   reps: NullableNumber;
   weight: NullableNumber;
   partialReps: NullableNumber;
@@ -44,6 +45,7 @@ type RawSession = {
   id: string;
   started_at: string;
   workout_id: string;
+  completed: boolean;
 };
 
 type RawWorkoutExercise = {
@@ -60,8 +62,15 @@ type RawExercise = {
 type ExerciseProgress = {
   exerciseId: number;
   exerciseName: string;
-  sets: Set[];
+  sets: ExerciseSet[];
   completed: boolean;
+};
+
+type RawExerciseSet = {
+  id: string;
+  reps: number;
+  weight: number;
+  partial_reps: number;
 };
 
 const SessionPage = ({ params }: SessionPageProps) => {
@@ -73,6 +82,7 @@ const SessionPage = ({ params }: SessionPageProps) => {
   const [exerciseProgress, setExerciseProgress] = useState<ExerciseProgress[]>(
     []
   );
+  const [showCancelModal, setShowCancelModal] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
   const resolvedParams = use(params);
@@ -88,7 +98,7 @@ const SessionPage = ({ params }: SessionPageProps) => {
       // First query: Fetch session data
       const { data: sessionData, error: sessionError } = await supabase
         .from("workout_sessions")
-        .select("id, started_at, workout_id")
+        .select("id, started_at, workout_id, completed")
         .eq("id", resolvedParams.id)
         .eq("user_id", user?.id)
         .single();
@@ -133,6 +143,7 @@ const SessionPage = ({ params }: SessionPageProps) => {
           workout_id: sessionData.workout_id,
           workout_name: workoutData.name,
           exercises: [],
+          completed: sessionData.completed || false,
         });
         return;
       }
@@ -177,6 +188,7 @@ const SessionPage = ({ params }: SessionPageProps) => {
         workout_id: sessionData.workout_id,
         workout_name: workoutData.name,
         exercises,
+        completed: sessionData.completed || false,
       });
 
       // Initialize exercise progress
@@ -187,6 +199,9 @@ const SessionPage = ({ params }: SessionPageProps) => {
         completed: false,
       }));
       setExerciseProgress(initialProgress);
+
+      // Load existing exercise data
+      await loadExistingExerciseData(exercises);
     } catch (error) {
       console.error("Error fetching session:", error);
     } finally {
@@ -198,7 +213,7 @@ const SessionPage = ({ params }: SessionPageProps) => {
     setCurrentExerciseIndex(exerciseIndex);
   };
 
-  const handleExerciseComplete = (sets: Set[]) => {
+  const handleExerciseComplete = async (sets: ExerciseSet[]) => {
     if (currentExerciseIndex === null) return;
 
     const updatedProgress = [...exerciseProgress];
@@ -209,6 +224,161 @@ const SessionPage = ({ params }: SessionPageProps) => {
     };
     setExerciseProgress(updatedProgress);
     setCurrentExerciseIndex(null);
+
+    // Save exercise data to database
+    await saveExerciseData(currentExerciseIndex, sets);
+  };
+
+  const loadExistingExerciseData = async (exercises: Exercise[]) => {
+    if (!sessionData) return;
+
+    try {
+      // Get all session exercises for this session
+      const { data: sessionExercises, error: sessionExercisesError } =
+        await supabase
+          .from("session_exercises")
+          .select(
+            `
+          id,
+          exercise_id,
+          order_index,
+          exercise_sets (
+            id,
+            reps,
+            weight,
+            partial_reps
+          )
+        `
+          )
+          .eq("session_id", sessionData.id)
+          .order("order_index");
+
+      if (sessionExercisesError) {
+        console.error(
+          "Error loading session exercises:",
+          sessionExercisesError
+        );
+        return;
+      }
+
+      // Update exercise progress with loaded data
+      const updatedProgress = [...exerciseProgress];
+
+      sessionExercises?.forEach((sessionExercise) => {
+        const exerciseIndex = exercises.findIndex(
+          (ex) => ex.id === sessionExercise.exercise_id
+        );
+        if (exerciseIndex !== -1) {
+          const sets: ExerciseSet[] =
+            sessionExercise.exercise_sets?.map(
+              (set: RawExerciseSet, index: number) => ({
+                id: set.id,
+                reps: set.reps,
+                weight: set.weight,
+                partialReps: set.partial_reps,
+                set_number: index + 1,
+              })
+            ) || [];
+
+          updatedProgress[exerciseIndex] = {
+            ...updatedProgress[exerciseIndex],
+            sets,
+            completed: sets.length > 0,
+          };
+        }
+      });
+
+      setExerciseProgress(updatedProgress);
+    } catch (error) {
+      console.error("Error loading existing exercise data:", error);
+    }
+  };
+
+  const saveExerciseData = async (
+    exerciseIndex: number,
+    sets: ExerciseSet[]
+  ) => {
+    if (!sessionData || !user) return;
+
+    const exercise = sessionData.exercises[exerciseIndex];
+
+    try {
+      // First, check if session_exercise record exists
+      const { data: existingSessionExercise, error: checkError } =
+        await supabase
+          .from("session_exercises")
+          .select("id")
+          .eq("session_id", sessionData.id)
+          .eq("exercise_id", exercise.id)
+          .single();
+
+      let sessionExerciseData;
+
+      if (checkError && checkError.code !== "PGRST116") {
+        // PGRST116 is "not found" error, which is expected if no record exists
+        console.error("Error checking session exercise:", checkError);
+        return;
+      }
+
+      if (existingSessionExercise) {
+        // Update existing record
+        const { data: updatedData, error: updateError } = await supabase
+          .from("session_exercises")
+          .update({ order_index: exerciseIndex })
+          .eq("id", existingSessionExercise.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error("Error updating session exercise:", updateError);
+          return;
+        }
+        sessionExerciseData = updatedData;
+      } else {
+        // Insert new record
+        const { data: insertedData, error: insertError } = await supabase
+          .from("session_exercises")
+          .insert({
+            session_id: sessionData.id,
+            exercise_id: exercise.id,
+            order_index: exerciseIndex,
+          })
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error("Error inserting session exercise:", insertError);
+          return;
+        }
+        sessionExerciseData = insertedData;
+      }
+
+      // Delete existing sets for this exercise
+      await supabase
+        .from("exercise_sets")
+        .delete()
+        .eq("session_exercise_id", sessionExerciseData.id);
+
+      // Insert new sets
+      if (sets.length > 0) {
+        const setsToInsert = sets.map((set) => ({
+          session_exercise_id: sessionExerciseData.id,
+          reps: set.reps,
+          weight: set.weight,
+          partial_reps: set.partialReps || 0,
+        }));
+
+        const { error: setsError } = await supabase
+          .from("exercise_sets")
+          .insert(setsToInsert);
+
+        if (setsError) {
+          console.error("Error saving sets:", setsError);
+        }
+      }
+    } catch (error) {
+      console.error("Error saving exercise data:", error);
+    }
   };
 
   const handleBackToExercises = () => {
@@ -217,6 +387,61 @@ const SessionPage = ({ params }: SessionPageProps) => {
 
   const handleBack = () => {
     router.push("/sessions");
+  };
+
+  const handleCancelSession = () => {
+    setShowCancelModal(true);
+  };
+
+  const handleConfirmCancel = async () => {
+    if (!sessionData || !user) return;
+
+    try {
+      // Delete the session from the database
+      const { error: deleteError } = await supabase
+        .from("workout_sessions")
+        .delete()
+        .eq("id", sessionData.id);
+
+      if (deleteError) {
+        console.error("Error deleting session:", deleteError);
+        return;
+      }
+
+      // Navigate back to sessions list
+      router.push("/sessions");
+    } catch (error) {
+      console.error("Error deleting session:", error);
+    }
+  };
+
+  const handleDismissCancel = () => {
+    setShowCancelModal(false);
+  };
+
+  const handleCompleteSession = async () => {
+    if (!sessionData || !user) return;
+
+    try {
+      // Update the session to mark it as completed
+      const { error: updateError } = await supabase
+        .from("workout_sessions")
+        .update({
+          completed: true,
+          ended_at: new Date().toISOString(),
+        })
+        .eq("id", sessionData.id);
+
+      if (updateError) {
+        console.error("Error completing session:", updateError);
+        return;
+      }
+
+      // Navigate back to sessions list
+      router.push("/sessions");
+    } catch (error) {
+      console.error("Error completing session:", error);
+    }
   };
 
   if (loading) {
@@ -278,6 +503,23 @@ const SessionPage = ({ params }: SessionPageProps) => {
       }
     >
       <div className="p-2">
+        {/* Session Action Buttons */}
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={handleCancelSession}
+            className="btn btn-outline btn-error flex-1"
+          >
+            {sessionData.completed ? "Delete Session" : "Cancel Session"}
+          </button>
+          <button
+            onClick={handleCompleteSession}
+            className="btn btn-primary flex-1"
+            disabled={exerciseProgress.every((ex) => !ex.completed)}
+          >
+            Complete Session
+          </button>
+        </div>
+
         <div className="mb-4">
           <h2 className="text-lg font-semibold mb-2">
             Exercises ({sessionData.exercises.length})
@@ -331,6 +573,36 @@ const SessionPage = ({ params }: SessionPageProps) => {
           </div>
         )}
       </div>
+
+      {/* Cancel Session Confirmation Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-base-100 rounded-lg p-6 max-w-sm mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <AlertTriangle className="size-6 text-error" />
+              <h3 className="text-lg font-semibold">Cancel Session</h3>
+            </div>
+            <p className="text-base-content/70 mb-6">
+              Are you sure you want to cancel this session? This will
+              permanently delete the session and all your progress.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleDismissCancel}
+                className="btn btn-outline flex-1"
+              >
+                Keep Session
+              </button>
+              <button
+                onClick={handleConfirmCancel}
+                className="btn btn-error flex-1"
+              >
+                Delete Session
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </ClientLayout>
   );
 };
