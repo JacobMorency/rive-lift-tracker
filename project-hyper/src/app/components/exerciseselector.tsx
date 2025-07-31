@@ -5,6 +5,7 @@ import { Plus, Check } from "lucide-react";
 import supabase from "@/app/lib/supabaseClient";
 import { Exercise } from "@/types/workout";
 import debounce from "lodash/debounce";
+import { formatExerciseName } from "@/app/lib/utils";
 
 type ExerciseSelectorProps = {
   onExerciseSelect: (exercises: Exercise[]) => void;
@@ -216,7 +217,9 @@ const ExerciseSelector = ({
                     >
                       <div className="flex items-center justify-between w-full">
                         <div className="flex-1 text-left">
-                          <div className="text-sm">{exercise.name}</div>
+                          <div className="text-sm">
+                            {formatExerciseName(exercise.name)}
+                          </div>
                         </div>
                       </div>
                     </button>
