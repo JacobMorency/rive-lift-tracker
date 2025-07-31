@@ -9,21 +9,21 @@ import SelectWorkoutModal from "./selectworkoutmodal";
 type Session = {
   id: string;
   name: string;
-  created_at: string;
-  exercise_count: number;
+  started_at: string;
+  ended_at: string | null;
   completed: boolean;
 };
 
-type SessionWithExercises = {
+// type Workout = {
+//   name: string;
+// }[];
+
+type RawSession = {
   id: string;
   started_at: string;
   ended_at: string | null;
   completed: boolean;
   workout_id: string;
-  workouts: {
-    name: string;
-    workout_exercises: { count: number }[];
-  }[];
 };
 
 const SessionsContent = () => {
@@ -44,42 +44,57 @@ const SessionsContent = () => {
 
     setLoading(true);
     try {
-      // Fetch sessions with workout and exercise count
-      const { data, error } = await supabase
+      // First query: Get sessions
+      const { data: rawSessionsData, error: sessionsError } = await supabase
         .from("workout_sessions")
-        .select(
-          `
-          id,
-          started_at,
-          ended_at,
-          completed,
-          workout_id,
-          workouts!inner(
-            name,
-            workout_exercises(count)
-          )
-        `
-        )
+        .select("id, started_at, ended_at, completed, workout_id")
         .eq("user_id", user.id)
         .order("started_at", { ascending: false });
 
-      if (error) {
-        console.error("Error fetching sessions:", error.message);
+      if (sessionsError) {
+        console.error("Error fetching sessions:", sessionsError.message);
         return;
       }
 
-      // Transform the data to include exercise count
-      const sessionsData =
-        data?.map((session: SessionWithExercises) => ({
-          id: session.id,
-          name: session.workouts[0]?.name || "Unknown Workout",
-          created_at: session.started_at,
-          exercise_count:
-            session.workouts[0]?.workout_exercises?.[0]?.count || 0,
-          completed: session.completed || false,
-        })) || [];
+      if (!rawSessionsData || rawSessionsData.length === 0) {
+        setSessions([]);
+        return;
+      }
 
-      setSessions(sessionsData);
+      // Get unique workout IDs
+      const workoutIds = [
+        ...new Set(rawSessionsData.map((session) => session.workout_id)),
+      ];
+
+      // Second query: Get workout names
+      const { data: workoutsData, error: workoutsError } = await supabase
+        .from("workouts")
+        .select("id, name")
+        .in("id", workoutIds);
+
+      if (workoutsError) {
+        console.error("Error fetching workouts:", workoutsError.message);
+        return;
+      }
+
+      // Create a map of workout IDs to names
+      const workoutMap = new Map<string, string>();
+      workoutsData?.forEach((workout) => {
+        workoutMap.set(workout.id, workout.name);
+      });
+
+      // Transform the data
+      const transformedSessions = rawSessionsData.map(
+        (session: RawSession) => ({
+          id: session.id,
+          name: workoutMap.get(session.workout_id) || "Unknown Workout",
+          started_at: session.started_at,
+          ended_at: session.ended_at,
+          completed: session.completed || false,
+        })
+      );
+
+      setSessions(transformedSessions);
     } catch (error) {
       console.error("Error fetching sessions:", error);
     } finally {
@@ -142,7 +157,7 @@ const SessionsContent = () => {
                         {session.name}
                       </div>
                       <div className="text-xs text-base-content/60">
-                        {new Date(session.created_at).toLocaleDateString()}
+                        {new Date(session.started_at).toLocaleDateString()}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -153,9 +168,7 @@ const SessionsContent = () => {
                       >
                         {session.completed ? "Completed" : "In Progress"}
                       </span>
-                      <p className="text-base-content/40">
-                        {session.exercise_count}
-                      </p>
+
                       <ChevronRight className="size-5 text-base-content/40 flex-shrink-0 ml-2" />
                     </div>
                   </div>
