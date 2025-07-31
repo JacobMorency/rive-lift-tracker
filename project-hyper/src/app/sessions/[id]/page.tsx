@@ -579,7 +579,7 @@ const SessionPage = ({ params }: SessionPageProps) => {
                     </div>
                     <div className="flex items-center gap-2">
                       {isCompleted && (
-                        <span className="badge badge-success badge-sm">
+                        <span className="badge badge-primary badge-sm">
                           {setCount} sets
                         </span>
                       )}
