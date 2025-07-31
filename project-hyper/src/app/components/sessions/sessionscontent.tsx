@@ -2,10 +2,10 @@
 
 import { useAuth } from "@/app/context/authcontext";
 import { useState, useEffect } from "react";
-import { Plus, Play, ChevronRight } from "lucide-react";
+import { Plus } from "lucide-react";
 import supabase from "@/app/lib/supabaseClient";
 import SelectWorkoutModal from "./selectworkoutmodal";
-import { useRouter } from "next/navigation";
+import SessionTabs from "./sessiontabs";
 
 type Session = {
   id: string;
@@ -29,7 +29,6 @@ const SessionsContent = () => {
   const [isSelectWorkoutModalOpen, setIsSelectWorkoutModalOpen] =
     useState(false);
   const { user } = useAuth();
-  const router = useRouter();
 
   useEffect(() => {
     if (user) {
@@ -104,10 +103,6 @@ const SessionsContent = () => {
     setIsSelectWorkoutModalOpen(true);
   };
 
-  const handleSessionClick = (sessionId: string) => {
-    router.push(`/sessions/${sessionId}`);
-  };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-32">
@@ -128,51 +123,7 @@ const SessionsContent = () => {
         </div>
 
         {/* Sessions List */}
-        <div className="px-4">
-          {sessions.length === 0 ? (
-            <div className="text-center py-8">
-              <Play className="size-12 text-base-content/40 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-base-content mb-2">
-                No Sessions
-              </h3>
-              <p className="text-base-content/60">
-                Start your first workout session to track your progress
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-1">
-              {sessions.map((session) => (
-                <button
-                  key={session.id}
-                  className="btn btn-ghost w-full py-6 text-left bg-base-100"
-                  onClick={() => handleSessionClick(session.id)}
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <Play className="size-5 text-primary mr-4" />
-                    <div className="flex-1 text-left">
-                      <div className="font-medium text-base-content">
-                        {session.name}
-                      </div>
-                      <div className="text-xs text-base-content/60">
-                        {new Date(session.started_at).toLocaleDateString()}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`badge badge-sm ${
-                          session.completed ? "badge-success" : "badge-warning"
-                        }`}
-                      >
-                        {session.completed ? "Completed" : "In Progress"}
-                      </span>
-                      <ChevronRight className="size-5 text-base-content/40 flex-shrink-0 ml-2" />
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <SessionTabs sessions={sessions} />
       </div>
 
       {/* Select Workout Modal */}
