@@ -2,7 +2,14 @@
 
 import { useAuth } from "@/app/context/authcontext";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Play, Dumbbell, AlertTriangle } from "lucide-react";
+import {
+  ArrowLeft,
+  Play,
+  Dumbbell,
+  AlertTriangle,
+  Trash2,
+  Check,
+} from "lucide-react";
 import supabase from "@/app/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import ClientLayout from "@/app/components/clientlayout";
@@ -494,36 +501,41 @@ const SessionPage = ({ params }: SessionPageProps) => {
   return (
     <ClientLayout
       header={
-        <div className="flex items-center gap-4">
-          <button onClick={handleBack} className="btn btn-ghost btn-sm">
-            <ArrowLeft className="size-5" />
-          </button>
-          <div>
-            <h1 className="text-lg font-semibold">
-              {sessionData.workout_name}
-            </h1>
-            <p className="text-sm text-base-content/60">
-              Started {new Date(sessionData.started_at).toLocaleDateString()}
-            </p>
-          </div>
-        </div>
+        <PageHeader
+          heading={sessionData.workout_name}
+          subtitle={`Started ${new Date(
+            sessionData.started_at
+          ).toLocaleDateString()}`}
+          action={
+            <div className="flex gap-1">
+              <button
+                onClick={handleCompleteSession}
+                className="btn btn-primary btn-sm"
+                disabled={exerciseProgress.every((ex) => !ex.completed)}
+                title="Complete Session"
+              >
+                <Check className="size-4" />
+              </button>
+              <button
+                onClick={handleCancelSession}
+                className="btn btn-error btn-sm"
+                title={
+                  sessionData.completed ? "Delete Session" : "Cancel Session"
+                }
+              >
+                <Trash2 className="size-4" />
+              </button>
+            </div>
+          }
+        />
       }
     >
       <div className="p-2">
-        {/* Session Action Buttons */}
-        <div className="flex gap-2 mb-4">
-          <button
-            onClick={handleCancelSession}
-            className="btn btn-outline btn-error flex-1"
-          >
-            {sessionData.completed ? "Delete Session" : "Cancel Session"}
-          </button>
-          <button
-            onClick={handleCompleteSession}
-            className="btn btn-primary flex-1"
-            disabled={exerciseProgress.every((ex) => !ex.completed)}
-          >
-            Complete Session
+        {/* Back Button */}
+        <div className="mb-4">
+          <button onClick={handleBack} className="btn btn-ghost btn-sm">
+            <ArrowLeft className="size-4 mr-2" />
+            Back to Sessions
           </button>
         </div>
 
@@ -582,34 +594,29 @@ const SessionPage = ({ params }: SessionPageProps) => {
       </div>
 
       {/* Cancel Session Confirmation Modal */}
-      {showCancelModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-base-100 rounded-lg p-6 max-w-sm mx-4">
-            <div className="flex items-center gap-3 mb-4">
-              <AlertTriangle className="size-6 text-error" />
-              <h3 className="text-lg font-semibold">Cancel Session</h3>
-            </div>
-            <p className="text-base-content/70 mb-6">
-              Are you sure you want to cancel this session? This will
-              permanently delete the session and all your progress.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={handleDismissCancel}
-                className="btn btn-outline flex-1"
-              >
-                Keep Session
-              </button>
-              <button
-                onClick={handleConfirmCancel}
-                className="btn btn-error flex-1"
-              >
-                Delete Session
-              </button>
-            </div>
+      <dialog className={`modal ${showCancelModal ? "modal-open" : ""}`}>
+        <div className="modal-box">
+          <div className="flex items-center gap-3 mb-4">
+            <AlertTriangle className="size-6 text-error" />
+            <h3 className="text-lg font-semibold">Cancel Session</h3>
+          </div>
+          <p className="text-base-content/70 mb-6">
+            Are you sure you want to cancel this session? This will permanently
+            delete the session and all your progress.
+          </p>
+          <div className="modal-action">
+            <button onClick={handleDismissCancel} className="btn btn-primary">
+              Keep Session
+            </button>
+            <button onClick={handleConfirmCancel} className="btn btn-error">
+              Delete Session
+            </button>
           </div>
         </div>
-      )}
+        <form method="dialog" className="modal-backdrop">
+          <button onClick={handleDismissCancel}>close</button>
+        </form>
+      </dialog>
     </ClientLayout>
   );
 };
