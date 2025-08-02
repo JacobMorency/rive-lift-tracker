@@ -1,48 +1,29 @@
 "use client";
 
-import { useAuth } from "@/app/context/authcontext";
 import { useState, useEffect } from "react";
-import { Plus, Star, Dumbbell } from "lucide-react";
-import supabase from "@/app/lib/supabaseClient";
+import { Plus, Play, Dumbbell } from "lucide-react";
 import AddWorkoutModal from "./addworkoutmodal";
 import WorkoutTemplatesModal from "./workouttemplatesmodal";
+import { useRouter } from "next/navigation";
 
 const WorkoutsContent = () => {
-  const [favoriteExercisesCount, setFavoriteExercisesCount] =
-    useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isWorkoutTemplatesModalOpen, setIsWorkoutTemplatesModalOpen] =
     useState<boolean>(false);
-  const { user } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchFavoriteExercises = async (): Promise<void> => {
-      if (user !== null) {
-        const { data, error } = await supabase
-          .from("favorite_exercises")
-          .select("*", { count: "exact" })
-          .eq("user_id", user.id);
-
-        if (error) {
-          console.error("Error fetching favorite exercises:", error.message);
-        } else {
-          setFavoriteExercisesCount(data.length);
-        }
-        setLoading(false);
-      }
-    };
-
-    fetchFavoriteExercises();
-  }, [user]);
+    setLoading(false);
+  }, []);
 
   const handleAddNewWorkout = () => {
     setIsModalOpen(true);
   };
 
-  const handleFavoriteExercises = () => {
-    // TODO: Navigate to favorite exercises page or modal
-    console.log("Navigate to favorite exercises");
+  const handleQuickStart = () => {
+    // Navigate to sessions page to start a new session
+    router.push("/sessions");
   };
 
   const handleWorkoutTemplates = () => {
@@ -120,29 +101,29 @@ const WorkoutsContent = () => {
           </div>
         </div>
 
-        {/* Favorite Exercises Card */}
+        {/* Quick Start Session Card */}
         <div className="px-4">
           <div
             className="card card-border bg-base-100 hover:bg-base-200 transition-colors duration-200 cursor-pointer"
-            onClick={handleFavoriteExercises}
+            onClick={handleQuickStart}
           >
             <div className="card-body">
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-3">
                   <div className="bg-primary/20 rounded-full p-2">
-                    <Star className="size-6 text-primary" />
+                    <Play className="size-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="card-title text-base-content text-lg">
-                      Favorite Exercises
+                      Quick Start Session
                     </h3>
                     <p className="text-base-content/60 text-sm">
-                      {favoriteExercisesCount} saved exercises
+                      Start tracking your workout
                     </p>
                   </div>
                 </div>
                 <div className="text-base-content/40">
-                  <Star className="size-5" />
+                  <Play className="size-5" />
                 </div>
               </div>
             </div>
