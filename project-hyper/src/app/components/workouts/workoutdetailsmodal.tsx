@@ -241,7 +241,7 @@ const WorkoutDetailsModal = ({
                       {workoutDetails.exercises.map((exercise) => (
                         <button
                           key={exercise.id}
-                          className="btn w-full py-4 text-left bg-base-100 hover:bg-base-200 border border-base-300"
+                          className="btn btn-ghost w-full py-4 text-left bg-base-100 hover:bg-base-200 border border-base-300"
                         >
                           <div className="flex items-center justify-between w-full">
                             <Dumbbell className="size-5 text-primary mr-4" />
