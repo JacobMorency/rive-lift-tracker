@@ -4,7 +4,7 @@ import { useAuth } from "@/app/context/authcontext";
 import { useState, useEffect } from "react";
 import {
   ArrowLeft,
-  Play,
+  ChevronRight,
   Dumbbell,
   AlertTriangle,
   Trash2,
@@ -568,7 +568,7 @@ const SessionPage = ({ params }: SessionPageProps) => {
               return (
                 <button
                   key={exercise.id}
-                  className="btn w-full py-4 text-left bg-base-100 hover:bg-base-200 border border-base-300"
+                  className="btn btn-ghost w-full py-4 text-left bg-base-100 hover:bg-base-200"
                   onClick={() => handleExerciseClick(index)}
                 >
                   <div className="flex items-center justify-between w-full">
@@ -583,7 +583,7 @@ const SessionPage = ({ params }: SessionPageProps) => {
                           {setCount} sets
                         </span>
                       )}
-                      <Play className="size-5 text-base-content/40" />
+                      <ChevronRight className="size-5 text-base-content/40" />
                     </div>
                   </div>
                 </button>
