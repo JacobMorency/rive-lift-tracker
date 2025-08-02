@@ -9,7 +9,7 @@ const BottomNav = () => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-base-100 border-t border-base-300 safe-bottom">
-      <div className="flex items-center justify-around px-2 py-3">
+      <div className="flex items-center justify-around px-2 pb-3">
         <button
           className={`flex flex-col items-center justify-center w-full py-2 px-1 transition-all duration-200 ${
             pathname === "/workouts"
