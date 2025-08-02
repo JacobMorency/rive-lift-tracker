@@ -106,7 +106,7 @@ const WorkoutTemplatesModal = ({
 
   return (
     <div className="modal modal-open">
-      <div className="modal-box w-full h-full p-0 rounded-none">
+      <div className="modal-box w-full h-full p-0 rounded-none animate-slide-up">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-base-300">
           <h2 className="text-lg font-semibold text-base-content">

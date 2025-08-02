@@ -186,7 +186,7 @@ const WorkoutDetailsModal = ({
   if (showExerciseSelector) {
     return (
       <div className="modal modal-open">
-        <div className="modal-box w-full h-full max-w-none p-0">
+        <div className="modal-box w-full h-full max-w-none p-0 animate-slide-up">
           <ExerciseSelector
             onExerciseSelect={handleExerciseSelect}
             onClose={handleCloseExerciseSelector}
@@ -202,7 +202,7 @@ const WorkoutDetailsModal = ({
 
   return (
     <div className="modal modal-open">
-      <div className="modal-box w-full h-full p-0 rounded-none">
+      <div className="modal-box w-full h-full p-0 rounded-none animate-slide-up">
         <div className="w-full h-full flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-base-300">

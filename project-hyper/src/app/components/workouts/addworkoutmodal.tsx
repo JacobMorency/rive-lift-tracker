@@ -154,7 +154,7 @@ const AddWorkoutModal = ({ isOpen, onClose }: AddWorkoutModalProps) => {
           </form>
         </div>
       ) : (
-        <div className="modal-box w-full h-full p-0 rounded-none">
+        <div className="modal-box w-full h-full p-0 rounded-none animate-slide-up">
           <AddExercisesContent
             workoutId={createdWorkoutId}
             onComplete={handleExercisesComplete}
