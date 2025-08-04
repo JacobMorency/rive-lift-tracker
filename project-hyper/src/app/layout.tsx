@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Head from "next/head";
 import "./globals.css";
 import { AuthProvider } from "@/app/context/authcontext";
+import { ModalProvider } from "@/app/context/modalcontext";
 import { Toaster } from "sonner";
 
 const APP_NAME = "Rive";
@@ -68,7 +69,9 @@ export default function RootLayout({
       </Head>
       <body className="bg-base-200">
         <Toaster richColors position="top-center" />
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <ModalProvider>{children}</ModalProvider>
+        </AuthProvider>
       </body>
     </html>
   );

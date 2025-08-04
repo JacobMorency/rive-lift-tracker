@@ -12,7 +12,7 @@ const LoginPage = () => {
     session: Session | null
   ): void => {
     if (user && session) {
-      router.push("/dashboard");
+      router.push("/workouts");
     }
     // TODO: Handle case where login fails or user is null
   };

@@ -32,6 +32,14 @@ export type ExercisesInWorkout = {
 
 export type NullableNumber = number | null;
 
+export type ExerciseSet = {
+  id?: string;
+  reps: NullableNumber;
+  weight: NullableNumber;
+  partialReps: NullableNumber;
+  set_number: number;
+};
+
 export type Workout = {
   id: number;
   user_id: string;
