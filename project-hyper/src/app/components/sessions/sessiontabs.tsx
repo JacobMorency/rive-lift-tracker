@@ -91,7 +91,7 @@ const SessionTabs = ({ sessions }: SessionTabsProps) => {
   return (
     <div className="mt-3">
       <div className="flex justify-center">
-        <div role="tablist" className="tabs tabs-box bg-base-100 shadow-md">
+        <div role="tablist" className="tabs tabs-box bg-base-300 shadow-md">
           <button
             role="tab"
             className={`tab ${
@@ -129,7 +129,7 @@ const SessionTabs = ({ sessions }: SessionTabsProps) => {
               {selectedSessions.map((session) => (
                 <button
                   key={session.id}
-                  className="btn btn-ghost w-full py-6 text-left bg-base-100"
+                  className="btn btn-ghost w-full py-6 text-left bg-base-300"
                   onClick={() => handleSessionClick(session.id)}
                 >
                   <div className="flex items-center justify-between w-full">

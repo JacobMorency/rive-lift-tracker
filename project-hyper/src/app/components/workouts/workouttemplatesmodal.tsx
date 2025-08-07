@@ -184,7 +184,7 @@ const WorkoutTemplatesModal = ({
                 {workoutTemplates.map((workout) => (
                   <div key={workout.id} className="flex items-center gap-2">
                     <button
-                      className="btn btn-ghost flex-1 py-4 text-left bg-base-100 hover:bg-base-200 border border-base-300 snap-start"
+                      className="btn btn-ghost flex-1 py-4 text-left bg-base-300 hover:bg-base-200 border border-base-300 snap-start"
                       onClick={() => handleWorkoutClick(workout.id)}
                     >
                       <div className="flex items-center justify-between w-full">
