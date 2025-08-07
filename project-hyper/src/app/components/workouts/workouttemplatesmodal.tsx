@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/app/context/authcontext";
 import { useState, useEffect } from "react";
-import { X, Dumbbell, ChevronRight, Plus } from "lucide-react";
+import { X, Dumbbell, ChevronRight, Plus, Trash2 } from "lucide-react";
 import supabase from "@/app/lib/supabaseClient";
 import WorkoutDetailsModal from "./workoutdetailsmodal";
 
@@ -102,6 +102,37 @@ const WorkoutTemplatesModal = ({
     setSelectedWorkoutId(null);
   };
 
+  const handleDeleteWorkout = async (
+    workoutId: string,
+    workoutName: string
+  ) => {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${workoutName}"? This action cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      // Delete the workout (this will cascade delete workout_exercises)
+      const { error } = await supabase
+        .from("workouts")
+        .delete()
+        .eq("id", workoutId);
+
+      if (error) {
+        console.error("Error deleting workout:", error.message);
+        return;
+      }
+
+      // Refresh the workout templates list
+      await fetchWorkoutTemplates();
+    } catch (error) {
+      console.error("Error deleting workout:", error);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -151,24 +182,35 @@ const WorkoutTemplatesModal = ({
             ) : (
               <div className="space-y-1 snap-y snap-mandatory">
                 {workoutTemplates.map((workout) => (
-                  <button
-                    key={workout.id}
-                    className="btn btn-ghost w-full py-4 text-left bg-base-100 hover:bg-base-200 border border-base-300 snap-start"
-                    onClick={() => handleWorkoutClick(workout.id)}
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <Dumbbell className="size-5 text-primary mr-4" />
-                      <div className="flex-1 text-left">
-                        <div className="font-medium text-base-content">
-                          {workout.name}
+                  <div key={workout.id} className="flex items-center gap-2">
+                    <button
+                      className="btn btn-ghost flex-1 py-4 text-left bg-base-100 hover:bg-base-200 border border-base-300 snap-start"
+                      onClick={() => handleWorkoutClick(workout.id)}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <Dumbbell className="size-5 text-primary mr-4" />
+                        <div className="flex-1 text-left">
+                          <div className="font-medium text-base-content">
+                            {workout.name}
+                          </div>
                         </div>
+                        <p className="text-base-content/40">
+                          {workout.exercise_count}
+                        </p>
+                        <ChevronRight className="size-5 text-base-content/40 flex-shrink-0 ml-2" />
                       </div>
-                      <p className="text-base-content/40">
-                        {workout.exercise_count}
-                      </p>
-                      <ChevronRight className="size-5 text-base-content/40 flex-shrink-0 ml-2" />
-                    </div>
-                  </button>
+                    </button>
+                    <button
+                      className="btn btn-error btn-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteWorkout(workout.id, workout.name);
+                      }}
+                      title="Delete workout"
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  </div>
                 ))}
               </div>
             )}
