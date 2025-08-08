@@ -58,20 +58,28 @@ const SessionsContent = () => {
         return;
       }
 
-      // Get unique workout IDs
+      // Get unique workout IDs (filter out null values)
       const workoutIds = [
-        ...new Set(rawSessionsData.map((session) => session.workout_id)),
+        ...new Set(
+          rawSessionsData
+            .map((session) => session.workout_id)
+            .filter((id): id is string => id !== null)
+        ),
       ];
 
-      // Second query: Get workout names
-      const { data: workoutsData, error: workoutsError } = await supabase
-        .from("workouts")
-        .select("id, name")
-        .in("id", workoutIds);
+      // Only query workouts if we have valid IDs
+      let workoutsData = null;
+      if (workoutIds.length > 0) {
+        const { data, error: workoutsError } = await supabase
+          .from("workouts")
+          .select("id, name")
+          .in("id", workoutIds);
 
-      if (workoutsError) {
-        console.error("Error fetching workouts:", workoutsError.message);
-        return;
+        if (workoutsError) {
+          console.error("Error fetching workouts:", workoutsError.message);
+          return;
+        }
+        workoutsData = data;
       }
 
       // Create a map of workout IDs to names

@@ -25,7 +25,7 @@ const WorkoutCard = ({
         className={`card card-border transition-all duration-200 cursor-pointer shadow-lg hover:shadow-xl ${
           isPrimary
             ? "bg-primary hover:bg-primary/90"
-            : "bg-base-100 hover:bg-base-200"
+            : "bg-base-300 hover:bg-base-200"
         }`}
         onClick={onClick}
       >

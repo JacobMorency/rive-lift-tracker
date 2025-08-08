@@ -568,7 +568,7 @@ const SessionPage = ({ params }: SessionPageProps) => {
               return (
                 <button
                   key={exercise.id}
-                  className="btn btn-ghost w-full py-4 text-left bg-base-100 hover:bg-base-200"
+                  className="btn btn-ghost w-full py-4 text-left bg-base-300 hover:bg-base-200"
                   onClick={() => handleExerciseClick(index)}
                 >
                   <div className="flex items-center justify-between w-full">

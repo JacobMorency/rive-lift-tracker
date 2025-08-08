@@ -97,17 +97,20 @@ const ProfileCard = () => {
               {userData?.first_name} {userData?.last_name}
             </h2>
             <p>{userData?.email}</p>
-            {isLoggingOut ? (
-              <div className="card-actions justify-center">
-                <span className="loading loading-spinner"></span>
-              </div>
-            ) : (
-              <div className="card-actions justify-end">
-                <button onClick={handleLogout} className="btn btn-primary">
-                  Logout
-                </button>
-              </div>
-            )}
+            <div className="flex items-center justify-between mt-4">
+              <p className="text-xs text-base-content/60">Version 0.1.0</p>
+              {isLoggingOut ? (
+                <div className="card-actions justify-center">
+                  <span className="loading loading-spinner"></span>
+                </div>
+              ) : (
+                <div className="card-actions justify-end">
+                  <button onClick={handleLogout} className="btn btn-primary">
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
