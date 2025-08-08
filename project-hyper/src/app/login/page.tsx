@@ -14,20 +14,11 @@ const LoginPage = () => {
     if (user && session) {
       router.push("/workouts");
     }
-    // TODO: Handle case where login fails or user is null
-  };
-
-  // TODO: Implement forgot password functionality
-  const handleForgotPassword = (): void => {
-    router.push("/underconstruction");
   };
 
   return (
     <div>
-      <LoginForm
-        onLoginSuccess={handleLoginSuccess}
-        handleForgotPassword={handleForgotPassword}
-      />
+      <LoginForm onLoginSuccess={handleLoginSuccess} />
     </div>
   );
 };
