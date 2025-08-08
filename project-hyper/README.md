@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rive Workout Tracker
 
-## Getting Started
+A modern, mobile-first workout tracking application built with Next.js 14, TypeScript, and Supabase. Track your fitness progress with session-based exercise management, real-time data persistence, and a beautiful responsive UI.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### **Session-Based Workout Tracking**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Quick Session Start**: Begin workouts instantly from your saved templates
+- **Real-time Progress**: Track sets, reps, and weights as you exercise
+- **Auto-save**: Your progress is automatically saved to the database
+- **Session Management**: Resume incomplete sessions or view completed ones
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### **Exercise Management**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Exercise Library**: Comprehensive database of exercises with proper categorization
+- **Custom Workouts**: Create and save your own workout templates
+- **Quick Input**: Optimized for fast set entry during active workouts
+- **Progress Tracking**: View your workout history with detailed analytics
 
-## Learn More
+### **User Experience**
 
-To learn more about Next.js, take a look at the following resources:
+- **Mobile-First Design**: Optimized for iOS PWA and mobile devices
+- **Intuitive Navigation**: Clean, modern UI with DaisyUI components
+- **Authentication**: Secure user accounts with Supabase Auth
+- **Responsive Layout**: Works seamlessly across all device sizes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### **Data & Analytics**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Workout History**: Time-based filtering (This Week, This Month, All Time)
+- **User Statistics**: Track total sessions and monthly progress
+- **Session Analytics**: View completed vs. in-progress sessions
+- **Exercise Progress**: Monitor your performance over time
 
-## Deploy on Vercel
+## 🛠️ Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Frontend**: Next.js 14, TypeScript, React
+- **Styling**: Tailwind CSS, DaisyUI
+- **Backend**: Supabase (PostgreSQL, Auth, Real-time)
+- **Deployment**: Vercel
+- **Icons**: Lucide React
+- **PWA**: Progressive Web App support
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📱 PWA Features
+
+- **iOS Safe Area**: Proper handling of device notches and safe areas
+- **Offline Capability**: Core functionality works without internet
+- **App-like Experience**: Install as a native app on mobile devices
+- **Theme Integration**: Consistent theming across the app
