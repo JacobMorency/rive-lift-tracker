@@ -104,7 +104,7 @@ const ExerciseTracker = ({
 
       <div className="flex-1 overflow-y-auto p-4 ">
         {/* Current Set Input */}
-        <div className="bg-base-200 rounded-lg p-4 mb-4">
+        <div className="bg-base-300 rounded-lg p-4 mb-4">
           <h3 className="text-sm font-medium mb-3">
             Set {currentSet.set_number}
           </h3>
@@ -113,7 +113,7 @@ const ExerciseTracker = ({
             {/* Reps */}
             <div>
               <label className="text-xs text-base-content/60">Reps</label>
-              <div className="bg-base-100 rounded-lg flex items-center">
+              <div className="bg-base-200 rounded-lg flex items-center">
                 <button
                   type="button"
                   className="px-3 py-2 text-sm hover:bg-base-300 rounded-l"
@@ -144,7 +144,7 @@ const ExerciseTracker = ({
                     }
                   }}
                   placeholder="0"
-                  className="input flex-1 text-center border-none shadow-none p-0 m-0 w-full min-w-0"
+                  className="input flex-1 text-center border-none shadow-none p-0 m-0 w-full min-w-0 bg-base-200"
                 />
                 <button
                   type="button"
@@ -166,7 +166,7 @@ const ExerciseTracker = ({
               <label className="text-xs text-base-content/60">
                 Weight (lbs)
               </label>
-              <div className="bg-base-100 rounded-lg flex items-center">
+              <div className="bg-base-200 rounded-lg flex items-center">
                 <button
                   type="button"
                   className="px-3 py-2 text-sm hover:bg-base-300 rounded-l"
@@ -200,7 +200,7 @@ const ExerciseTracker = ({
                     }
                   }}
                   placeholder="0"
-                  className="input flex-1 text-center border-none shadow-none p-0 m-0 w-full min-w-0"
+                  className="input flex-1 text-center border-none shadow-none p-0 m-0 w-full min-w-0 bg-base-200"
                 />
                 <button
                   type="button"
@@ -220,7 +220,7 @@ const ExerciseTracker = ({
             {/* Partial Reps */}
             <div>
               <label className="text-xs text-base-content/60">Partials</label>
-              <div className="bg-base-100 rounded-lg flex items-center">
+              <div className="bg-base-200 rounded-lg flex items-center">
                 <button
                   type="button"
                   className="px-3 py-2 text-sm hover:bg-base-300 rounded-l"
@@ -253,7 +253,7 @@ const ExerciseTracker = ({
                     }
                   }}
                   placeholder="0"
-                  className="input flex-1 text-center border-none shadow-none p-0 m-0 w-full min-w-0"
+                  className="input flex-1 text-center border-none shadow-none p-0 m-0 w-full min-w-0 bg-base-200"
                 />
                 <button
                   type="button"
@@ -272,7 +272,7 @@ const ExerciseTracker = ({
           </div>
 
           {/* Weight Increment Tabs */}
-          <div className="tabs tabs-xs tabs-box mt-3 bg-base-100">
+          <div className="tabs tabs-xs tabs-box mt-3 bg-base-200">
             <input
               type="radio"
               name="weightIncrement"
@@ -349,7 +349,7 @@ const ExerciseTracker = ({
 
         {/* Completed Sets */}
         {sets.length > 0 && (
-          <div>
+          <div className="bg-base-300 rounded-lg p-4">
             <h3 className="text-sm font-medium mb-2">
               Completed Sets ({sets.length})
             </h3>
@@ -357,7 +357,7 @@ const ExerciseTracker = ({
               {sets.map((set, index) => (
                 <div
                   key={index}
-                  className="bg-base-100 rounded-lg p-3 flex items-center justify-between border border-base-300"
+                  className="bg-base-200 rounded-lg p-3 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-medium bg">
